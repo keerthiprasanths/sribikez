@@ -683,49 +683,47 @@ function showSync(state) {
 
 // ================================================================
 //  BILL NUMBER — sequential SB00001, SB00002...
+//  Old timestamp-style numbers (SB747217 etc) are ignored.
+//  Only counts new-format sequential numbers (1 to 9999).
 // ================================================================
 function formatBillNo(num){
   return 'SB' + String(num).padStart(5,'0');
 }
-function nextBillNoFromCache(){
-  // Find highest number from all cached records (both old and new format)
+function getMaxSeqFromData(data){
+  // Only consider numbers 1–9999 as valid sequential bill numbers.
+  // Numbers >= 10000 are old timestamp fragments — skip them.
   var max = 0;
-  allRecordsCached.forEach(function(r){
-    if(r.billNo && r.billNo.startsWith('SB')){
-      var n = parseInt(r.billNo.slice(2)); // works for SB001, SB00001, SB747217 etc
-      if(!isNaN(n) && n > max) max = n;
+  data.forEach(function(r){
+    if(r && r.billNo && r.billNo.startsWith('SB')){
+      var n = parseInt(r.billNo.slice(2));
+      if(!isNaN(n) && n >= 1 && n <= 9999 && n > max) max = n;
     }
   });
-  // Also check localStorage saved counter
-  var saved = parseInt(localStorage.getItem('sribikez_lastBillNum')||'0');
+  return max;
+}
+function nextBillNoFromCache(){
+  var max = getMaxSeqFromData(allRecordsCached);
+  var saved = parseInt(localStorage.getItem('sribikez_seqBillNum')||'0');
   if(saved > max) max = saved;
   var next = max + 1;
-  localStorage.setItem('sribikez_lastBillNum', next);
+  localStorage.setItem('sribikez_seqBillNum', next);
   return formatBillNo(next);
 }
-// Async version: always fetches latest from Firebase first, then generates number
+// Async: fetches ALL records from Firebase, finds true max sequential number
 function getNextBillNo(callback){
   if(!fbReady){
-    // Firebase not ready, use cache
     callback(nextBillNoFromCache());
     return;
   }
   window.__fbGet(window.__fbRef).then(function(snap){
     var data = snap.val();
-    var max = 0;
-    if(data){
-      Object.keys(data).forEach(function(k){
-        var r = data[k];
-        if(r && r.billNo && r.billNo.startsWith('SB')){
-          var n = parseInt(r.billNo.slice(2));
-          if(!isNaN(n) && n > max) max = n;
-        }
-      });
-    }
-    var saved = parseInt(localStorage.getItem('sribikez_lastBillNum')||'0');
+    var arr = [];
+    if(data) Object.keys(data).forEach(function(k){ arr.push(data[k]); });
+    var max = getMaxSeqFromData(arr);
+    var saved = parseInt(localStorage.getItem('sribikez_seqBillNum')||'0');
     if(saved > max) max = saved;
     var next = max + 1;
-    localStorage.setItem('sribikez_lastBillNum', next);
+    localStorage.setItem('sribikez_seqBillNum', next);
     callback(formatBillNo(next));
   }).catch(function(){
     callback(nextBillNoFromCache());
