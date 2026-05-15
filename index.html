@@ -27,6 +27,7 @@ const firebaseConfig = {
   messagingSenderId: "297613717232",
   appId: "1:297613717232:web:e3d354eb8c6da0de131c35"
 };
+
 // ────────────────────────────────────────────────────────────────────────────
 
 const app  = initializeApp(firebaseConfig);
@@ -145,7 +146,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .bill-table th{background:#E8490F;color:#fff;padding:6px 8px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:1px;}
 .bill-table td{padding:6px 8px;border-bottom:1px solid #eee;font-size:10px;color:#333;}
 .bill-table .num{text-align:right;}
-.bill-total-row{background:#fff8f5;font-weight:700;color:#E8490F;font-family:'Rajdhani',sans-serif;font-size:12px;}
+.bill-total-row{background:#fff8f5;font-weight:700;color:#E8490F;font-family:'Rajdhani',sans-serif;font-size:18px;}
 .bill-footer{display:flex;justify-content:flex-end;margin-top:14px;padding-top:9px;border-top:1px solid #eee;}
 .sign-block{text-align:center;}
 .sign-img-area{width:130px;height:46px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid #ccc;overflow:hidden;}
@@ -265,12 +266,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <option value="">Select Mechanic</option>
             <option value="Gowtham|7010258785">Gowtham</option>
             <option value="Jeeva|9789944027">Jeeva</option>
-            <option value="Arivalazhan|8178840304">Arivalazhan</option>
+            <option value="Arivalazhan|8148840304">Arivalazhan</option>
             <option value="others">Others - Enter manually</option>
           </select>
           <div class="mech-hint" id="mechHint"></div>
         </div>
         <div class="field" id="mechOtherName" style="display:none;"><label>Mechanic Name *</label><input type="text" id="mechNameCustom" placeholder="Enter name"></div>
+        <div class="field"><label>Current KM Reading (Optional)</label><input type="number" id="vehKm" placeholder="e.g. 12500" min="0"></div>
       </div>
       <div id="mechOtherPhoneRow" style="display:none;margin-top:9px;">
         <div class="field"><label>Mechanic Phone *</label><input type="tel" id="mechPhoneCustom" placeholder="10-digit number" maxlength="10"></div>
@@ -397,7 +399,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <div class="bill-header">
         <div class="bill-biz-name">SRI BIKEZ</div>
         <div class="bill-biz-sub">Two Wheeler Multi Brand Service Center</div>
-        <div class="bill-biz-addr">Jalakandapuram Road, Edappadi, Tamil Nadu<br>Phone: 9865234433</div>
+        <div class="bill-biz-addr">Jalakandapuram main Road, Edappadi, Tamil Nadu<br>Phone: 9865234433</div>
       </div>
       <div class="bill-meta">
         <div>
@@ -440,8 +442,8 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" id="billBackBtn" onclick="billGoBack()">Back</button>
-      <button class="btn btn-wa" onclick="shareWhatsApp()">WhatsApp Bill</button>
-      <button class="btn btn-primary" onclick="openPrintTab()">Print / Save PDF (A5)</button>
+      <button class="btn btn-wa" onclick="shareWhatsApp()">WhatsApp Bill + PDF</button>
+      <button class="btn btn-primary" onclick="openPrintTab()">Print / Save PDF</button>
       <button class="btn btn-green" onclick="finishService()">Finish Service</button>
     </div>
   </div>
@@ -468,7 +470,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     <div class="step-title">Dashboard and Records</div>
     <div class="step-sub">Live sync across all devices</div>
   </div>
-  <div id="adminLoginOverlay">
+  <div id="adminLoginOverlay" style="display:none;">
     <div class="container">
       <div class="admin-login-wrap">
         <div class="card">
@@ -510,8 +512,11 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <option>Gowtham</option><option>Jeeva</option><option>Arivalazhan</option>
           </select>
           <button class="btn btn-secondary btn-sm" onclick="exportCSV()">Export CSV</button>
+          <label class="btn btn-secondary btn-sm" style="cursor:pointer;">Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(event)"></label>
           <button class="btn btn-red btn-sm" onclick="clearAllData()">Clear All</button>
-          <button class="btn btn-secondary btn-sm" onclick="goPage(1)">New Service</button>
+        </div>
+        <div style="margin-bottom:10px;">
+          <button class="btn btn-green" onclick="goPage(1)" style="font-size:13px;padding:8px 20px;">+ New Service Entry</button>
         </div>
         <div class="table-wrap">
           <table class="records-table">
@@ -580,7 +585,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 var state = {
   vehNum:'',vehName:'',custName:'',custPhone:'',
   entryDate:'',delivDate:'',mechName:'',mechPhone:'',
-  complaints:[],billNo:'',total:0,editMode:false
+  vehKm:'',complaints:[],billNo:'',total:0,editMode:false
 };
 var ADMIN_PASS  = 'sribikez2024';
 var OWNER_PASS  = 'owner@2024';          // separate owner password
@@ -678,12 +683,31 @@ function showSync(state) {
 }
 
 // ================================================================
+//  BILL NUMBER — sequential SB001, SB002...
+// ================================================================
+function nextBillNo(){
+  var last = localStorage.getItem('sribikez_lastBillNum');
+  var num = last ? parseInt(last) + 1 : 1;
+  // Also check Firebase cached records to ensure no duplicate
+  var maxFromRecords = 0;
+  allRecordsCached.forEach(function(r){
+    if(r.billNo && r.billNo.startsWith('SB')){
+      var n = parseInt(r.billNo.slice(2));
+      if(!isNaN(n) && n > maxFromRecords) maxFromRecords = n;
+    }
+  });
+  if(maxFromRecords >= num) num = maxFromRecords + 1;
+  localStorage.setItem('sribikez_lastBillNum', num);
+  return 'SB' + String(num).padStart(3,'0');
+}
+
+// ================================================================
 //  MECHANICS
 // ================================================================
 var MECHS = {
   'Gowtham|7010258785':      { name:'Gowtham',      phone:'7010258785' },
   'Jeeva|9789944027':        { name:'Jeeva',        phone:'9789944027' },
-  'Arivalazhan|8178840304':  { name:'Arivalazhan',  phone:'8178840304' }
+  'Arivalazhan|8148840304':  { name:'Arivalazhan',  phone:'8148840304' }
 };
 function onMechSelect() {
   var v  = document.getElementById('mechSelect').value;
@@ -855,9 +879,9 @@ function goPage(n){
 function goAdmin(){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('pageAdmin').classList.add('active');
-  document.getElementById('adminLoginOverlay').style.display='block';
-  document.getElementById('adminContent').style.display='none';
-  document.getElementById('adminPass').value='';
+  document.getElementById('adminLoginOverlay').style.display='none';
+  document.getElementById('adminContent').style.display='block';
+  startLiveListener();
   window.scrollTo(0,0);
 }
 function billGoBack(){if(state.editMode)goAdmin();else goPage(2);}
@@ -898,7 +922,8 @@ function goToComplaints(){
   state.entryDate=document.getElementById('entryDate').value;
   state.delivDate=document.getElementById('delivDate').value;
   state.mechName=mech.name;state.mechPhone=mech.phone;
-  if(!state.billNo)state.billNo='SB'+Date.now().toString().slice(-6);
+  state.vehKm=document.getElementById('vehKm').value.trim();
+  if(!state.billNo) state.billNo = nextBillNo();
   autoSaveRecord('In Progress',null);
   document.getElementById('chipNum').textContent=state.vehNum;
   document.getElementById('chipName').textContent=state.vehName;
@@ -911,6 +936,7 @@ function autoSaveRecord(status,cb){
     vehNum:state.vehNum,vehName:state.vehName,
     custName:state.custName,custPhone:state.custPhone,
     mechName:state.mechName,mechPhone:state.mechPhone,
+    vehKm:state.vehKm||'',
     complaints:state.complaints.map(function(c){return c.text;}).join(', '),
     parts:[],total:0,status:status,savedAt:new Date().toISOString()
   };
@@ -992,99 +1018,131 @@ function updateBillPreview(){
 function shareEntryWhatsApp(){
   if(!state.custPhone){showToast('No phone number','error');return;}
   var c=state.complaints.length?state.complaints.map(function(c){return '- '+c.text;}).join('\n'):'- Will be updated shortly';
+  var kmLine = state.vehKm ? '\nKM Reading: '+state.vehKm : '';
   var msg='Sri Bikez - Service Confirmation\n\nDear '+state.custName+',\n\n'+
-    'Your vehicle '+state.vehName+' (Reg: '+state.vehNum+') has been received.\n\n'+
+    'Your vehicle '+state.vehName+' (Reg: '+state.vehNum+')'+kmLine+' has been received.\n\n'+
     'Service Start: '+fmtDate(state.entryDate)+'\nExpected Delivery: '+fmtDate(state.delivDate)+'\n\n'+
     'Complaints Noted:\n'+c+'\n\nMechanic: '+(state.mechName||'--')+'\nMechanic Contact: '+(state.mechPhone||'--')+'\n\n'+
-    'Sri Bikez, Edappadi\nJalakandapuram Road, Edappadi, Tamil Nadu\nPhone: 9865234433';
+    'Sri Bikez\nJalakandapuram main Road, Edappadi, Tamil Nadu\nPhone: 9865234433';
   window.open('https://wa.me/91'+state.custPhone+'?text='+encodeURIComponent(msg),'_blank');
 }
+
 function shareWhatsApp(){
   var s=getBillingState();
+  s.vehKm = state.vehKm||'';
   if(!s.custPhone){showToast('No phone number','error');return;}
   var parts=getParts();
   var itemLines=parts.map(function(p,i){var qn=parseFloat(p.qty)||0;return (i+1)+'. '+p.desc+(qn>0?' Qty '+p.qty+' x Rs '+p.rate:'')+' = Rs '+p.amt;}).join('\n');
-  var msg='Sri Bikez - Service Bill\n\nDear '+s.custName+',\nVehicle: '+s.vehName+' ('+s.vehNum+')\n'+
-    'Bill No: '+state.billNo+'\nDate: '+fmtDate(s.entryDate)+'\n\n'+itemLines+'\n\n'+
-    'Total: Rs '+state.total.toFixed(2)+'\nMechanic: '+s.mechName+' - Ph: '+s.mechPhone+'\n\n'+
-    'Sri Bikez, Edappadi - Phone: 9865234433\nThank you!';
+  // Send text bill via WhatsApp
+  var msg='*Sri Bikez - Service Bill*\n\n'+
+    'Dear '+s.custName+',\n'+
+    'Vehicle: *'+s.vehName+'* ('+s.vehNum+')\n'+
+    'Bill No: *'+state.billNo+'*\n'+
+    'Date: '+fmtDate(s.entryDate)+'\n\n'+
+    '*Items:*\n'+itemLines+'\n\n'+
+    '*Total: Rs '+state.total.toFixed(2)+'*\n\n'+
+    'Mechanic: '+s.mechName+' - Ph: '+s.mechPhone+'\n\n'+
+    'Sri Bikez, Edappadi - Phone: 9865234433\n'+
+    'Thank you for choosing Sri Bikez! We value your trust.';
   window.open('https://wa.me/91'+s.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+  // Also open print tab so user can save PDF and share separately
+  setTimeout(function(){
+    showToast('WhatsApp opened. Print tab also opening for PDF...');
+    openPrintTab();
+  }, 800);
 }
 
 // ================================================================
-//  PRINT TAB — A5 SIZE (148mm x 210mm)
+//  PRINT TAB — NORMAL SIZE with correct header/footer
 // ================================================================
-function openPrintTab(){
-  updateBillPreview();
-  var s=getBillingState();
-  var parts=getParts();
-  var sigHTML=activeSigDataURL?
-    '<img src="'+activeSigDataURL+'" style="max-width:122px;max-height:42px;object-fit:contain;display:block;margin:0 auto;">':
-    '<div style="width:130px;height:44px;border-bottom:2px solid #ccc;"></div>';
-  var rows=parts.length?
-    parts.map(function(p,i){var qn=parseFloat(p.qty)||0;return '<tr><td>'+(i+1)+'</td><td>'+p.desc+'</td><td style="text-align:right">'+(qn===0?'--':p.qty)+'</td><td style="text-align:right">'+parseFloat(p.rate||0).toFixed(2)+'</td><td style="text-align:right">'+parseFloat(p.amt||0).toFixed(2)+'</td></tr>';}).join(''):
-    '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:12px;">No items</td></tr>';
-
-  /* A5 = 148mm x 210mm — set @page size and body width accordingly */
-  var html='<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+function buildBillHTML(s, parts, sigHTML, forPrint){
+  var rows = parts.length ?
+    parts.map(function(p,i){var qn=parseFloat(p.qty)||0;return '<tr><td>'+(i+1)+'</td><td>'+p.desc+'</td><td style="text-align:right">'+(qn===0?'--':p.qty)+'</td><td style="text-align:right">'+parseFloat(p.rate||0).toFixed(2)+'</td><td style="text-align:right">'+parseFloat(p.amt||0).toFixed(2)+'</td></tr>';}).join('') :
+    '<tr><td colspan="5" style="text-align:center;color:#aaa;padding:14px;">No items</td></tr>';
+  var kmLine = s.vehKm ? '<div class="to-sub">KM: '+s.vehKm+'</div>' : '';
+  return '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
     '<title>Bill '+state.billNo+' - Sri Bikez</title>'+
     '<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">'+
     '<style>'+
-    '@page{size:A5 portrait;margin:8mm;}'+
+    '@page{size:auto;margin:15mm 12mm;}'+
     '*{box-sizing:border-box;margin:0;padding:0;}'+
-    'body{font-family:"DM Sans",sans-serif;background:#fff;width:148mm;min-height:210mm;padding:0;margin:0 auto;}'+
-    '.bill{width:100%;padding:6mm 6mm 6mm 6mm;}'+
-    '.biz{text-align:center;border-bottom:1.5pt solid #E8490F;padding-bottom:3mm;margin-bottom:4mm;}'+
-    '.biz-name{font-family:"Rajdhani",sans-serif;font-size:20pt;font-weight:700;color:#E8490F;letter-spacing:2px;}'+
-    '.biz-sub{font-size:7pt;color:#777;letter-spacing:2px;text-transform:uppercase;margin-top:1mm;}'+
-    '.biz-addr{font-size:7.5pt;color:#555;margin-top:2mm;line-height:1.5;}'+
-    '.meta{display:flex;justify-content:space-between;margin-bottom:4mm;flex-wrap:wrap;gap:3mm;}'+
-    '.to-label{font-size:6pt;text-transform:uppercase;letter-spacing:1px;color:#aaa;margin-bottom:1mm;}'+
-    '.to-name{font-family:"Rajdhani",sans-serif;font-size:12pt;font-weight:600;}'+
-    '.to-sub{font-size:7.5pt;color:#666;}'+
-    '.info{text-align:right;font-size:7.5pt;color:#666;line-height:1.75;}'+
-    '.bill-no{font-family:"Rajdhani",sans-serif;font-size:10pt;font-weight:700;color:#E8490F;}'+
-    'table{width:100%;border-collapse:collapse;margin-bottom:3mm;}'+
-    'th{background:#E8490F;color:#fff;padding:2mm 2.5mm;text-align:left;font-family:"Rajdhani",sans-serif;font-size:8pt;letter-spacing:0.5px;}'+
-    'td{padding:2mm 2.5mm;border-bottom:0.5pt solid #eee;font-size:8pt;}'+
+    'body{font-family:"DM Sans",sans-serif;background:#fff;max-width:720px;margin:0 auto;padding:0;}'+
+    '.bill{width:100%;padding:20px 24px 24px;}'+
+    '.biz{text-align:center;border-bottom:2.5px solid #E8490F;padding-bottom:12px;margin-bottom:16px;}'+
+    '.biz-name{font-family:"Rajdhani",sans-serif;font-size:28pt;font-weight:700;color:#E8490F;letter-spacing:2px;}'+
+    '.biz-sub{font-size:10pt;color:#555;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;}'+
+    '.biz-addr{font-size:10pt;color:#444;margin-top:6px;line-height:1.6;}'+
+    '.meta{display:flex;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}'+
+    '.to-label{font-size:8pt;text-transform:uppercase;letter-spacing:1px;color:#aaa;margin-bottom:2px;}'+
+    '.to-name{font-family:"Rajdhani",sans-serif;font-size:15pt;font-weight:600;}'+
+    '.to-sub{font-size:9.5pt;color:#555;margin-top:1px;}'+
+    '.info{text-align:right;font-size:9.5pt;color:#555;line-height:1.85;}'+
+    '.bill-no{font-family:"Rajdhani",sans-serif;font-size:13pt;font-weight:700;color:#E8490F;}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:14px;}'+
+    'th{background:#E8490F;color:#fff;padding:9px 11px;text-align:left;font-family:"Rajdhani",sans-serif;font-size:11pt;letter-spacing:0.5px;}'+
+    'td{padding:8px 11px;border-bottom:0.5pt solid #eee;font-size:10pt;}'+
     '.num{text-align:right;}'+
-    '.tr{background:#fff8f5;font-weight:700;color:#E8490F;font-family:"Rajdhani",sans-serif;font-size:9pt;}'+
-    '.footer{display:flex;justify-content:flex-end;margin-top:5mm;padding-top:3mm;border-top:0.5pt solid #eee;}'+
-    '.sign-area{width:35mm;height:14mm;display:flex;align-items:center;justify-content:center;border-bottom:1.5pt solid #ccc;overflow:hidden;}'+
-    '.sign-label{font-size:6pt;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-top:2mm;text-align:center;}'+
-    '.thanks{font-size:7pt;color:#aaa;text-align:center;margin-top:4mm;padding-top:3mm;border-top:0.5pt dashed #eee;}'+
-    '.pbtn{display:block;margin:4mm auto;padding:2mm 8mm;background:#E8490F;color:#fff;border:none;border-radius:4px;font-family:"Rajdhani",sans-serif;font-size:11pt;font-weight:600;cursor:pointer;}'+
-    '@media print{.pbtn{display:none;}}'+
+    '.total-row{background:#fff3ef;font-weight:700;color:#E8490F;font-family:"Rajdhani",sans-serif;font-size:16pt;}'+
+    '.total-row td{padding:11px 14px;}'+
+    '.footer{display:flex;justify-content:flex-end;margin-top:20px;padding-top:14px;border-top:1pt solid #eee;}'+
+    '.sign-area{width:160px;height:55px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid #ccc;overflow:hidden;}'+
+    '.sign-label{font-size:8pt;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-top:5px;text-align:center;}'+
+    '.thanks{font-size:10pt;color:#888;text-align:center;margin-top:14px;padding-top:10px;border-top:1pt dashed #eee;font-style:italic;}'+
+    (forPrint ? '.pbtn{display:block;margin:0 auto 16px;padding:9px 28px;background:#E8490F;color:#fff;border:none;border-radius:6px;font-family:"Rajdhani",sans-serif;font-size:14pt;font-weight:600;cursor:pointer;}@media print{.pbtn{display:none;}}' : '')+
     '</style></head><body>'+
-    '<button class="pbtn" onclick="window.print()">Print / Save as PDF (A5)</button>'+
+    (forPrint ? '<button class="pbtn" onclick="window.print()">Print / Save as PDF</button>' : '')+
     '<div class="bill">'+
     '<div class="biz">'+
     '<div class="biz-name">SRI BIKEZ</div>'+
     '<div class="biz-sub">Two Wheeler Multi Brand Service Center</div>'+
-    '<div class="biz-addr">Jalakandapuram Road, Edappadi, Tamil Nadu<br>Phone: 9865234433</div>'+
+    '<div class="biz-addr">Jalakandapuram main Road, Edappadi, Tamil Nadu &nbsp;|&nbsp; Phone: 9865234433</div>'+
     '</div>'+
     '<div class="meta">'+
-    '<div><div class="to-label">Bill To</div><div class="to-name">'+s.custName+'</div><div class="to-sub">'+s.vehNum+' - '+s.vehName+'</div><div class="to-sub">Ph: '+s.custPhone+'</div></div>'+
-    '<div class="info"><div class="bill-no">Bill #'+state.billNo+'</div><div>Date: '+fmtDate(s.entryDate)+'</div><div>Mechanic: '+s.mechName+'</div><div>Expected: '+fmtDate(s.delivDate)+'</div></div>'+
+    '<div>'+
+      '<div class="to-label">Bill To</div>'+
+      '<div class="to-name">'+s.custName+'</div>'+
+      '<div class="to-sub">'+s.vehNum+' - '+s.vehName+'</div>'+
+      '<div class="to-sub">Ph: '+s.custPhone+'</div>'+
+      kmLine+
+    '</div>'+
+    '<div class="info">'+
+      '<div class="bill-no">Bill #'+state.billNo+'</div>'+
+      '<div>Date: '+fmtDate(s.entryDate)+'</div>'+
+      '<div>Mechanic: '+s.mechName+'</div>'+
+      '<div>Expected: '+fmtDate(s.delivDate)+'</div>'+
+    '</div>'+
     '</div>'+
     '<table><thead><tr>'+
-    '<th style="width:22pt">S.No</th><th>Particulars</th>'+
-    '<th class="num" style="width:28pt">Qty</th>'+
-    '<th class="num" style="width:42pt">Rate Rs</th>'+
-    '<th class="num" style="width:48pt">Amount Rs</th>'+
+    '<th style="width:38px">S.No</th><th>Particulars</th>'+
+    '<th class="num" style="width:55px">Qty</th>'+
+    '<th class="num" style="width:80px">Rate Rs</th>'+
+    '<th class="num" style="width:90px">Amount Rs</th>'+
     '</tr></thead><tbody>'+rows+'</tbody>'+
-    '<tfoot><tr class="tr"><td colspan="4" style="text-align:right;padding:2mm 2.5mm;">TOTAL</td><td class="num" style="padding:2mm 2.5mm;">Rs '+state.total.toFixed(2)+'</td></tr></tfoot></table>'+
-    '<div class="footer"><div><div class="sign-area">'+sigHTML+'</div><div class="sign-label">Authorised Signatory</div></div></div>'+
+    '<tfoot><tr class="total-row"><td colspan="4" style="text-align:right;">TOTAL</td><td class="num">Rs '+state.total.toFixed(2)+'</td></tr></tfoot></table>'+
+    '<div class="footer"><div>'+
+      '<div class="sign-area">'+sigHTML+'</div>'+
+      '<div class="sign-label">Authorised Signatory</div>'+
+    '</div></div>'+
     '<div class="thanks">Thank you for choosing Sri Bikez! We value your trust.</div>'+
     '</div></body></html>';
+}
 
-  var tab=window.open('','_blank');
+function openPrintTab(){
+  updateBillPreview();
+  var s = getBillingState();
+  s.vehKm = state.vehKm||'';
+  var parts = getParts();
+  var sigHTML = activeSigDataURL ?
+    '<img src="'+activeSigDataURL+'" style="max-width:150px;max-height:51px;object-fit:contain;display:block;margin:0 auto;">' :
+    '<div style="width:150px;height:50px;border-bottom:2px solid #ccc;"></div>';
+  var html = buildBillHTML(s, parts, sigHTML, true);
+  var tab = window.open('','_blank');
   tab.document.write(html);
   tab.document.close();
 }
 
 // ================================================================
-//  FINISH SERVICE
+//  WHATSAPP — text message + PDF download link
 // ================================================================
 function finishService(){
   updateBillPreview();
@@ -1096,6 +1154,7 @@ function finishService(){
     billNo:state.billNo,date:s.entryDate,delivDate:s.delivDate,
     vehNum:s.vehNum,vehName:s.vehName,custName:s.custName,custPhone:s.custPhone,
     mechName:s.mechName,mechPhone:s.mechPhone,complaints:complaintsStr,
+    vehKm:state.vehKm||'',
     parts:getParts(),total:state.total,status:'Completed',savedAt:new Date().toISOString()
   };
   fbSave(record,function(){
@@ -1115,8 +1174,8 @@ function finishService(){
   });
 }
 function newService(){
-  state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',mechName:'',mechPhone:'',complaints:[],billNo:'',total:0,editMode:false};
-  ['vehNum','vehName','custName','custPhone'].forEach(function(id){document.getElementById(id).value='';});
+  state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,editMode:false};
+  ['vehNum','vehName','custName','custPhone','vehKm'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('mechSelect').value='';
   document.getElementById('mechHint').textContent='';
   document.getElementById('mechOtherName').style.display='none';
@@ -1136,11 +1195,10 @@ function newService(){
 // ================================================================
 var liveListenerActive=false;
 function adminLogin(){
-  if(document.getElementById('adminPass').value===ADMIN_PASS){
-    document.getElementById('adminLoginOverlay').style.display='none';
-    document.getElementById('adminContent').style.display='block';
-    startLiveListener();
-  }else{showToast('Wrong password!','error');}
+  // kept for any legacy calls; goAdmin now opens directly
+  document.getElementById('adminLoginOverlay').style.display='none';
+  document.getElementById('adminContent').style.display='block';
+  startLiveListener();
 }
 
 function startLiveListener(){
@@ -1291,6 +1349,47 @@ function clearAllData(){
   if(!confirm('Delete ALL records? Cannot be undone.'))return;
   allRecordsCached.forEach(function(r){fbDelete(r.billNo,null);});
   showToast('All records cleared');
+}
+
+function importCSV(event){
+  var file = event.target.files[0];
+  if(!file){return;}
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var lines = e.target.result.split('\n');
+    if(lines.length < 2){showToast('CSV file is empty','error');return;}
+    var headers = lines[0].split(',').map(function(h){return h.trim().replace(/"/g,'').toLowerCase();});
+    var imported = 0;
+    for(var i=1;i<lines.length;i++){
+      var line = lines[i].trim();
+      if(!line)continue;
+      // handle quoted fields with commas
+      var cols = line.match(/(".*?"|[^,]+)(?=,|$)/g)||line.split(',');
+      cols = cols.map(function(c){return c.trim().replace(/^"|"$/g,'');});
+      var record = {};
+      headers.forEach(function(h,idx){record[h]=cols[idx]||'';});
+      // Map CSV columns to record fields
+      var r = {
+        billNo:   record['bill no']   || record['billno']   || ('IMP'+Date.now()+i),
+        date:     record['date']      || '',
+        delivDate:record['expected delivery']||record['delivdate']||'',
+        vehNum:   record['vehicle no']||record['vehnum']   ||'',
+        vehName:  record['vehicle']   ||record['vehname']  ||'',
+        custName: record['customer']  ||record['custname'] ||'',
+        custPhone:record['phone']     ||record['custphone']||'',
+        mechName: record['mechanic']  ||record['mechname'] ||'',
+        mechPhone:record['mech phone']||record['mechphone']||'',
+        complaints:record['complaints']||'',
+        total:    parseFloat(record['total']||0)||0,
+        status:   record['status']   ||'Completed',
+        parts:[],vehKm:'',savedAt:new Date().toISOString()
+      };
+      if(r.billNo) { fbSave(r,null); imported++; }
+    }
+    showToast('Imported '+imported+' records from CSV');
+    event.target.value='';
+  };
+  reader.readAsText(file);
 }
 
 // ================================================================
