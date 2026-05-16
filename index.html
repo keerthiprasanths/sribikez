@@ -519,6 +519,11 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <option value="Completed">Completed</option>
             <option value="In Progress">In Progress</option>
           </select>
+          <select id="filterPayment" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
+            <option value="">All Payments</option>
+            <option value="Paid">Paid</option>
+            <option value="Unpaid">Unpaid</option>
+          </select>
           <select id="filterMech" onchange="filterRecords()">
             <option value="">All Mechanics</option>
             <option>Gowtham</option><option>Jeeva</option><option>Arivalazhan</option>
@@ -1387,12 +1392,18 @@ function renderStats(records){
   var monR=records.filter(function(r){return(r.date||'').startsWith(mk);});
   var monAmt=monR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
   var inP=records.filter(function(r){return r.status==='In Progress';}).length;
+  var paidR=records.filter(function(r){return r.paymentStatus==='Paid';});
+  var unpaidR=records.filter(function(r){return r.status==='Completed'&&r.paymentStatus!=='Paid';});
+  var paidAmt=paidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  var unpaidAmt=unpaidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
   document.getElementById('statsRow').innerHTML=
     '<div class="stat-card"><div class="stat-num">'+records.length+'</div><div class="stat-label">Total</div></div>'+
     '<div class="stat-card"><div class="stat-num" style="color:var(--green)">'+todayR.length+'</div><div class="stat-label">Today</div><div class="stat-sub">Rs '+todayAmt.toFixed(0)+'</div></div>'+
     '<div class="stat-card"><div class="stat-num" style="color:var(--blue)">'+monR.length+'</div><div class="stat-label">This Month</div><div class="stat-sub">Rs '+monAmt.toFixed(0)+'</div></div>'+
     '<div class="stat-card"><div class="stat-num">Rs '+totalAmt.toFixed(0)+'</div><div class="stat-label">Revenue</div></div>'+
-    '<div class="stat-card"><div class="stat-num" style="color:var(--yellow)">'+inP+'</div><div class="stat-label">In Progress</div></div>';
+    '<div class="stat-card"><div class="stat-num" style="color:var(--yellow)">'+inP+'</div><div class="stat-label">In Progress</div></div>'+
+    '<div class="stat-card" style="cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Paid\';switchTab(0);filterRecords();"><div class="stat-num" style="color:#16a34a">'+paidR.length+'</div><div class="stat-label">Paid</div><div class="stat-sub">Rs '+paidAmt.toFixed(0)+'</div></div>'+
+    '<div class="stat-card" style="cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Unpaid\';switchTab(0);filterRecords();"><div class="stat-num" style="color:#ef4444">'+unpaidR.length+'</div><div class="stat-label">Unpaid</div><div class="stat-sub">Rs '+unpaidAmt.toFixed(0)+'</div></div>';
 }
 function renderOverviewCharts(records){
   var months=[];var now=new Date();
@@ -1422,9 +1433,13 @@ function filterRecords(){
   var q=(document.getElementById('searchInput')?document.getElementById('searchInput').value.toLowerCase():'');
   var fs=(document.getElementById('filterStatus')?document.getElementById('filterStatus').value:'');
   var fm=(document.getElementById('filterMech')?document.getElementById('filterMech').value:'');
+  var fp=(document.getElementById('filterPayment')?document.getElementById('filterPayment').value:'');
   var filtered=allRecordsCached.filter(function(r){
     var mq=!q||(r.custName||'').toLowerCase().includes(q)||(r.vehNum||'').toLowerCase().includes(q)||(r.custPhone||'').includes(q)||(r.billNo||'').toLowerCase().includes(q)||(r.vehName||'').toLowerCase().includes(q);
-    return mq&&(!fs||r.status===fs)&&(!fm||r.mechName===fm);
+    var ms=!fs||r.status===fs;
+    var mm=!fm||r.mechName===fm;
+    var mp=!fp||(fp==='Paid'?r.paymentStatus==='Paid':r.paymentStatus!=='Paid');
+    return mq&&ms&&mm&&mp;
   });
   filtered.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
   var tbody=document.getElementById('adminTableBody');
