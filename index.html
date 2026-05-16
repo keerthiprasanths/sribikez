@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Security: prevent clickjacking, XSS via meta -->
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<meta http-equiv="Referrer-Policy" content="no-referrer">
 <title>Sri Bikez - Two Wheeler Service Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -204,7 +208,12 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .owner-unlock{background:rgba(232,73,15,.07);border:1px solid rgba(232,73,15,.24);border-radius:9px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
 .owner-unlock input{background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;flex:1;min-width:140px;}
 .owner-unlock input:focus{border-color:var(--orange);}
-.toast{position:fixed;bottom:14px;right:14px;background:var(--green);color:#000;padding:9px 14px;border-radius:7px;font-weight:600;font-size:11px;transform:translateY(80px);opacity:0;transition:all .28s;z-index:9999;display:flex;align-items:center;gap:5px;}
+.badge-blue{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.26);}
+.badge-paid{background:rgba(34,197,94,.18);color:#16a34a;border:1.5px solid #16a34a;font-weight:700;}
+.badge-unpaid{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.26);}
+.autosave-bar{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.22);border-radius:7px;padding:7px 12px;margin-bottom:10px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;}
+.autosave-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 .toast.show{transform:translateY(0);opacity:1;}
 .toast.error{background:#ef4444;color:#fff;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
@@ -358,6 +367,10 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     </div>
     <!-- Parts -->
     <div class="card">
+      <div class="autosave-bar" id="autosaveBar" style="display:none;">
+        <div class="autosave-dot"></div>
+        <span id="autosaveMsg">Bill auto-saved</span>
+      </div>
       <div class="card-title">Parts and Labour</div>
       <div style="overflow-x:auto;">
         <table class="parts-table">
@@ -521,7 +534,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
           <table class="records-table">
             <thead><tr>
               <th>Bill</th><th>Date</th><th>Veh No</th><th>Vehicle</th>
-              <th>Customer</th><th>Phone</th><th>Mechanic</th><th>Amount</th><th>Status</th><th>Actions</th>
+              <th>Customer</th><th>Phone</th><th>Mechanic</th><th>Amount</th><th>Status</th><th>Payment</th><th>Actions</th>
             </tr></thead>
             <tbody id="adminTableBody"></tbody>
           </table>
@@ -587,8 +600,42 @@ var state = {
   vehKm:'',complaints:[],billNo:'',total:0,editMode:false
 };
 var ADMIN_PASS  = 'sribikez2024';
-var OWNER_PASS  = 'owner@2024';          // separate owner password
+var OWNER_PASS  = 'owner@2024';
 var ownerUnlocked = false;
+
+// ================================================================
+//  SECURITY HELPERS
+// ================================================================
+// Sanitize text to prevent XSS when inserting into innerHTML
+function sanitize(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;')
+    .replace(/\//g,'&#x2F;');
+}
+// Validate phone numbers (10 digits only)
+function isValidPhone(p) { return /^\d{10}$/.test(String(p).trim()); }
+// Validate vehicle number (basic Indian format)
+function isValidVehNum(v) { return /^[A-Z]{2}\s?\d{1,2}\s?[A-Z]{1,3}\s?\d{1,4}$/.test(String(v).trim()); }
+// Rate limiter: prevent rapid repeated calls (e.g. spam save)
+var _rateLimits = {};
+function rateLimit(key, ms) {
+  var now = Date.now();
+  if (_rateLimits[key] && now - _rateLimits[key] < ms) return false;
+  _rateLimits[key] = now; return true;
+}
+// Input length limits
+var INPUT_LIMITS = { custName:80, vehName:60, vehNum:15, custPhone:10, mechName:60 };
+function enforceInputLimits() {
+  Object.keys(INPUT_LIMITS).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.value.length > INPUT_LIMITS[id]) el.value = el.value.slice(0, INPUT_LIMITS[id]);
+  });
+}
 var presetComplaints = JSON.parse(localStorage.getItem('sribikez_presets')||'null') || [
   'Engine not starting','Battery weak / dead','Brake not working','Tyre puncture',
   'Chain loose / broken','Oil leakage','Clutch slipping','Gear not shifting',
@@ -875,12 +922,59 @@ function recalcRow(row){
   var amt=(isNaN(qty)||qty===0)?rate:qty*rate;
   row.cells[3].querySelector('input').value=amt.toFixed(2);
 }
+var _autoSaveTimer = null;
 function calcTotal(){
   var t=0;
   document.querySelectorAll('#partsBody tr').forEach(function(tr){t+=parseFloat(tr.cells[3].querySelector('input').value)||0;});
   state.total=t;
   document.getElementById('liveTotalAmt').textContent='Rs '+t.toFixed(2);
   updateBillPreview();
+  // Auto-save bill after 2 seconds of no typing
+  if(state.billNo) {
+    clearTimeout(_autoSaveTimer);
+    _autoSaveTimer = setTimeout(function(){
+      if(!rateLimit('autosave', 3000)) return;
+      autoSaveBill();
+    }, 2000);
+  }
+}
+function autoSaveBill(){
+  if(!state.billNo || !fbReady) return;
+  var s = getBillingState ? getBillingState() : state;
+  var complaintsStr = Array.isArray(state.complaints) ?
+    state.complaints.map(function(c){return c.text;}).join(', ') : (state.complaints||'');
+  var record = {
+    billNo:state.billNo, date:s.entryDate||state.entryDate,
+    delivDate:s.delivDate||state.delivDate,
+    vehNum:s.vehNum||state.vehNum, vehName:s.vehName||state.vehName,
+    custName:s.custName||state.custName, custPhone:s.custPhone||state.custPhone,
+    mechName:s.mechName||state.mechName, mechPhone:s.mechPhone||state.mechPhone,
+    vehKm:state.vehKm||'', complaints:complaintsStr,
+    parts:getParts(), total:state.total,
+    status:'In Progress', savedAt:new Date().toISOString(),
+    paymentStatus: 'Unpaid'
+  };
+  var bar = document.getElementById('autosaveBar');
+  var msg = document.getElementById('autosaveMsg');
+  if(bar) bar.style.display='flex';
+  if(msg) msg.textContent='Auto-saving bill...';
+  var recRef = window.__fbRef2(window.__fbDb, 'sribikez/records/'+record.billNo);
+  window.__fbGet(recRef).then(function(snap){
+    var existing = snap.val();
+    // preserve paymentStatus if already set
+    if(existing && existing.paymentStatus) record.paymentStatus = existing.paymentStatus;
+    if(existing && existing.status === 'Completed') record.status = 'Completed';
+    window.__fbSet(recRef, record).then(function(){
+      if(msg) msg.textContent='Bill auto-saved at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      setTimeout(function(){ if(bar) bar.style.display='none'; }, 3000);
+    });
+  }).catch(function(){
+    // if record doesn't exist yet just save it
+    window.__fbSet(recRef, record).then(function(){
+      if(msg) msg.textContent='Bill saved';
+      setTimeout(function(){ if(bar) bar.style.display='none'; }, 3000);
+    });
+  });
 }
 function getParts(){
   var rows=[];
@@ -938,6 +1032,7 @@ function unlockOwner(){
 //  PAGE 1 to 2
 // ================================================================
 function goToComplaints(){
+  enforceInputLimits();
   var vn=document.getElementById('vehNum').value.trim();
   var vm=document.getElementById('vehName').value.trim();
   var cn=document.getElementById('custName').value.trim();
@@ -945,15 +1040,19 @@ function goToComplaints(){
   var ms=document.getElementById('mechSelect').value;
   if(!vn||!vm||!cn||!cp){showToast('Fill all required fields','error');return;}
   if(!ms){showToast('Select a mechanic','error');return;}
+  if(!isValidPhone(cp)){showToast('Enter valid 10-digit phone number','error');return;}
+  // sanitize inputs
+  vn = sanitize(vn.toUpperCase()); vm = sanitize(vm);
+  cn = sanitize(cn);
   var mech=getMech();
   if(ms==='others'&&!mech.name){showToast('Enter mechanic name','error');return;}
+  if(ms==='others'&&mech.phone&&!isValidPhone(mech.phone)){showToast('Enter valid mechanic phone','error');return;}
   state.vehNum=vn;state.vehName=vm;state.custName=cn;state.custPhone=cp;
   state.entryDate=document.getElementById('entryDate').value;
   state.delivDate=document.getElementById('delivDate').value;
-  state.mechName=mech.name;state.mechPhone=mech.phone;
+  state.mechName=sanitize(mech.name);state.mechPhone=mech.phone;
   state.vehKm=document.getElementById('vehKm').value.trim();
   if(state.billNo){
-    // already assigned (e.g. came back from page 2), just proceed
     _proceedToComplaints();
   } else {
     showToast('Generating bill number...');
@@ -1195,7 +1294,9 @@ function finishService(){
     vehNum:s.vehNum,vehName:s.vehName,custName:s.custName,custPhone:s.custPhone,
     mechName:s.mechName,mechPhone:s.mechPhone,complaints:complaintsStr,
     vehKm:state.vehKm||'',
-    parts:getParts(),total:state.total,status:'Completed',savedAt:new Date().toISOString()
+    parts:getParts(),total:state.total,status:'Completed',
+    paymentStatus:'Unpaid',
+    savedAt:new Date().toISOString()
   };
   fbSave(record,function(){
     if(state.editMode){showToast('Bill updated and completed');goAdmin();return;}
@@ -1327,24 +1428,50 @@ function filterRecords(){
   });
   filtered.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
   var tbody=document.getElementById('adminTableBody');
-  if(!filtered.length){tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--muted)">No records found.</td></tr>';return;}
+  if(!filtered.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--muted)">No records found.</td></tr>';return;}
   tbody.innerHTML=filtered.map(function(r){
     var sc=r.status==='Completed'?'badge-green':'badge-yellow';
+    var isPaid=r.paymentStatus==='Paid';
+    var payClass=isPaid?'badge-paid':'badge-unpaid';
+    var payText=isPaid?'PAID':'UNPAID';
+    var payTitle=isPaid?'Click to mark as Unpaid':'Click to mark as Paid';
+    var safeBill=sanitize(r.billNo||'--');
     return '<tr>'+
-      '<td><strong style="color:var(--orange)">'+(r.billNo||'--')+'</strong></td>'+
+      '<td><strong style="color:var(--orange)">'+safeBill+'</strong></td>'+
       '<td>'+fmtDate(r.date)+'</td>'+
-      '<td><strong>'+(r.vehNum||'--')+'</strong></td>'+
-      '<td style="max-width:85px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.vehName||'--')+'</td>'+
-      '<td>'+(r.custName||'--')+'</td><td>'+(r.custPhone||'--')+'</td>'+
-      '<td>'+(r.mechName||'--')+'</td>'+
+      '<td><strong>'+sanitize(r.vehNum||'--')+'</strong></td>'+
+      '<td style="max-width:85px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sanitize(r.vehName||'--')+'</td>'+
+      '<td>'+sanitize(r.custName||'--')+'</td>'+
+      '<td>'+sanitize(r.custPhone||'--')+'</td>'+
+      '<td>'+sanitize(r.mechName||'--')+'</td>'+
       '<td><strong style="color:var(--green)">Rs '+parseFloat(r.total||0).toFixed(0)+'</strong></td>'+
-      '<td><span class="badge '+sc+'">'+(r.status||'Draft')+'</span></td>'+
+      '<td><span class="badge '+sc+'">'+sanitize(r.status||'Draft')+'</span></td>'+
+      '<td><span class="badge '+payClass+'" style="cursor:pointer;" title="'+payTitle+'" '+
+        'data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span></td>'+
       '<td><div style="display:flex;gap:3px;">'+
-        '<button class="btn btn-blue btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+r.billNo+'" onclick="editFromAdmin(this.dataset.bill)">Edit</button>'+
-        '<button class="btn btn-red btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+r.billNo+'" onclick="deleteRecord(this.dataset.bill)">Del</button>'+
+        '<button class="btn btn-blue btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">Edit</button>'+
+        '<button class="btn btn-red btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="deleteRecord(this.dataset.bill)">Del</button>'+
       '</div></td>'+
     '</tr>';
   }).join('');
+}
+
+function togglePaid(billNo){
+  if(!rateLimit('togglePaid_'+billNo,1500))return;
+  var r=null;
+  for(var i=0;i<allRecordsCached.length;i++){if(allRecordsCached[i].billNo===billNo){r=allRecordsCached[i];break;}}
+  if(!r){showToast('Record not found','error');return;}
+  var newPay=(r.paymentStatus==='Paid')?'Unpaid':'Paid';
+  var recRef=window.__fbRef2(window.__fbDb,'sribikez/records/'+billNo);
+  window.__fbGet(recRef).then(function(snap){
+    var ex=snap.val()||{};
+    ex.paymentStatus=newPay;
+    if(newPay==='Paid') ex.paidAt=new Date().toISOString();
+    else delete ex.paidAt;
+    return window.__fbSet(recRef,ex);
+  }).then(function(){
+    showToast(newPay==='Paid'?'Marked as Paid':'Marked as Unpaid');
+  }).catch(function(){showToast('Update failed','error');});
 }
 
 function editFromAdmin(billNo){
