@@ -222,6 +222,48 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .sync-indicator.saving{background:rgba(59,130,246,.18);color:var(--blue);border:1px solid rgba(59,130,246,.3);}
 .sync-indicator.saved{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.28);}
 .sync-indicator.error{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.28);}
+/* HAMBURGER */
+.hamburger{width:34px;height:34px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;background:transparent;border:1px solid var(--border);border-radius:7px;padding:6px;}
+.hamburger span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .2s;}
+.hamburger:hover{border-color:var(--orange);}
+.hamburger:hover span{background:var(--orange);}
+.ham-menu{position:fixed;top:0;right:-260px;width:250px;height:100vh;background:var(--dark);border-left:1px solid var(--border);z-index:999;transition:right .28s ease;padding:0;box-shadow:-4px 0 20px rgba(0,0,0,.5);}
+.ham-menu.open{right:0;}
+.ham-header{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+.ham-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--orange2);}
+.ham-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 4px;}
+.ham-close:hover{color:var(--text);}
+.ham-item{display:flex;align-items:center;gap:11px;padding:14px 18px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;font-size:14px;font-weight:500;}
+.ham-item:hover{background:rgba(232,73,15,.1);color:var(--orange2);}
+.ham-icon{font-size:18px;width:24px;text-align:center;}
+.ham-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:998;}
+.ham-overlay.open{display:block;}
+/* OUTSIDE WORK */
+.ow-ref-card{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.25);border-radius:9px;padding:12px 15px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.ow-ref-info{font-size:12px;color:var(--muted);}
+.ow-ref-bill{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--blue);}
+.shop-suggest{position:relative;}
+.shop-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--card);border:1px solid var(--orange);border-top:none;border-radius:0 0 8px 8px;z-index:50;max-height:170px;overflow-y:auto;display:none;}
+.shop-dropdown.open{display:block;}
+.shop-option{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);}
+.shop-option:hover{background:rgba(232,73,15,.1);color:var(--orange2);}
+.ow-table{width:100%;border-collapse:collapse;min-width:640px;}
+.ow-table th{background:#161616;padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);}
+.ow-table td{padding:8px 10px;border-bottom:1px solid #1c1c1c;font-size:12px;vertical-align:middle;}
+.ow-table tr:hover td{background:#1c1c1c;}
+.shop-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:15px;}
+.shop-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:13px;}
+.shop-card-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--orange2);margin-bottom:3px;}
+.shop-card-month{font-size:10px;color:var(--muted);margin-bottom:5px;}
+.shop-card-amt{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green);}
+.shop-card-count{font-size:10px;color:var(--muted);margin-top:2px;}
+.ow-filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.ow-filter-row select,.ow-filter-row input{background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;}
+.ow-filter-row select:focus,.ow-filter-row input:focus{border-color:var(--orange);}
+.ow-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:15px;}
+.ow-tab{padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;}
+.ow-tab:hover{color:var(--text);}
+.ow-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
 </style>
 </head>
 <body>
@@ -240,8 +282,36 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
   <div style="display:flex;gap:7px;align-items:center;">
     <span class="db-status offline" id="dbStatus">Connecting...</span>
     <button class="btn btn-secondary btn-sm" onclick="goAdmin()">Admin</button>
+    <div class="hamburger" onclick="openHamMenu()" title="More options">
+      <span></span><span></span><span></span>
+    </div>
   </div>
 </nav>
+
+<!-- HAMBURGER OVERLAY + MENU -->
+<div class="ham-overlay" id="hamOverlay" onclick="closeHamMenu()"></div>
+<div class="ham-menu" id="hamMenu">
+  <div class="ham-header">
+    <div class="ham-title">Menu</div>
+    <button class="ham-close" onclick="closeHamMenu()">&#10005;</button>
+  </div>
+  <div class="ham-item" onclick="closeHamMenu();goPage(1)">
+    <span class="ham-icon">&#127949;</span> Vehicle Service
+  </div>
+  <div class="ham-item" onclick="closeHamMenu();goAdmin()">
+    <span class="ham-icon">&#128203;</span> Admin Panel
+  </div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork()" style="color:var(--orange2);">
+    <span class="ham-icon">&#128295;</span> Outside Work
+  </div>
+  <div style="padding:14px 18px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Outside Work Types</div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Welding')"><span class="ham-icon">&#128293;</span> Welding</div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Tinkering')"><span class="ham-icon">&#128736;</span> Tinkering</div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Painting')"><span class="ham-icon">&#127912;</span> Painting</div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Lathe Work')"><span class="ham-icon">&#9881;</span> Lathe Work</div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Electrical')"><span class="ham-icon">&#9889;</span> Electrical</div>
+  <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Other')"><span class="ham-icon">&#43;</span> Other Work</div>
+</div>
 
 <!-- PROGRESS -->
 <div class="progress-bar" id="progressBar">
@@ -585,11 +655,177 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
           <div class="chart-canvas-wrap" style="height:220px;"><canvas id="chartRevTrend"></canvas></div>
         </div>
         <div class="chart-card full">
+          <div class="chart-title">Outside Work - Monthly Cost</div>
+          <div class="chart-canvas-wrap" style="height:180px;"><canvas id="chartOutsideWork"></canvas></div>
+        </div>
+        <div class="chart-card full">
           <div class="chart-title">Mechanic Performance</div>
           <div id="mechPerfTable"></div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: OUTSIDE WORK                                          -->
+<!-- ============================================================ -->
+<div class="page" id="pageOutside">
+  <div class="step-header">
+    <div class="step-badge"><span>Outside Work</span></div>
+    <div class="step-title">Outside Work Manager</div>
+    <div class="step-sub">Track welding, tinkering, painting and other external work with shop-wise billing</div>
+  </div>
+  <div class="container">
+
+    <!-- OW TABS -->
+    <div class="ow-tabs">
+      <div class="ow-tab active" id="owTabBtn0" onclick="switchOwTab(0)">Add Work</div>
+      <div class="ow-tab" id="owTabBtn1" onclick="switchOwTab(1)">All Entries</div>
+      <div class="ow-tab" id="owTabBtn2" onclick="switchOwTab(2)">Shop Summary</div>
+    </div>
+
+    <!-- OW TAB 0: ADD WORK -->
+    <div id="owTabPanel0">
+
+      <!-- Linked bill reference -->
+      <div class="ow-ref-card" id="owRefCard" style="display:none;">
+        <div>
+          <div class="ow-ref-info">Linked to service bill</div>
+          <div class="ow-ref-bill" id="owRefBillNo">--</div>
+          <div class="ow-ref-info" id="owRefCust">--</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="clearOwRef()">Unlink</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Link to Service Bill (Optional)</div>
+        <div style="display:flex;gap:8px;align-items:flex-end;">
+          <div class="field" style="flex:1;">
+            <label>Bill Number</label>
+            <input type="text" id="owLinkBill" placeholder="e.g. SB00001" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <button class="btn btn-blue btn-sm" style="margin-bottom:1px;" onclick="linkOwBill()">Link Bill</button>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:5px;">Linking a bill lets you reference which vehicle this outside work was done for</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Work Details</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Date of Work *</label>
+            <input type="date" id="owDate">
+          </div>
+          <div class="field">
+            <label>Type of Work *</label>
+            <select id="owWorkType">
+              <option value="">Select work type</option>
+              <option>Welding</option>
+              <option>Tinkering</option>
+              <option>Painting</option>
+              <option>Lathe Work</option>
+              <option>Electrical</option>
+              <option>Body Work</option>
+              <option>Chrome Work</option>
+              <option>Sandblasting</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column:1/-1;">
+            <label>Work Description *</label>
+            <input type="text" id="owDesc" placeholder="Describe the work done...">
+          </div>
+          <div class="field shop-suggest">
+            <label>Outside Shop Name *</label>
+            <input type="text" id="owShopName" placeholder="Type shop name..." oninput="showShopSuggestions()" onblur="setTimeout(function(){closeShopDropdown()},200)" autocomplete="off">
+            <div class="shop-dropdown" id="shopDropdown"></div>
+          </div>
+          <div class="field">
+            <label>Shop Phone (Optional)</label>
+            <input type="tel" id="owShopPhone" placeholder="Shop contact number" maxlength="10">
+          </div>
+          <div class="field">
+            <label>Amount (Rs) *</label>
+            <input type="number" id="owAmount" placeholder="0" min="0" oninput="updateOwTotal()">
+          </div>
+          <div class="field">
+            <label>Payment to Shop</label>
+            <select id="owShopPayStatus">
+              <option value="Pending">Pending (Pay Later)</option>
+              <option value="Paid">Paid</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding:10px 13px;background:rgba(232,73,15,.07);border-radius:7px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:var(--muted);">Work Amount</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--orange);" id="owTotalDisplay">Rs 0</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goPage(1)">Back to Service</button>
+        <button class="btn btn-primary" onclick="saveOutsideWork()">Save Outside Work</button>
+      </div>
+    </div>
+
+    <!-- OW TAB 1: ALL ENTRIES -->
+    <div id="owTabPanel1" style="display:none;">
+      <div class="ow-filter-row">
+        <input type="text" id="owSearch" placeholder="Search shop, work, bill..." oninput="renderOwEntries()">
+        <select id="owFilterType" onchange="renderOwEntries()">
+          <option value="">All Work Types</option>
+          <option>Welding</option><option>Tinkering</option><option>Painting</option>
+          <option>Lathe Work</option><option>Electrical</option><option>Other</option>
+        </select>
+        <select id="owFilterShopPay" onchange="renderOwEntries()">
+          <option value="">All Payment</option>
+          <option value="Pending">Pending</option>
+          <option value="Paid">Paid</option>
+        </select>
+        <select id="owFilterMonth" onchange="renderOwEntries()">
+          <option value="">All Months</option>
+        </select>
+        <button class="btn btn-green btn-sm" onclick="exportOwCSV()">Export CSV</button>
+      </div>
+      <div style="overflow-x:auto;border:1px solid var(--border);border-radius:9px;">
+        <table class="ow-table">
+          <thead><tr>
+            <th>Date</th><th>Work Type</th><th>Description</th>
+            <th>Shop</th><th>Linked Bill</th><th>Amount</th><th>Shop Payment</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="owTableBody"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:10px 14px;background:var(--card);border-radius:8px;border:1px solid var(--border);">
+        <span style="font-size:12px;color:var(--muted);" id="owEntriesCount">0 entries</span>
+        <div>
+          <span style="font-size:12px;color:var(--muted);">Total: </span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--orange);" id="owTotalSum">Rs 0</span>
+          <span style="font-size:11px;color:#ef4444;margin-left:12px;">Pending: </span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#ef4444;" id="owPendingSum">Rs 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- OW TAB 2: SHOP SUMMARY -->
+    <div id="owTabPanel2" style="display:none;">
+      <div class="ow-filter-row">
+        <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Month:</label>
+        <select id="owSummaryMonth" onchange="renderShopSummary()">
+          <option value="">All Time</option>
+        </select>
+        <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Year:</label>
+        <select id="owSummaryYear" onchange="renderShopSummary()">
+        </select>
+      </div>
+      <div class="shop-cards" id="shopCards"></div>
+      <div class="card">
+        <div class="card-title">Shop-wise Pending Payments</div>
+        <div id="shopPendingTable"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -995,6 +1231,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').re
 //  NAVIGATION
 // ================================================================
 function goPage(n){
+  document.getElementById('progressBar').style.display='flex';
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page'+n).classList.add('active');
   document.querySelectorAll('.prog-step').forEach(function(s,i){
@@ -1005,6 +1242,7 @@ function goPage(n){
   window.scrollTo(0,0);
 }
 function goAdmin(){
+  document.getElementById('progressBar').style.display='flex';
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('pageAdmin').classList.add('active');
   document.getElementById('adminLoginOverlay').style.display='none';
@@ -1632,6 +1870,12 @@ function renderAnalytics(){
   for(var ti=11;ti>=0;ti--){var tD=new Date(nowT.getFullYear(),nowT.getMonth()-ti,1);tMons.push({key:tD.getFullYear()+'-'+String(tD.getMonth()+1).padStart(2,'0'),label:tD.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})});}
   var tData=tMons.map(function(m){return allRecordsCached.filter(function(r){return(r.date||'').startsWith(m.key);}).reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);});
   makeChart('chartRevTrend','line',tMons.map(function(m){return m.label;}),tData,'Revenue Rs','#E8490F');
+  // Outside work monthly cost chart
+  var owTmons=[];var nowOW=new Date();
+  for(var oi=5;oi>=0;oi--){var oD=new Date(nowOW.getFullYear(),nowOW.getMonth()-oi,1);owTmons.push({key:oD.getFullYear()+'-'+String(oD.getMonth()+1).padStart(2,'0'),label:oD.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})});}
+  var owData=owTmons.map(function(m){return owCached.filter(function(e){return (e.date||'').startsWith(m.key);}).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);});
+  makeChart('chartOutsideWork','bar',owTmons.map(function(m){return m.label;}),owData,'Outside Work Rs','#A855F7');
+
   var mMap={};filtered.forEach(function(r){if(!r.mechName)return;if(!mMap[r.mechName])mMap[r.mechName]={jobs:0,rev:0,done:0};mMap[r.mechName].jobs++;mMap[r.mechName].rev+=parseFloat(r.total)||0;if(r.status==='Completed')mMap[r.mechName].done++;});
   var mE=Object.entries(mMap).sort(function(a,b){return b[1].rev-a[1].rev;});
   var mRows=mE.map(function(e){var n=e[0],d=e[1];return '<tr style="border-bottom:1px solid var(--border);">'+
@@ -1654,6 +1898,347 @@ function renderAnalytics(){
     '<div style="padding:16px;color:var(--muted);font-size:11px;text-align:center;">No data for selected period</div>';
 }
 function topEntry(arr){var f={},top='',max=0;arr.forEach(function(x){f[x]=(f[x]||0)+1;if(f[x]>max){max=f[x];top=x;}});return top;}
+
+// ================================================================
+//  HAMBURGER MENU
+// ================================================================
+function openHamMenu(){
+  document.getElementById('hamMenu').classList.add('open');
+  document.getElementById('hamOverlay').classList.add('open');
+}
+function closeHamMenu(){
+  document.getElementById('hamMenu').classList.remove('open');
+  document.getElementById('hamOverlay').classList.remove('open');
+}
+function goOutsideWork(workType){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('pageOutside').classList.add('active');
+  document.getElementById('progressBar').style.display='none';
+  if(workType && workType!=='Outside'){
+    document.getElementById('owWorkType').value=workType;
+  }
+  switchOwTab(0);
+  owInit();
+  window.scrollTo(0,0);
+}
+
+// ================================================================
+//  OUTSIDE WORK — DATA (Firebase path: sribikez/outsidework/)
+// ================================================================
+var owRef;
+var owCached = [];
+var savedShops = JSON.parse(localStorage.getItem('sribikez_shops')||'[]');
+var owLinkedBill = null;
+
+function owFbRef(){
+  if(!owRef) owRef = window.__fbRef2(window.__fbDb,'sribikez/outsidework');
+  return owRef;
+}
+function owSave(entry, cb){
+  if(!fbReady){showToast('Database not connected','error');return;}
+  var r = window.__fbRef2(window.__fbDb,'sribikez/outsidework/'+entry.id);
+  window.__fbSet(r, entry).then(function(){ if(cb)cb(); }).catch(function(e){ showToast('Save failed','error'); });
+}
+function owDeleteEntry(id){
+  if(!fbReady)return;
+  var r = window.__fbRef2(window.__fbDb,'sribikez/outsidework/'+id);
+  window.__fbRemove(r).then(function(){ showToast('Entry deleted'); }).catch(function(){ showToast('Delete failed','error'); });
+}
+function owListenAll(){
+  if(!fbReady) return;
+  window.__fbOnValue(owFbRef(), function(snap){
+    var data = snap.val();
+    owCached = [];
+    if(data) Object.keys(data).forEach(function(k){ owCached.push(data[k]); });
+    owCached.sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    // Refresh visible tab
+    var panel = document.getElementById('owTabPanel1');
+    if(panel && panel.style.display!=='none') renderOwEntries();
+    var panel2 = document.getElementById('owTabPanel2');
+    if(panel2 && panel2.style.display!=='none') renderShopSummary();
+  });
+}
+
+function owInit(){
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('owDate').value = today;
+  owListenAll();
+  populateOwMonthFilters();
+}
+
+// ================================================================
+//  SHOP AUTOCOMPLETE
+// ================================================================
+function showShopSuggestions(){
+  var val = document.getElementById('owShopName').value.toLowerCase();
+  var dd = document.getElementById('shopDropdown');
+  if(!val){ dd.classList.remove('open'); return; }
+  var matches = savedShops.filter(function(s){ return s.name.toLowerCase().includes(val); });
+  if(!matches.length){ dd.classList.remove('open'); return; }
+  dd.innerHTML = matches.map(function(s){
+    return '<div class="shop-option" onclick="selectShop(\''+sanitize(s.name)+'\',\''+sanitize(s.phone||'')+'\')">'+
+      sanitize(s.name)+(s.phone?' <span style="color:var(--muted);font-size:10px;">'+s.phone+'</span>':'')+
+    '</div>';
+  }).join('');
+  dd.classList.add('open');
+}
+function selectShop(name, phone){
+  document.getElementById('owShopName').value = name;
+  if(phone) document.getElementById('owShopPhone').value = phone;
+  closeShopDropdown();
+}
+function closeShopDropdown(){
+  var dd = document.getElementById('shopDropdown');
+  if(dd) dd.classList.remove('open');
+}
+function saveShopToMemory(name, phone){
+  var existing = savedShops.findIndex(function(s){ return s.name.toLowerCase()===name.toLowerCase(); });
+  if(existing>=0){
+    if(phone) savedShops[existing].phone = phone;
+  } else {
+    savedShops.push({name:name, phone:phone||''});
+  }
+  localStorage.setItem('sribikez_shops', JSON.stringify(savedShops));
+}
+
+// ================================================================
+//  LINK BILL REFERENCE
+// ================================================================
+function linkOwBill(){
+  var bn = document.getElementById('owLinkBill').value.trim().toUpperCase();
+  if(!bn){ showToast('Enter a bill number','error'); return; }
+  // Search in cached records
+  var found = null;
+  for(var i=0;i<allRecordsCached.length;i++){
+    if(allRecordsCached[i].billNo===bn){ found=allRecordsCached[i]; break; }
+  }
+  if(!found){
+    // Try fetching from Firebase
+    var r = window.__fbRef2(window.__fbDb,'sribikez/records/'+bn);
+    window.__fbGet(r).then(function(snap){
+      var d = snap.val();
+      if(d){ setOwRef(d); }
+      else showToast('Bill '+bn+' not found','error');
+    });
+    return;
+  }
+  setOwRef(found);
+}
+function setOwRef(rec){
+  owLinkedBill = rec;
+  document.getElementById('owRefCard').style.display='flex';
+  document.getElementById('owRefBillNo').textContent = rec.billNo;
+  document.getElementById('owRefCust').textContent = (rec.custName||'--')+' | '+(rec.vehNum||'--')+' | '+(rec.vehName||'--');
+  document.getElementById('owLinkBill').value = rec.billNo;
+  showToast('Linked to '+rec.billNo);
+}
+function clearOwRef(){
+  owLinkedBill = null;
+  document.getElementById('owRefCard').style.display='none';
+  document.getElementById('owLinkBill').value='';
+}
+function updateOwTotal(){
+  var amt = parseFloat(document.getElementById('owAmount').value)||0;
+  document.getElementById('owTotalDisplay').textContent = 'Rs '+amt.toFixed(2);
+}
+
+// ================================================================
+//  SAVE OUTSIDE WORK ENTRY
+// ================================================================
+function saveOutsideWork(){
+  var date   = document.getElementById('owDate').value;
+  var wtype  = document.getElementById('owWorkType').value;
+  var desc   = document.getElementById('owDesc').value.trim();
+  var shop   = document.getElementById('owShopName').value.trim();
+  var phone  = document.getElementById('owShopPhone').value.trim();
+  var amount = parseFloat(document.getElementById('owAmount').value)||0;
+  var payStatus = document.getElementById('owShopPayStatus').value;
+  if(!date||!wtype||!desc||!shop||!amount){
+    showToast('Fill all required fields','error'); return;
+  }
+  var entry = {
+    id: 'OW'+Date.now(),
+    date: date,
+    workType: wtype,
+    desc: sanitize(desc),
+    shopName: sanitize(shop),
+    shopPhone: phone,
+    amount: amount,
+    shopPayStatus: payStatus,
+    linkedBillNo: owLinkedBill ? owLinkedBill.billNo : '',
+    linkedCustName: owLinkedBill ? (owLinkedBill.custName||'') : '',
+    linkedVehNum: owLinkedBill ? (owLinkedBill.vehNum||'') : '',
+    savedAt: new Date().toISOString()
+  };
+  saveShopToMemory(shop, phone);
+  owSave(entry, function(){
+    showToast('Outside work saved!');
+    // reset form
+    document.getElementById('owDesc').value='';
+    document.getElementById('owAmount').value='';
+    document.getElementById('owShopName').value='';
+    document.getElementById('owShopPhone').value='';
+    document.getElementById('owWorkType').value='';
+    document.getElementById('owShopPayStatus').value='Pending';
+    document.getElementById('owTotalDisplay').textContent='Rs 0';
+    clearOwRef();
+    switchOwTab(1);
+  });
+}
+
+// ================================================================
+//  RENDER OW ENTRIES TABLE
+// ================================================================
+function renderOwEntries(){
+  var q=(document.getElementById('owSearch')?document.getElementById('owSearch').value.toLowerCase():'');
+  var ft=(document.getElementById('owFilterType')?document.getElementById('owFilterType').value:'');
+  var fp=(document.getElementById('owFilterShopPay')?document.getElementById('owFilterShopPay').value:'');
+  var fm=(document.getElementById('owFilterMonth')?document.getElementById('owFilterMonth').value:'');
+  var filtered=owCached.filter(function(e){
+    var mq=!q||(e.shopName||'').toLowerCase().includes(q)||(e.desc||'').toLowerCase().includes(q)||(e.linkedBillNo||'').toLowerCase().includes(q)||(e.workType||'').toLowerCase().includes(q);
+    var mt=!ft||e.workType===ft;
+    var mp=!fp||e.shopPayStatus===fp;
+    var mm=!fm||(e.date||'').startsWith(fm);
+    return mq&&mt&&mp&&mm;
+  });
+  var tbody=document.getElementById('owTableBody');
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--muted)">No entries found.</td></tr>';
+    document.getElementById('owEntriesCount').textContent='0 entries';
+    document.getElementById('owTotalSum').textContent='Rs 0';
+    document.getElementById('owPendingSum').textContent='Rs 0';
+    return;
+  }
+  var totalSum=filtered.reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
+  var pendingSum=filtered.filter(function(e){return e.shopPayStatus==='Pending';}).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);
+  document.getElementById('owEntriesCount').textContent=filtered.length+' entries';
+  document.getElementById('owTotalSum').textContent='Rs '+totalSum.toFixed(0);
+  document.getElementById('owPendingSum').textContent='Rs '+pendingSum.toFixed(0);
+  tbody.innerHTML=filtered.map(function(e){
+    var paidCls=e.shopPayStatus==='Paid'?'badge-paid':'badge-unpaid';
+    var paidTxt=e.shopPayStatus==='Paid'?'PAID':'PENDING';
+    var linkTxt=e.linkedBillNo?('<span style="color:var(--blue);font-size:11px;">'+sanitize(e.linkedBillNo)+'</span><br><span style="color:var(--muted);font-size:10px;">'+sanitize(e.linkedCustName)+'</span>'):'<span style="color:var(--muted)">--</span>';
+    return '<tr>'+
+      '<td>'+fmtDate(e.date)+'</td>'+
+      '<td><span class="badge badge-yellow" style="font-size:9px;">'+sanitize(e.workType)+'</span></td>'+
+      '<td style="max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+sanitize(e.desc)+'">'+sanitize(e.desc)+'</td>'+
+      '<td><strong>'+sanitize(e.shopName)+'</strong>'+(e.shopPhone?'<br><span style="color:var(--muted);font-size:10px;">'+sanitize(e.shopPhone)+'</span>':'')+'</td>'+
+      '<td>'+linkTxt+'</td>'+
+      '<td><strong style="color:var(--orange)">Rs '+parseFloat(e.amount||0).toFixed(0)+'</strong></td>'+
+      '<td><span class="badge '+paidCls+'" style="cursor:pointer;" onclick="toggleOwPay(\''+e.id+'\')">'+paidTxt+'</span></td>'+
+      '<td><button class="btn btn-red btn-sm" style="padding:3px 8px;font-size:10px;" onclick="owDeleteEntry(\''+e.id+'\')">Del</button></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function toggleOwPay(id){
+  if(!rateLimit('owpay_'+id,1000))return;
+  var entry=null;
+  for(var i=0;i<owCached.length;i++){if(owCached[i].id===id){entry=owCached[i];break;}}
+  if(!entry)return;
+  var updated = {};
+  Object.keys(entry).forEach(function(k){updated[k]=entry[k];});
+  updated.shopPayStatus = (entry.shopPayStatus==='Paid')?'Pending':'Paid';
+  owSave(updated, function(){ showToast(updated.shopPayStatus==='Paid'?'Marked Paid':'Marked Pending'); });
+}
+
+// ================================================================
+//  SHOP SUMMARY TAB
+// ================================================================
+function renderShopSummary(){
+  var fm = document.getElementById('owSummaryMonth')?document.getElementById('owSummaryMonth').value:'';
+  var fy = document.getElementById('owSummaryYear')?document.getElementById('owSummaryYear').value:'';
+  var filtered = owCached;
+  if(fm && fy) filtered = owCached.filter(function(e){return (e.date||'').startsWith(fy+'-'+String(fm).padStart(2,'0'));});
+  else if(fy) filtered = owCached.filter(function(e){return (e.date||'').startsWith(fy);});
+  // Group by shop
+  var shops={};
+  filtered.forEach(function(e){
+    var sn=e.shopName||'Unknown';
+    if(!shops[sn])shops[sn]={name:sn,phone:e.shopPhone||'',total:0,pending:0,count:0,entries:[]};
+    shops[sn].total+=parseFloat(e.amount)||0;
+    shops[sn].count++;
+    shops[sn].entries.push(e);
+    if(e.shopPayStatus==='Pending') shops[sn].pending+=parseFloat(e.amount)||0;
+  });
+  var shopArr=Object.values(shops).sort(function(a,b){return b.total-a.total;});
+  var cardsEl=document.getElementById('shopCards');
+  if(!shopArr.length){cardsEl.innerHTML='<div style="color:var(--muted);font-size:12px;padding:10px;">No outside work entries for this period.</div>';document.getElementById('shopPendingTable').innerHTML='';return;}
+  // Month label
+  var mLabel=fm&&fy?new Date(parseInt(fy),parseInt(fm)-1).toLocaleDateString('en-IN',{month:'long',year:'numeric'}):(fy||'All Time');
+  cardsEl.innerHTML=shopArr.map(function(s){
+    return '<div class="shop-card">'+
+      '<div class="shop-card-name">'+sanitize(s.name)+'</div>'+
+      (s.phone?'<div class="shop-card-month" style="color:var(--muted);">'+sanitize(s.phone)+'</div>':'')+
+      '<div class="shop-card-month">'+sanitize(mLabel)+' | '+s.count+' jobs</div>'+
+      '<div class="shop-card-amt">Rs '+s.total.toFixed(0)+'</div>'+
+      (s.pending>0?'<div class="shop-card-count" style="color:#ef4444;margin-top:3px;">Pending: Rs '+s.pending.toFixed(0)+'</div>':'<div class="shop-card-count" style="color:var(--green);">All Paid</div>')+
+    '</div>';
+  }).join('');
+  // Pending table
+  var pendingShops=shopArr.filter(function(s){return s.pending>0;});
+  if(!pendingShops.length){document.getElementById('shopPendingTable').innerHTML='<div style="color:var(--green);font-size:12px;padding:8px;">All payments cleared!</div>';return;}
+  document.getElementById('shopPendingTable').innerHTML=
+    '<table style="width:100%;border-collapse:collapse;">'+
+    '<thead><tr style="background:#161616;">'+
+    '<th style="padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Shop</th>'+
+    '<th style="padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Phone</th>'+
+    '<th style="padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Jobs</th>'+
+    '<th style="padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Total</th>'+
+    '<th style="padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#ef4444;">Pending</th>'+
+    '</tr></thead><tbody>'+
+    pendingShops.map(function(s){return '<tr style="border-bottom:1px solid var(--border);">'+
+      '<td style="padding:9px 10px;font-weight:600;">'+sanitize(s.name)+'</td>'+
+      '<td style="padding:9px 10px;color:var(--muted);">'+sanitize(s.phone||'--')+'</td>'+
+      '<td style="padding:9px 10px;color:var(--orange);">'+s.count+'</td>'+
+      '<td style="padding:9px 10px;color:var(--green);">Rs '+s.total.toFixed(0)+'</td>'+
+      '<td style="padding:9px 10px;color:#ef4444;font-weight:700;">Rs '+s.pending.toFixed(0)+'</td>'+
+    '</tr>';}).join('')+
+    '</tbody></table>';
+}
+
+function populateOwMonthFilters(){
+  var now=new Date();
+  var mNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var owMon=document.getElementById('owFilterMonth');
+  var owSMon=document.getElementById('owSummaryMonth');
+  var owSYear=document.getElementById('owSummaryYear');
+  if(owMon){
+    owMon.innerHTML='<option value="">All Months</option>';
+    for(var i=0;i<12;i++){
+      var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+      var key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      owMon.innerHTML+='<option value="'+key+'">'+mNames[d.getMonth()]+' '+d.getFullYear()+'</option>';
+    }
+  }
+  if(owSMon){
+    owSMon.innerHTML='<option value="">All Time</option>'+mNames.map(function(n,i){return '<option value="'+(i+1)+'"'+(i===now.getMonth()?' selected':'')+'>'+n+'</option>';}).join('');
+  }
+  if(owSYear){
+    var curY=now.getFullYear();
+    owSYear.innerHTML=[curY,curY-1,curY-2].map(function(y){return '<option value="'+y+'"'+(y===curY?' selected':'')+'>'+y+'</option>';}).join('');
+  }
+}
+
+function switchOwTab(n){
+  for(var i=0;i<3;i++){
+    document.getElementById('owTabPanel'+i).style.display=i===n?'block':'none';
+    document.getElementById('owTabBtn'+i).classList.toggle('active',i===n);
+  }
+  if(n===1) renderOwEntries();
+  if(n===2) renderShopSummary();
+}
+
+function exportOwCSV(){
+  if(!owCached.length){showToast('No entries','error');return;}
+  var h=['Date','Work Type','Description','Shop','Shop Phone','Linked Bill','Customer','Amount','Shop Payment'];
+  var rows=owCached.map(function(e){return[e.date,e.workType,'"'+(e.desc||'')+'"',e.shopName,e.shopPhone,e.linkedBillNo,e.linkedCustName,e.amount,e.shopPayStatus].join(',');});
+  var csv=[h.join(',')].concat(rows).join('\n');
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='outside_work_'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();showToast('CSV downloaded!');
+}
 
 // ================================================================
 //  UTILS
