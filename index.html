@@ -264,6 +264,37 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .ow-tab{padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;}
 .ow-tab:hover{color:var(--text);}
 .ow-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+
+/* ── REMINDERS PAGE ─────────────────────────────────────────── */
+.rem-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:15px;}
+.rem-tab{padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;}
+.rem-tab:hover{color:var(--text);}
+.rem-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+.rem-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.rem-card-info{flex:1;min-width:180px;}
+.rem-card-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--text);}
+.rem-card-veh{font-size:11px;color:var(--orange2);margin-top:2px;}
+.rem-card-meta{font-size:10px;color:var(--muted);margin-top:3px;}
+.rem-card-due{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;margin-top:5px;}
+.rem-card-due.overdue{color:#ef4444;}
+.rem-card-due.due-soon{color:var(--yellow);}
+.rem-card-due.ok{color:var(--green);}
+.rem-card-actions{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.rem-setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap;}
+.rem-setting-label{font-size:12px;font-weight:500;}
+.rem-setting-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+.rem-toggle{position:relative;width:40px;height:22px;flex-shrink:0;}
+.rem-toggle input{opacity:0;width:0;height:0;}
+.rem-toggle-slider{position:absolute;inset:0;background:#333;border-radius:11px;cursor:pointer;transition:.2s;}
+.rem-toggle input:checked+.rem-toggle-slider{background:var(--orange);}
+.rem-toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;}
+.rem-toggle input:checked+.rem-toggle-slider:before{transform:translateX(18px);}
+.unpaid-card{background:var(--card);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:13px;margin-bottom:9px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.unpaid-days{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#ef4444;}
+.badge-overdue{background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.3);}
+.badge-week{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.3);}
+.rem-empty{text-align:center;padding:30px 16px;color:var(--muted);font-size:13px;}
+.send-all-bar{background:rgba(232,73,15,.07);border:1px solid rgba(232,73,15,.22);border-radius:9px;padding:11px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 </style>
 </head>
 <body>
@@ -300,6 +331,9 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
   </div>
   <div class="ham-item" onclick="closeHamMenu();goAdmin()">
     <span class="ham-icon">&#128203;</span> Admin Panel
+  </div>
+  <div class="ham-item" onclick="closeHamMenu();goReminders()" style="color:#A855F7;">
+    <span class="ham-icon">&#128276;</span> Reminders
   </div>
   <div class="ham-item" onclick="closeHamMenu();goOutsideWork()" style="color:var(--orange2);">
     <span class="ham-icon">&#128295;</span> Outside Work
@@ -662,6 +696,108 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
           <div class="chart-title">Mechanic Performance</div>
           <div id="mechPerfTable"></div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PAGE: REMINDERS                                             -->
+<!-- ============================================================ -->
+<div class="page" id="pageReminders">
+  <div class="step-header">
+    <div class="step-badge"><span>Reminders</span></div>
+    <div class="step-title">Service & Payment Reminders</div>
+    <div class="step-sub">Auto-send WhatsApp reminders to customers</div>
+  </div>
+  <div class="container">
+    <div class="rem-tabs">
+      <div class="rem-tab active" id="remTabBtn0" onclick="switchRemTab(0)">&#128276; Service Due</div>
+      <div class="rem-tab" id="remTabBtn1" onclick="switchRemTab(1)">&#128178; Unpaid Bills</div>
+      <div class="rem-tab" id="remTabBtn2" onclick="switchRemTab(2)">&#9881; Settings</div>
+    </div>
+
+    <!-- TAB 0: SERVICE DUE -->
+    <div id="remTabPanel0">
+      <div class="send-all-bar">
+        <div>
+          <div style="font-size:12px;font-weight:600;">Service Due Reminders</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Customers whose next service is due based on last service date</div>
+        </div>
+        <button class="btn btn-wa btn-sm" onclick="sendAllServiceReminders()">Send All via WhatsApp</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+        <select id="remFilterInterval" onchange="renderServiceDue()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
+          <option value="all">All Intervals</option>
+          <option value="overdue">Overdue</option>
+          <option value="week">Due This Week</option>
+          <option value="month">Due This Month</option>
+        </select>
+        <input type="text" id="remSearch" placeholder="Search customer, vehicle..." oninput="renderServiceDue()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;flex:1;min-width:140px;">
+      </div>
+      <div id="serviceDueList"><div class="rem-empty">Loading...</div></div>
+    </div>
+
+    <!-- TAB 1: UNPAID BILLS -->
+    <div id="remTabPanel1" style="display:none;">
+      <div class="send-all-bar">
+        <div>
+          <div style="font-size:12px;font-weight:600;">Unpaid Bill Reminders</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">Customers with pending payments older than selected days</div>
+        </div>
+        <button class="btn btn-wa btn-sm" onclick="sendAllPaymentReminders()">Send All via WhatsApp</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+        <select id="unpaidFilterDays" onchange="renderUnpaidBills()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
+          <option value="0">All Unpaid</option>
+          <option value="7" selected>Older than 1 week</option>
+          <option value="30">Older than 1 month</option>
+          <option value="60">Older than 2 months</option>
+        </select>
+        <input type="text" id="unpaidSearch" placeholder="Search..." oninput="renderUnpaidBills()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;flex:1;min-width:140px;">
+      </div>
+      <div id="unpaidBillsList"><div class="rem-empty">Loading...</div></div>
+    </div>
+
+    <!-- TAB 2: SETTINGS -->
+    <div id="remTabPanel2" style="display:none;">
+      <div class="card">
+        <div class="card-title">&#9881; Reminder Intervals</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Set after how many months a service reminder should be sent to each customer.</div>
+        <div class="rem-setting-row">
+          <div>
+            <div class="rem-setting-label">Default Service Interval</div>
+            <div class="rem-setting-sub">Send reminder after this many months from last service</div>
+          </div>
+          <select id="remDefaultInterval" onchange="saveRemSettings()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:600;">
+            <option value="1">1 Month</option>
+            <option value="2" selected>2 Months</option>
+            <option value="3">3 Months</option>
+            <option value="4">4 Months</option>
+            <option value="6">6 Months</option>
+          </select>
+        </div>
+        <div class="rem-setting-row" style="border:none;">
+          <div>
+            <div class="rem-setting-label">Payment Reminder After</div>
+            <div class="rem-setting-sub">Remind unpaid customers after this many days</div>
+          </div>
+          <select id="remPayDays" onchange="saveRemSettings()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:600;">
+            <option value="3">3 Days</option>
+            <option value="7" selected>1 Week</option>
+            <option value="14">2 Weeks</option>
+            <option value="30">1 Month</option>
+          </select>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">&#128172; WhatsApp Message Preview</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Service reminder message that will be sent to customers:</div>
+        <div style="background:#161616;border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:#ccc;white-space:pre-wrap;" id="remMsgPreview"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">&#128178; Payment Reminder Preview</div>
+        <div style="background:#161616;border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:#ccc;white-space:pre-wrap;" id="payMsgPreview"></div>
       </div>
     </div>
   </div>
@@ -1701,8 +1837,10 @@ function filterRecords(){
       '<td><span class="badge '+sc+'">'+sanitize(r.status||'Draft')+'</span></td>'+
       '<td><span class="badge '+payClass+'" style="cursor:pointer;" title="'+payTitle+'" '+
         'data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span></td>'+
-      '<td><div style="display:flex;gap:3px;">'+
+      '<td><div style="display:flex;gap:3px;flex-wrap:wrap;">'+
         '<button class="btn btn-blue btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">Edit</button>'+
+        (!isPaid?'<button class="btn btn-wa btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="sendPaymentReminder(this.dataset.bill)" title="Send payment reminder via WhatsApp">&#128172; Pay</button>':'')+
+        '<button class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:10px;border-color:#A855F7;color:#A855F7;" data-bill="'+safeBill+'" onclick="sendServiceReminder(this.dataset.bill)" title="Send service reminder via WhatsApp">&#128276;</button>'+
         '<button class="btn btn-red btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="deleteRecord(this.dataset.bill)">Del</button>'+
       '</div></td>'+
     '</tr>';
@@ -2245,6 +2383,263 @@ function exportOwCSV(){
 // ================================================================
 function fmtDate(d){if(!d)return'--';var dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='error'?' error':'')+' show';setTimeout(function(){t.classList.remove('show');},2800);}
+
+// ================================================================
+//  REMINDERS PAGE
+// ================================================================
+var remSettings = JSON.parse(localStorage.getItem('sribikez_rem_settings')||'null') || {interval:2, payDays:7};
+
+function goReminders(){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('progressBar').style.display='none';
+  document.getElementById('pageReminders').classList.add('active');
+  window.scrollTo(0,0);
+  loadRemSettings();
+  renderServiceDue();
+  renderUnpaidBills();
+}
+
+function switchRemTab(n){
+  for(var i=0;i<3;i++){
+    document.getElementById('remTabPanel'+i).style.display=i===n?'block':'none';
+    document.getElementById('remTabBtn'+i).classList.toggle('active',i===n);
+  }
+  if(n===0) renderServiceDue();
+  if(n===1) renderUnpaidBills();
+  if(n===2) updateMsgPreviews();
+}
+
+function loadRemSettings(){
+  var s = remSettings;
+  var di = document.getElementById('remDefaultInterval');
+  var pd = document.getElementById('remPayDays');
+  if(di) di.value = s.interval||2;
+  if(pd) pd.value = s.payDays||7;
+  updateMsgPreviews();
+}
+
+function saveRemSettings(){
+  var di = document.getElementById('remDefaultInterval');
+  var pd = document.getElementById('remPayDays');
+  remSettings.interval = parseInt(di?di.value:2)||2;
+  remSettings.payDays = parseInt(pd?pd.value:7)||7;
+  localStorage.setItem('sribikez_rem_settings', JSON.stringify(remSettings));
+  showToast('Settings saved!');
+  updateMsgPreviews();
+}
+
+function updateMsgPreviews(){
+  var sp = document.getElementById('remMsgPreview');
+  var pp = document.getElementById('payMsgPreview');
+  if(sp) sp.textContent = buildServiceReminderMsg({custName:'[Customer Name]', vehName:'[Vehicle]', vehNum:'[TN 01 AB 1234]', date:'[Last Service Date]'});
+  if(pp) pp.textContent = buildPaymentReminderMsg({custName:'[Customer Name]', vehName:'[Vehicle]', vehNum:'[TN 01 AB 1234]', billNo:'[SB00001]', total:1500, date:'[Service Date]'});
+}
+
+function buildServiceReminderMsg(r){
+  return '🔧 *Sri Bikez - Service Reminder*\n\n'+
+    'Dear '+r.custName+',\n\n'+
+    'Your vehicle *'+r.vehName+'* ('+r.vehNum+') is due for its periodic service.\n\n'+
+    'Last Serviced: '+fmtDate(r.date)+'\n\n'+
+    'Regular servicing keeps your bike in top condition and prevents costly repairs. Please visit us at your convenience.\n\n'+
+    '📍 Sri Bikez\nJalakandapuram main Road, Edappadi, Tamil Nadu\n📞 9865234433\n\nWe look forward to serving you! 🙏';
+}
+
+function buildPaymentReminderMsg(r){
+  return '💰 *Sri Bikez - Payment Reminder*\n\n'+
+    'Dear '+r.custName+',\n\n'+
+    'This is a gentle reminder for the pending payment for your vehicle *'+r.vehName+'* ('+r.vehNum+').\n\n'+
+    'Bill No: *'+r.billNo+'*\nService Date: '+fmtDate(r.date)+'\n*Amount Due: Rs '+parseFloat(r.total||0).toFixed(0)+'*\n\n'+
+    'Please settle the payment at your earliest convenience.\n\n'+
+    '📍 Sri Bikez\nJalakandapuram main Road, Edappadi, Tamil Nadu\n📞 9865234433\n\nThank you! 🙏';
+}
+
+function renderServiceDue(){
+  var container = document.getElementById('serviceDueList');
+  if(!container) return;
+  if(!allRecordsCached.length){container.innerHTML='<div class="rem-empty">No service records found. Add service records first.</div>';return;}
+
+  var interval = remSettings.interval||2;
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  // Get latest service per customer phone
+  var customerMap = {};
+  allRecordsCached.forEach(function(r){
+    if(!r.custPhone||!r.date) return;
+    var existing = customerMap[r.custPhone];
+    if(!existing || r.date > existing.date) customerMap[r.custPhone] = r;
+  });
+
+  var duelist = Object.values(customerMap).map(function(r){
+    var lastDate = new Date(r.date+'T00:00:00');
+    var dueDate = new Date(lastDate);
+    dueDate.setMonth(dueDate.getMonth() + interval);
+    var daysUntil = Math.round((dueDate - today) / (1000*60*60*24));
+    return Object.assign({}, r, {dueDate:dueDate, daysUntil:daysUntil});
+  }).sort(function(a,b){return a.daysUntil - b.daysUntil;});
+
+  // Apply filters
+  var filterVal = document.getElementById('remFilterInterval')?document.getElementById('remFilterInterval').value:'all';
+  var searchQ = (document.getElementById('remSearch')?document.getElementById('remSearch').value:'').toLowerCase();
+  var filtered = duelist.filter(function(r){
+    var matchSearch = !searchQ || (r.custName||'').toLowerCase().includes(searchQ) || (r.vehNum||'').toLowerCase().includes(searchQ) || (r.vehName||'').toLowerCase().includes(searchQ);
+    var matchFilter = filterVal==='all' || (filterVal==='overdue'&&r.daysUntil<0) || (filterVal==='week'&&r.daysUntil>=0&&r.daysUntil<=7) || (filterVal==='month'&&r.daysUntil>=0&&r.daysUntil<=30);
+    return matchSearch && matchFilter;
+  });
+
+  if(!filtered.length){container.innerHTML='<div class="rem-empty">No customers match this filter. 🎉</div>';return;}
+
+  container.innerHTML = filtered.map(function(r){
+    var dueClass = r.daysUntil < 0 ? 'overdue' : (r.daysUntil<=7?'due-soon':'ok');
+    var dueText = r.daysUntil < 0 ? 'Overdue by '+Math.abs(r.daysUntil)+' days' : (r.daysUntil===0?'Due Today':'Due in '+r.daysUntil+' days');
+    var dueBadge = r.daysUntil < 0 ? '<span class="badge badge-overdue">OVERDUE</span>' : (r.daysUntil<=7?'<span class="badge badge-week">DUE SOON</span>':'<span class="badge badge-green">UPCOMING</span>');
+    return '<div class="rem-card">'+
+      '<div class="rem-card-info">'+
+        '<div class="rem-card-name">'+sanitize(r.custName||'--')+'</div>'+
+        '<div class="rem-card-veh">'+sanitize(r.vehNum||'')+'  '+sanitize(r.vehName||'')+'</div>'+
+        '<div class="rem-card-meta">Last service: '+fmtDate(r.date)+' &nbsp;|&nbsp; Bill: '+sanitize(r.billNo||'--')+'</div>'+
+        '<div class="rem-card-meta">Ph: '+sanitize(r.custPhone||'--')+'</div>'+
+        '<div class="rem-card-due '+dueClass+'">'+dueText+' '+dueBadge+'</div>'+
+      '</div>'+
+      '<div class="rem-card-actions">'+
+        '<button class="btn btn-wa btn-sm" data-phone="'+sanitize(r.custPhone)+'" data-bill="'+sanitize(r.billNo)+'" onclick="sendServiceReminderByData(this.dataset.phone,this.dataset.bill)">&#128172; WhatsApp</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function renderUnpaidBills(){
+  var container = document.getElementById('unpaidBillsList');
+  if(!container) return;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var minDays = parseInt(document.getElementById('unpaidFilterDays')?document.getElementById('unpaidFilterDays').value:7)||0;
+  var searchQ = (document.getElementById('unpaidSearch')?document.getElementById('unpaidSearch').value:'').toLowerCase();
+
+  var unpaid = allRecordsCached.filter(function(r){
+    if(r.paymentStatus==='Paid') return false;
+    if(!r.date) return false;
+    var svcDate = new Date(r.date+'T00:00:00');
+    var daysSince = Math.round((today - svcDate)/(1000*60*60*24));
+    if(daysSince < minDays) return false;
+    if(searchQ && !(r.custName||'').toLowerCase().includes(searchQ) && !(r.vehNum||'').toLowerCase().includes(searchQ) && !(r.billNo||'').toLowerCase().includes(searchQ)) return false;
+    return true;
+  }).map(function(r){
+    var svcDate = new Date(r.date+'T00:00:00');
+    var daysSince = Math.round((today - svcDate)/(1000*60*60*24));
+    return Object.assign({},r,{daysSince:daysSince});
+  }).sort(function(a,b){return b.daysSince-a.daysSince;});
+
+  if(!unpaid.length){container.innerHTML='<div class="rem-empty">No unpaid bills matching this filter! 🎉</div>';return;}
+
+  var totalUnpaid = unpaid.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  container.innerHTML =
+    '<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">'+
+    '<span style="font-size:11px;color:var(--muted);">'+unpaid.length+' unpaid bills</span>'+
+    '<span style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:#ef4444;">Rs '+totalUnpaid.toFixed(0)+'</span>'+
+    '</div>'+
+    unpaid.map(function(r){
+      var dueClass = r.daysSince >= 30 ? 'badge-overdue' : 'badge-week';
+      return '<div class="unpaid-card">'+
+        '<div style="flex:1;min-width:160px;">'+
+          '<div class="rem-card-name">'+sanitize(r.custName||'--')+'</div>'+
+          '<div class="rem-card-veh">'+sanitize(r.vehNum||'')+'  '+sanitize(r.vehName||'')+'</div>'+
+          '<div class="rem-card-meta">Bill: '+sanitize(r.billNo||'--')+' &nbsp;|&nbsp; Date: '+fmtDate(r.date)+'</div>'+
+          '<div class="rem-card-meta">Ph: '+sanitize(r.custPhone||'--')+'</div>'+
+          '<div style="margin-top:5px;display:flex;align-items:center;gap:8px;">'+
+            '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:#ef4444;">Rs '+parseFloat(r.total||0).toFixed(0)+'</span>'+
+            '<span class="badge '+dueClass+'">'+r.daysSince+' days pending</span>'+
+          '</div>'+
+        '</div>'+
+        '<div style="display:flex;flex-direction:column;gap:5px;">'+
+          '<button class="btn btn-wa btn-sm" data-bill="'+sanitize(r.billNo)+'" onclick="sendPaymentReminder(this.dataset.bill)">&#128172; Remind</button>'+
+          '<button class="btn btn-green btn-sm" data-bill="'+sanitize(r.billNo)+'" onclick="markPaidFromReminders(this.dataset.bill)">Mark Paid</button>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+}
+
+function sendServiceReminderByData(phone, billNo){
+  var r = null;
+  for(var i=0;i<allRecordsCached.length;i++){if(allRecordsCached[i].billNo===billNo){r=allRecordsCached[i];break;}}
+  if(!r&&phone){r={custPhone:phone,custName:'Customer',vehName:'your vehicle',vehNum:'',date:'',billNo:billNo};}
+  if(!r||!r.custPhone){showToast('Phone number not found','error');return;}
+  var msg = buildServiceReminderMsg(r);
+  window.open('https://wa.me/91'+r.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+  showToast('Opening WhatsApp...');
+}
+
+function sendServiceReminder(billNo){
+  var r = null;
+  for(var i=0;i<allRecordsCached.length;i++){if(allRecordsCached[i].billNo===billNo){r=allRecordsCached[i];break;}}
+  if(!r||!r.custPhone){showToast('Phone number not found','error');return;}
+  var msg = buildServiceReminderMsg(r);
+  window.open('https://wa.me/91'+r.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+  showToast('Service reminder sent!');
+}
+
+function sendPaymentReminder(billNo){
+  var r = null;
+  for(var i=0;i<allRecordsCached.length;i++){if(allRecordsCached[i].billNo===billNo){r=allRecordsCached[i];break;}}
+  if(!r||!r.custPhone){showToast('Phone number not found','error');return;}
+  var msg = buildPaymentReminderMsg(r);
+  window.open('https://wa.me/91'+r.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+  showToast('Payment reminder sent!');
+}
+
+function markPaidFromReminders(billNo){
+  var recRef = window.__fbRef2(window.__fbDb,'sribikez/records/'+billNo);
+  window.__fbGet(recRef).then(function(snap){
+    var ex=snap.val()||{};
+    ex.paymentStatus='Paid';
+    ex.paidAt=new Date().toISOString();
+    return window.__fbSet(recRef,ex);
+  }).then(function(){
+    showToast('Marked as Paid!');
+    renderUnpaidBills();
+  }).catch(function(){showToast('Update failed','error');});
+}
+
+function sendAllServiceReminders(){
+  var interval = remSettings.interval||2;
+  var today = new Date(); today.setHours(0,0,0,0);
+  var customerMap = {};
+  allRecordsCached.forEach(function(r){
+    if(!r.custPhone||!r.date) return;
+    if(!customerMap[r.custPhone]||r.date>customerMap[r.custPhone].date) customerMap[r.custPhone]=r;
+  });
+  var due = Object.values(customerMap).filter(function(r){
+    var dueDate = new Date(r.date+'T00:00:00');
+    dueDate.setMonth(dueDate.getMonth()+interval);
+    return dueDate <= today || (dueDate-today)/(1000*60*60*24) <= 7;
+  });
+  if(!due.length){showToast('No reminders to send right now!');return;}
+  if(!confirm('Send service reminders to '+due.length+' customer(s) via WhatsApp? Each will open separately.'))return;
+  due.forEach(function(r,i){
+    setTimeout(function(){
+      var msg = buildServiceReminderMsg(r);
+      window.open('https://wa.me/91'+r.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+    }, i*600);
+  });
+  showToast('Sending '+due.length+' reminders...');
+}
+
+function sendAllPaymentReminders(){
+  var today = new Date(); today.setHours(0,0,0,0);
+  var minDays = remSettings.payDays||7;
+  var unpaid = allRecordsCached.filter(function(r){
+    if(r.paymentStatus==='Paid'||!r.date||!r.custPhone) return false;
+    var d = Math.round((today-new Date(r.date+'T00:00:00'))/(1000*60*60*24));
+    return d >= minDays;
+  });
+  if(!unpaid.length){showToast('No unpaid reminders to send!');return;}
+  if(!confirm('Send payment reminders to '+unpaid.length+' customer(s) via WhatsApp?'))return;
+  unpaid.forEach(function(r,i){
+    setTimeout(function(){
+      var msg = buildPaymentReminderMsg(r);
+      window.open('https://wa.me/91'+r.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+    }, i*600);
+  });
+  showToast('Sending '+unpaid.length+' payment reminders...');
+}
 </script>
 </body>
 </html>
