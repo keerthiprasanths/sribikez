@@ -642,40 +642,58 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 
       <!-- TAB 0: RECORDS (shown first) -->
       <div id="tabPanel0">
-        <div class="search-bar">
-          <input type="text" id="searchInput" placeholder="Search name, vehicle, phone, bill..." oninput="filterRecords()">
-          <select id="filterStatus" onchange="filterRecords()">
-            <option value="">All Status</option>
-            <option value="Completed">Completed</option>
-            <option value="In Progress">In Progress</option>
-          </select>
-          <select id="filterPayment" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
-            <option value="">All Payments</option>
-            <option value="Paid">Paid</option>
-            <option value="Unpaid">Unpaid</option>
-          </select>
-          <select id="filterMech" onchange="filterRecords()">
-            <option value="">All Mechanics</option>
-            <option>Gowtham</option><option>Jeeva</option><option>Arivalazhan</option>
-          </select>
-          <button class="btn btn-secondary btn-sm" onclick="exportCSV()">Export CSV</button>
-          <label class="btn btn-secondary btn-sm" style="cursor:pointer;">Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(event)"></label>
-          <button class="btn btn-red btn-sm" onclick="clearAllData()">Clear All</button>
+        <!-- TOP ACTION ROW -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+          <button class="btn btn-green" onclick="goPage(1)" style="font-size:14px;padding:10px 22px;letter-spacing:.5px;">+ New Service</button>
+          <div style="display:flex;gap:7px;flex-wrap:wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="border-color:var(--blue);color:var(--blue);">Export CSV</button>
+            <label class="btn btn-secondary btn-sm" style="cursor:pointer;border-color:var(--purple);color:var(--purple);">Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(event)"></label>
+            <button class="btn btn-sm" style="background:transparent;border:1px solid #ef4444;color:#ef4444;" onclick="clearAllData()">Clear All</button>
+          </div>
         </div>
-        <div style="margin-bottom:10px;">
-          <button class="btn btn-green" onclick="goPage(1)" style="font-size:13px;padding:8px 20px;">+ New Service Entry</button>
+
+        <!-- SEARCH BAR — big and visible -->
+        <div style="background:var(--card);border:2px solid var(--orange);border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+            <span style="font-size:18px;">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search by customer name, vehicle number, phone, or bill number..." oninput="filterRecords()"
+              style="flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;"
+            >
+            <button onclick="document.getElementById('searchInput').value='';filterRecords();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px;">✕</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <select id="filterStatus" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+              <option value="">All Status</option>
+              <option value="Completed">✅ Completed</option>
+              <option value="In Progress">🔧 In Progress</option>
+            </select>
+            <select id="filterPayment" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+              <option value="">All Payments</option>
+              <option value="Paid">💚 Paid</option>
+              <option value="Unpaid">🔴 Unpaid</option>
+            </select>
+            <select id="filterMech" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+              <option value="">All Mechanics</option>
+              <option>Gowtham</option><option>Jeeva</option><option>Arivalazhan</option>
+            </select>
+            <select id="filterSort" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+              <option value="date_desc">Latest First</option>
+              <option value="date_asc">Oldest First</option>
+              <option value="bill_desc">Bill No ↓</option>
+              <option value="bill_asc">Bill No ↑</option>
+              <option value="amount_desc">Amount ↓</option>
+            </select>
+            <span id="recordCountBadge" style="font-size:11px;color:var(--muted);padding:5px 9px;background:#161616;border-radius:6px;border:1px solid var(--border);white-space:nowrap;">0 records</span>
+          </div>
         </div>
-        <div class="table-wrap">
-          <table class="records-table">
-            <thead><tr>
-              <th>Bill</th><th>Date</th><th>Veh No</th><th>Vehicle</th>
-              <th>Customer</th><th>Phone</th><th>Mechanic</th><th>Amount</th><th>Status</th><th>Payment</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="adminTableBody"></tbody>
-          </table>
+
+        <!-- RECORDS TABLE — card-style rows -->
+        <div id="adminTableWrap">
+          <div id="adminCardView"></div>
         </div>
-        <div style="margin-top:9px;font-size:10px;color:var(--muted);">
-          Live sync via Firebase. All devices update automatically in real time.
+
+        <div style="margin-top:9px;font-size:10px;color:var(--muted);text-align:center;">
+          Live sync via Firebase · All devices update in real time
         </div>
       </div>
 
@@ -1075,44 +1093,93 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- GOOGLE DRIVE SETUP MODAL                                    -->
 <!-- ============================================================ -->
 <div id="driveSetupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:600;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;">
-    <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--orange2);margin-bottom:16px;">Google Drive Auto-Save Setup</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7;">Bills are saved as PDF to your Google Drive automatically when you click Finish Service. Follow these steps once to set it up:</div>
-    <div style="background:#161616;border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;line-height:1.8;color:var(--text);">
-      <strong style="color:var(--orange2);">Step 1:</strong> Go to <a href="https://script.google.com" target="_blank" style="color:var(--blue);">script.google.com</a> and create a new project<br>
-      <strong style="color:var(--orange2);">Step 2:</strong> Paste the Apps Script code shown below<br>
-      <strong style="color:var(--orange2);">Step 3:</strong> Click Deploy → New Deployment → Web App → Anyone → Deploy<br>
-      <strong style="color:var(--orange2);">Step 4:</strong> Copy the Web App URL and paste it below
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--orange2);margin-bottom:6px;">Google Drive Auto-Save Setup</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Bills are automatically saved to Google Drive when you click Finish Service.</div>
+
+    <!-- METHOD TABS -->
+    <div style="display:flex;gap:0;background:#161616;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;">
+      <button id="driveMethodA" onclick="switchDriveMethod('A')" style="flex:1;padding:9px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--orange);color:#fff;transition:all .18s;">Method A — Apps Script</button>
+      <button id="driveMethodB" onclick="switchDriveMethod('B')" style="flex:1;padding:9px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:all .18s;">Method B — Auto Download</button>
     </div>
-    <div style="background:#111;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:14px;font-family:monospace;font-size:10px;color:#a8ff78;overflow-x:auto;white-space:pre-wrap;">function doPost(e) {
-  var data = JSON.parse(e.postData.contents);
-  var billNo = data.billNo || 'UNKNOWN';
-  var html = data.html;
-  var month = data.month; // e.g. "2024-05"
 
-  // Get or create month folder
-  var root = DriveApp.getRootFolder();
-  var folders = root.getFoldersByName('Sri Bikez Bills');
-  var main = folders.hasNext() ? folders.next() : root.createFolder('Sri Bikez Bills');
-  var mFolders = main.getFoldersByName(month);
-  var mFolder = mFolders.hasNext() ? mFolders.next() : main.createFolder(month);
+    <!-- METHOD A: Apps Script -->
+    <div id="drivePanelA">
+      <div style="background:#161616;border-radius:8px;padding:12px;margin-bottom:10px;font-size:11px;line-height:1.9;color:var(--text);">
+        <strong style="color:var(--orange2);">Step 1</strong> — Go to <a href="https://script.google.com" target="_blank" style="color:var(--blue);">script.google.com</a> → New Project → delete existing code<br>
+        <strong style="color:var(--orange2);">Step 2</strong> — Paste the code below → Save (Ctrl+S)<br>
+        <strong style="color:var(--orange2);">Step 3</strong> — Click <strong>Deploy → New Deployment → Web App</strong><br>
+        &nbsp;&nbsp;&nbsp;• Execute as: <strong>Me</strong><br>
+        &nbsp;&nbsp;&nbsp;• Who has access: <strong>Anyone</strong> (not "Anyone with Google account")<br>
+        <strong style="color:var(--orange2);">Step 4</strong> — Click <strong>Authorize access</strong> → allow → Copy the Web App URL<br>
+        <strong style="color:var(--orange2);">Step 5</strong> — Paste URL below and click Save URL
+      </div>
+      <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px;margin-bottom:10px;font-family:monospace;font-size:10px;color:#7ee787;overflow-x:auto;white-space:pre-wrap;max-height:180px;overflow-y:auto;">function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var billNo = data.billNo || 'UNKNOWN';
+    var html = data.html;
+    var month = data.month;
 
-  // Save HTML as file (open in browser to print as PDF)
-  var blob = Utilities.newBlob(html, 'text/html', billNo + '.html');
-  mFolder.createFile(blob);
+    var root = DriveApp.getRootFolder();
+    var folders = root.getFoldersByName('Sri Bikez Bills');
+    var main = folders.hasNext() ? folders.next() : root.createFolder('Sri Bikez Bills');
+    var mf = main.getFoldersByName(month);
+    var mFolder = mf.hasNext() ? mf.next() : main.createFolder(month);
+    mFolder.createFile(Utilities.newBlob(html,'text/html',billNo+'.html'));
 
-  return ContentService.createTextOutput('saved')
-    .setMimeType(ContentService.MimeType.TEXT);
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'saved'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({status:'error',msg:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+function doGet(e){
+  return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
 }</div>
-    <div class="field" style="margin-bottom:12px;">
-      <label>Your Apps Script Web App URL</label>
-      <input type="text" id="driveWebAppURL" placeholder="https://script.google.com/macros/s/..." style="font-size:12px;">
+      <div class="field" style="margin-bottom:10px;">
+        <label>Apps Script Web App URL</label>
+        <input type="text" id="driveWebAppURL" placeholder="https://script.google.com/macros/s/AKfycb.../exec" style="font-size:11px;">
+      </div>
+      <div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:10px;margin-bottom:10px;font-size:11px;color:var(--yellow);line-height:1.7;">
+        <strong>Connection failed?</strong> The most common cause is CORS. Fix it:<br>
+        1. In Apps Script editor → click <strong>Project Settings</strong> (gear icon)<br>
+        2. Check <strong>"Show appsscript.json in editor"</strong><br>
+        3. In the editor, click <strong>appsscript.json</strong> → add this line inside the JSON:<br>
+        <code style="color:#a8ff78;">"oauthScopes":["https://www.googleapis.com/auth/drive"]</code><br>
+        4. <strong>Delete old deployment</strong> → create a <strong>New Deployment</strong> → copy new URL
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="saveDriveURL()">Save URL</button>
+        <button class="btn btn-secondary btn-sm" onclick="testDriveConnection()">Test Connection</button>
+        <button class="btn btn-secondary btn-sm" onclick="closeDriveModal()">Close</button>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary" onclick="saveDriveURL()">Save URL</button>
-      <button class="btn btn-secondary" onclick="closeDriveModal()">Close</button>
-      <button class="btn btn-secondary btn-sm" style="margin-left:auto;" onclick="testDriveConnection()">Test Connection</button>
+
+    <!-- METHOD B: Auto Download to Computer + Manual Upload -->
+    <div id="drivePanelB" style="display:none;">
+      <div style="background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--text);line-height:1.8;">
+        <strong style="color:var(--green);">No setup required.</strong> When you click Finish Service, the bill HTML file is automatically downloaded to your phone or computer. Then manually drag that file into your Google Drive folder. Simple and always works.
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.7;">
+        <strong style="color:var(--text);">How it works:</strong><br>
+        1. Click <strong>Finish Service</strong> → bill file downloads automatically<br>
+        2. Open <strong>drive.google.com</strong> on your phone/computer<br>
+        3. Drag the downloaded file to the <strong>Sri Bikez Bills</strong> folder<br>
+        4. Open the file anytime and print as PDF
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;padding:10px;background:#161616;border-radius:8px;border:1px solid var(--border);">
+        <input type="checkbox" id="autoDownloadToggle" onchange="toggleAutoDownload()" style="width:16px;height:16px;accent-color:var(--orange);">
+        <span>Enable auto-download on Finish Service</span>
+      </label>
+      <div style="margin-top:12px;">
+        <button class="btn btn-secondary btn-sm" onclick="closeDriveModal()">Close</button>
+      </div>
     </div>
+
     <div id="driveTestResult" style="margin-top:8px;font-size:11px;color:var(--muted);"></div>
   </div>
 </div>
@@ -1963,6 +2030,8 @@ function filterRecords(){
   var fs=(document.getElementById('filterStatus')?document.getElementById('filterStatus').value:'');
   var fm=(document.getElementById('filterMech')?document.getElementById('filterMech').value:'');
   var fp=(document.getElementById('filterPayment')?document.getElementById('filterPayment').value:'');
+  var sortVal=(document.getElementById('filterSort')?document.getElementById('filterSort').value:'date_desc');
+
   var filtered=allRecordsCached.filter(function(r){
     var mq=!q||(r.custName||'').toLowerCase().includes(q)||(r.vehNum||'').toLowerCase().includes(q)||(r.custPhone||'').includes(q)||(r.billNo||'').toLowerCase().includes(q)||(r.vehName||'').toLowerCase().includes(q);
     var ms=!fs||r.status===fs;
@@ -1970,35 +2039,75 @@ function filterRecords(){
     var mp=!fp||(fp==='Paid'?r.paymentStatus==='Paid':r.paymentStatus!=='Paid');
     return mq&&ms&&mm&&mp;
   });
-  filtered.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
-  var tbody=document.getElementById('adminTableBody');
-  if(!filtered.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;padding:20px;color:var(--muted)">No records found.</td></tr>';return;}
-  tbody.innerHTML=filtered.map(function(r){
-    var sc=r.status==='Completed'?'badge-green':'badge-yellow';
+
+  // Sort
+  filtered.sort(function(a,b){
+    if(sortVal==='date_asc')  return (a.date||'').localeCompare(b.date||'');
+    if(sortVal==='date_desc') return (b.date||'').localeCompare(a.date||'');
+    if(sortVal==='bill_asc')  return (a.billNo||'').localeCompare(b.billNo||'');
+    if(sortVal==='bill_desc') return (b.billNo||'').localeCompare(a.billNo||'');
+    if(sortVal==='amount_desc') return (parseFloat(b.total)||0)-(parseFloat(a.total)||0);
+    return (b.date||'').localeCompare(a.date||'');
+  });
+
+  var countEl=document.getElementById('recordCountBadge');
+  if(countEl) countEl.textContent=filtered.length+' record'+(filtered.length!==1?'s':'');
+
+  var wrap=document.getElementById('adminCardView');
+  if(!wrap) return;
+
+  if(!filtered.length){
+    wrap.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted);"><div style="font-size:40px;margin-bottom:10px;">📋</div><div style="font-size:14px;">No records found</div></div>';
+    return;
+  }
+
+  wrap.innerHTML=filtered.map(function(r){
     var isPaid=r.paymentStatus==='Paid';
+    var isComplete=r.status==='Completed';
     var payClass=isPaid?'badge-paid':'badge-unpaid';
     var payText=isPaid?'PAID':'UNPAID';
-    var payTitle=isPaid?'Click to mark as Unpaid':'Click to mark as Paid';
+    var statusColor=isComplete?'var(--green)':'var(--yellow)';
     var safeBill=sanitize(r.billNo||'--');
-    return '<tr>'+
-      '<td><strong style="color:var(--orange)">'+safeBill+'</strong></td>'+
-      '<td>'+fmtDate(r.date)+'</td>'+
-      '<td><strong>'+sanitize(r.vehNum||'--')+'</strong></td>'+
-      '<td style="max-width:85px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+sanitize(r.vehName||'--')+'</td>'+
-      '<td>'+sanitize(r.custName||'--')+'</td>'+
-      '<td>'+sanitize(r.custPhone||'--')+'</td>'+
-      '<td>'+sanitize(r.mechName||'--')+'</td>'+
-      '<td><strong style="color:var(--green)">Rs '+parseFloat(r.total||0).toFixed(0)+'</strong></td>'+
-      '<td><span class="badge '+sc+'">'+sanitize(r.status||'Draft')+'</span></td>'+
-      '<td><span class="badge '+payClass+'" style="cursor:pointer;" title="'+payTitle+'" '+
-        'data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span></td>'+
-      '<td><div style="display:flex;gap:3px;flex-wrap:wrap;">'+
-        '<button class="btn btn-blue btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">Edit</button>'+
-        (!isPaid?'<button class="btn btn-wa btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="sendPaymentReminder(this.dataset.bill)" title="Send payment reminder via WhatsApp">&#128172; Pay</button>':'')+
-        '<button class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:10px;border-color:#A855F7;color:#A855F7;" data-bill="'+safeBill+'" onclick="sendServiceReminder(this.dataset.bill)" title="Send service reminder via WhatsApp">&#128276;</button>'+
-        '<button class="btn btn-red btn-sm" style="padding:3px 8px;font-size:10px;" data-bill="'+safeBill+'" onclick="deleteRecord(this.dataset.bill)">Del</button>'+
-      '</div></td>'+
-    '</tr>';
+    var borderColor=isComplete?'rgba(34,197,94,.2)':'rgba(245,158,11,.2)';
+
+    return '<div style="background:var(--card);border:1px solid '+borderColor+';border-left:3px solid '+statusColor+';border-radius:10px;padding:14px 16px;margin-bottom:9px;transition:background .15s;" onmouseenter="this.style.background=\'#2a2a2a\'" onmouseleave="this.style.background=\'var(--card)\'">' +
+      // ROW 1: Bill No, Date, Status badges
+      '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--orange);">'+safeBill+'</span>' +
+          '<span style="font-size:11px;color:var(--muted);">'+fmtDate(r.date)+'</span>' +
+        '</div>' +
+        '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<span class="badge '+payClass+'" style="cursor:pointer;padding:3px 9px;" title="Click to toggle payment" data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span>' +
+          '<span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:6px;background:'+(isComplete?'rgba(34,197,94,.12)':'rgba(245,158,11,.12)')+';color:'+statusColor+';border:1px solid '+(isComplete?'rgba(34,197,94,.3)':'rgba(245,158,11,.3)')+'">'+(r.status||'Draft')+'</span>' +
+        '</div>' +
+      '</div>' +
+      // ROW 2: Customer + Vehicle
+      '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">' +
+        '<div style="flex:1;min-width:140px;">' +
+          '<div style="font-size:13px;font-weight:600;color:var(--text);">'+sanitize(r.custName||'--')+'</div>' +
+          '<div style="font-size:11px;color:var(--muted);">📞 '+sanitize(r.custPhone||'--')+'</div>' +
+        '</div>' +
+        '<div style="flex:1;min-width:140px;">' +
+          '<div style="font-size:12px;font-weight:600;color:var(--orange2);">'+sanitize(r.vehNum||'--')+'</div>' +
+          '<div style="font-size:11px;color:var(--muted);">'+sanitize(r.vehName||'--')+'</div>' +
+        '</div>' +
+        '<div style="flex:1;min-width:120px;">' +
+          '<div style="font-size:11px;color:var(--muted);">👨‍🔧 '+sanitize(r.mechName||'--')+'</div>' +
+          (r.vehKm?'<div style="font-size:10px;color:var(--blue);">'+sanitize(r.vehKm)+' KM</div>':'')+
+        '</div>' +
+        '<div style="text-align:right;">' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:'+(isPaid?'var(--green)':'#ef4444')+';">Rs '+parseFloat(r.total||0).toFixed(0)+'</div>' +
+        '</div>' +
+      '</div>' +
+      // ROW 3: Actions
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);">' +
+        '<button class="btn btn-blue btn-sm" style="padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">✏️ Edit Bill</button>' +
+        (!isPaid?'<button class="btn btn-sm" style="background:#25D366;color:#fff;padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="sendPaymentReminder(this.dataset.bill)">💬 Payment Reminder</button>':'')+
+        '<button class="btn btn-sm" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#A855F7;padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="sendServiceReminder(this.dataset.bill)">🔔 Service Reminder</button>'+
+        '<button class="btn btn-red btn-sm" style="padding:5px 12px;font-size:12px;margin-left:auto;" data-bill="'+safeBill+'" onclick="deleteRecord(this.dataset.bill)">🗑️ Delete</button>'+
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
@@ -2543,45 +2652,75 @@ function showToast(msg,type){var t=document.getElementById('toast');t.textConten
 //  GOOGLE DRIVE AUTO-SAVE
 // ================================================================
 var driveWebAppURL = localStorage.getItem('sribikez_driveURL') || '';
+var autoDownloadEnabled = localStorage.getItem('sribikez_autodownload') === 'true';
 
 function openDriveModal(){
   document.getElementById('driveSetupModal').style.display='flex';
   document.getElementById('driveWebAppURL').value = driveWebAppURL;
+  var tog = document.getElementById('autoDownloadToggle');
+  if(tog) tog.checked = autoDownloadEnabled;
+  switchDriveMethod(driveWebAppURL ? 'A' : (autoDownloadEnabled ? 'B' : 'A'));
 }
 function closeDriveModal(){
   document.getElementById('driveSetupModal').style.display='none';
 }
+function switchDriveMethod(m){
+  var btnA=document.getElementById('driveMethodA');
+  var btnB=document.getElementById('driveMethodB');
+  var panA=document.getElementById('drivePanelA');
+  var panB=document.getElementById('drivePanelB');
+  if(!btnA||!btnB)return;
+  if(m==='A'){
+    btnA.style.background='var(--orange)';btnA.style.color='#fff';
+    btnB.style.background='transparent';btnB.style.color='var(--muted)';
+    panA.style.display='block';panB.style.display='none';
+  }else{
+    btnB.style.background='var(--orange)';btnB.style.color='#fff';
+    btnA.style.background='transparent';btnA.style.color='var(--muted)';
+    panB.style.display='block';panA.style.display='none';
+  }
+}
+function toggleAutoDownload(){
+  var tog=document.getElementById('autoDownloadToggle');
+  autoDownloadEnabled=tog?tog.checked:false;
+  localStorage.setItem('sribikez_autodownload', autoDownloadEnabled?'true':'false');
+  showToast(autoDownloadEnabled?'Auto-download enabled':'Auto-download disabled');
+}
 function saveDriveURL(){
-  var url = document.getElementById('driveWebAppURL').value.trim();
-  if(!url){ showToast('Enter the Web App URL','error'); return; }
-  driveWebAppURL = url;
-  localStorage.setItem('sribikez_driveURL', url);
+  var url=document.getElementById('driveWebAppURL').value.trim();
+  if(!url){showToast('Enter the Web App URL','error');return;}
+  driveWebAppURL=url;
+  localStorage.setItem('sribikez_driveURL',url);
   showToast('Drive URL saved! Auto-save is now active.');
   closeDriveModal();
 }
 function testDriveConnection(){
-  var url = document.getElementById('driveWebAppURL').value.trim();
-  var res = document.getElementById('driveTestResult');
-  if(!url){ res.textContent='Enter URL first'; return; }
-  res.textContent = 'Testing connection...';
-  res.style.color='var(--blue)';
-  fetch(url, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({billNo:'TEST',html:'<h1>Test</h1>',month:'test'})
-  }).then(function(r){ return r.text(); })
-  .then(function(t){
-    res.textContent = 'Connection OK! Response: '+t;
-    res.style.color='var(--green)';
-  }).catch(function(e){
-    res.textContent = 'Connection failed. Check URL and redeploy as Anyone access.';
-    res.style.color='#ef4444';
-  });
+  var url=document.getElementById('driveWebAppURL').value.trim();
+  var res=document.getElementById('driveTestResult');
+  if(!url){res.textContent='Enter URL first';return;}
+  res.textContent='Testing connection...';res.style.color='var(--blue)';
+  fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({billNo:'TEST',html:'<h1>Test OK</h1>',month:'test'})})
+    .then(function(r){return r.text();})
+    .then(function(t){res.textContent='Connection OK! Response: '+t;res.style.color='var(--green)';})
+    .catch(function(){res.textContent='Connection failed. Check URL, redeploy as "Anyone" (not "Anyone with account"), and try again.';res.style.color='#ef4444';});
 }
 function autoSaveBillToDrive(record, s){
   var driveEl = document.getElementById('driveStatusInline');
+  // Method B — auto download if enabled
+  if(autoDownloadEnabled && !driveWebAppURL){
+    var d2=new Date(record.date+'T00:00:00');
+    var monthStr2=d2.getFullYear()+'-'+String(d2.getMonth()+1).padStart(2,'0')+'-'+d2.toLocaleDateString('en-IN',{month:'long'});
+    downloadBillFile(record.billNo, billHTML);
+    if(driveEl){driveEl.className='drive-status saved';driveEl.textContent='Bill downloaded — drag to Google Drive folder: Sri Bikez Bills / '+monthStr2;}
+    return;
+  }
+  // Both enabled — prefer Apps Script, fallback to download
+  if(autoDownloadEnabled && driveWebAppURL){
+    downloadBillFile(record.billNo, billHTML);
+  }
+
   if(!driveWebAppURL){
-    if(driveEl){ driveEl.className='drive-status failed'; driveEl.textContent='Drive not configured. Go to Menu > Drive Auto-Save Setup'; }
+    if(driveEl){driveEl.className='drive-status failed';driveEl.textContent='Drive not set up. Go to Menu > Drive Auto-Save Setup';}
     return;
   }
   // Build bill HTML for Drive storage
@@ -2648,7 +2787,20 @@ function autoSaveBillToDrive(record, s){
     showToast('Bill saved to Google Drive');
   }).catch(function(){
     if(driveEl){ driveEl.className='drive-status failed'; driveEl.textContent='Drive save failed. Check setup in Menu > Drive Auto-Save Setup'; }
+    // Fallback: auto-download if Apps Script fails
+    if(autoDownloadEnabled) downloadBillFile(record.billNo, billHTML);
   });
+}
+
+function downloadBillFile(billNo, htmlContent){
+  var blob = new Blob([htmlContent], {type:'text/html'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = billNo + '.html';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); document.body.removeChild(a); }, 1000);
 }
 
 // ================================================================
@@ -2968,27 +3120,33 @@ function renderUnpaidBills(){
 
   var totalUnpaid = unpaid.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
   container.innerHTML =
-    '<div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">'+
-    '<span style="font-size:11px;color:var(--muted);">'+unpaid.length+' unpaid bills</span>'+
-    '<span style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:#ef4444;">Rs '+totalUnpaid.toFixed(0)+'</span>'+
+    '<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">' +
+    '<div><div style="font-size:12px;font-weight:600;color:#ef4444;">'+unpaid.length+' Unpaid Bills</div><div style="font-size:10px;color:var(--muted);">Tap buttons to remind or mark paid</div></div>' +
+    '<span style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:#ef4444;">Rs '+totalUnpaid.toFixed(0)+'</span>' +
     '</div>'+
     unpaid.map(function(r){
       var dueClass = r.daysSince >= 30 ? 'badge-overdue' : 'badge-week';
-      return '<div class="unpaid-card">'+
-        '<div style="flex:1;min-width:160px;">'+
-          '<div class="rem-card-name">'+sanitize(r.custName||'--')+'</div>'+
-          '<div class="rem-card-veh">'+sanitize(r.vehNum||'')+'  '+sanitize(r.vehName||'')+'</div>'+
-          '<div class="rem-card-meta">Bill: '+sanitize(r.billNo||'--')+' &nbsp;|&nbsp; Date: '+fmtDate(r.date)+'</div>'+
-          '<div class="rem-card-meta">Ph: '+sanitize(r.custPhone||'--')+'</div>'+
-          '<div style="margin-top:5px;display:flex;align-items:center;gap:8px;">'+
-            '<span style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:#ef4444;">Rs '+parseFloat(r.total||0).toFixed(0)+'</span>'+
-            '<span class="badge '+dueClass+'">'+r.daysSince+' days pending</span>'+
-          '</div>'+
-        '</div>'+
-        '<div style="display:flex;flex-direction:column;gap:5px;">'+
-          '<button class="btn btn-wa btn-sm" data-bill="'+sanitize(r.billNo)+'" onclick="sendPaymentReminder(this.dataset.bill)">&#128172; Remind</button>'+
-          '<button class="btn btn-green btn-sm" data-bill="'+sanitize(r.billNo)+'" onclick="markPaidFromReminders(this.dataset.bill)">Mark Paid</button>'+
-        '</div>'+
+      var safeBill = sanitize(r.billNo||'--');
+      return '<div style="background:var(--card);border:1px solid rgba(239,68,68,.25);border-left:3px solid #ef4444;border-radius:10px;padding:14px 16px;margin-bottom:10px;">' +
+        // Row 1 — customer + amount
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' +
+          '<div>' +
+            '<div style="font-family:Rajdhani,sans-serif;font-size:16px;font-weight:700;color:var(--text);">'+sanitize(r.custName||'--')+'</div>' +
+            '<div style="font-size:12px;color:var(--orange2);font-weight:600;">'+sanitize(r.vehNum||'')+'  '+sanitize(r.vehName||'')+'</div>' +
+            '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Bill: <strong style="color:var(--orange);">'+safeBill+'</strong> &nbsp;|&nbsp; Date: '+fmtDate(r.date)+'</div>' +
+            '<div style="font-size:11px;color:var(--muted);">📞 '+sanitize(r.custPhone||'--')+'</div>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+            '<div style="font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;color:#ef4444;">Rs '+parseFloat(r.total||0).toFixed(0)+'</div>' +
+            '<span class="badge '+dueClass+'">'+r.daysSince+' days pending</span>' +
+          '</div>' +
+        '</div>' +
+        // Row 2 — action buttons, clearly visible and large
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);">' +
+          '<button style="display:flex;align-items:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;min-width:120px;justify-content:center;" data-bill="'+safeBill+'" onclick="sendPaymentReminder(this.dataset.bill)">💬 Remind</button>' +
+          '<button style="display:flex;align-items:center;gap:6px;background:var(--green);color:#000;border:none;border-radius:8px;padding:9px 16px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;min-width:120px;justify-content:center;" data-bill="'+safeBill+'" onclick="markPaidFromReminders(this.dataset.bill)">✅ Mark Paid</button>' +
+          '<button style="display:flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;min-width:120px;justify-content:center;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">✏️ Edit Bill</button>' +
+        '</div>' +
       '</div>';
     }).join('');
 }
