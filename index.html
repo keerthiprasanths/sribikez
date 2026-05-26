@@ -296,6 +296,29 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .badge-week{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.3);}
 .rem-empty{text-align:center;padding:30px 16px;color:var(--muted);font-size:13px;}
 .send-all-bar{background:rgba(232,73,15,.07);border:1px solid rgba(232,73,15,.22);border-radius:9px;padding:11px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+/* CUSTOMER PORTAL */
+.portal-hero{background:linear-gradient(135deg,var(--dark) 0%,#1f1a16 100%);border-bottom:2px solid var(--orange);padding:28px 20px 22px;text-align:center;}
+.portal-logo{height:52px;object-fit:contain;margin-bottom:10px;}
+.portal-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--text);letter-spacing:1px;}
+.portal-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+.portal-otp-box{display:flex;gap:8px;justify-content:center;margin:16px 0;}
+.portal-otp-box input{width:44px;height:52px;text-align:center;font-size:22px;font-weight:700;font-family:'Rajdhani',sans-serif;background:#161616;border:2px solid var(--border);border-radius:8px;color:var(--text);outline:none;}
+.portal-otp-box input:focus{border-color:var(--orange);}
+.portal-history-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px;}
+.portal-bill-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
+.portal-bill-no{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--orange);}
+.portal-bill-date{font-size:11px;color:var(--muted);}
+.portal-veh{font-size:13px;font-weight:600;margin-bottom:4px;}
+.portal-complaints{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;}
+.portal-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.portal-row:last-child{border-bottom:none;}
+.portal-total{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--orange);}
+.portal-km{display:inline-block;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:5px;padding:2px 8px;font-size:10px;color:var(--blue);margin-left:6px;}
+/* Drive status */
+.drive-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:6px;margin-top:5px;}
+.drive-status.saving{background:rgba(59,130,246,.1);color:var(--blue);}
+.drive-status.saved{background:rgba(34,197,94,.1);color:var(--green);}
+.drive-status.failed{background:rgba(239,68,68,.1);color:#ef4444;}
 </style>
 </head>
 <body>
@@ -329,11 +352,17 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
   <div class="ham-item" onclick="closeHamMenu();goAdmin()">
     <span class="ham-icon">&#128203;</span> Admin Panel
   </div>
+  <div class="ham-item" onclick="closeHamMenu();goPortal()" style="color:var(--blue);">
+    <span class="ham-icon">&#128100;</span> Customer Portal
+  </div>
   <div class="ham-item" onclick="closeHamMenu();goReminders()" style="color:#A855F7;">
     <span class="ham-icon">&#128276;</span> Reminders
   </div>
   <div class="ham-item" onclick="closeHamMenu();goOutsideWork()" style="color:var(--orange2);">
     <span class="ham-icon">&#128295;</span> Outside Work
+  </div>
+  <div class="ham-item" onclick="closeHamMenu();openDriveModal()" style="color:var(--green);">
+    <span class="ham-icon">&#128190;</span> Drive Auto-Save Setup
   </div>
   <div style="padding:14px 18px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Outside Work Types</div>
   <div class="ham-item" onclick="closeHamMenu();goOutsideWork('Welding')"><span class="ham-icon">&#128293;</span> Welding</div>
@@ -959,6 +988,132 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CUSTOMER PORTAL PAGE                                        -->
+<!-- ============================================================ -->
+<div class="page" id="pagePortal">
+  <div class="portal-hero">
+    <div class="portal-title">Sri Bikez</div>
+    <div class="portal-sub">Customer Service History Portal</div>
+  </div>
+  <div class="container" style="max-width:500px;">
+
+    <!-- STEP 1: Search by Phone or Vehicle Number -->
+    <div id="portalStep1" class="card" style="margin-top:24px;">
+      <div class="card-title" style="justify-content:center;font-size:18px;">View Your Service History</div>
+      <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px;">Enter your mobile number or vehicle number to view all your past services and bills</p>
+
+      <div style="display:flex;gap:0;background:#161616;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;">
+        <button id="portalTabPhone" onclick="switchPortalTab('phone')" style="flex:1;padding:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--orange);color:#fff;transition:all .18s;">Mobile Number</button>
+        <button id="portalTabVeh" onclick="switchPortalTab('veh')" style="flex:1;padding:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:all .18s;">Vehicle Number</button>
+      </div>
+
+      <div id="portalPhoneInput">
+        <div class="field" style="margin-bottom:14px;">
+          <label>Your Mobile Number</label>
+          <input type="tel" id="portalPhone" placeholder="e.g. 9876543210" maxlength="10"
+            style="font-size:18px;text-align:center;letter-spacing:3px;"
+            onkeyup="if(event.key==='Enter')portalSearch()">
+        </div>
+      </div>
+
+      <div id="portalVehInput" style="display:none;">
+        <div class="field" style="margin-bottom:14px;">
+          <label>Your Vehicle Number</label>
+          <input type="text" id="portalVehNum" placeholder="e.g. TN 33 AB 1234"
+            style="font-size:16px;text-align:center;letter-spacing:2px;text-transform:uppercase;"
+            oninput="this.value=this.value.toUpperCase()"
+            onkeyup="if(event.key==='Enter')portalSearch()">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;font-size:15px;padding:13px;" onclick="portalSearch()">Search My History</button>
+
+      <div id="portalSearchError" style="display:none;margin-top:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:7px;padding:9px 12px;font-size:12px;color:#ef4444;text-align:center;"></div>
+
+      <div style="text-align:center;margin-top:12px;">
+        <button class="btn btn-secondary btn-sm" onclick="goPage(1)">Back to Service</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Service History -->
+    <div id="portalStep3" style="display:none;margin-top:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;" id="portalCustGreet">Hello!</div>
+          <div style="font-size:11px;color:var(--muted);" id="portalCustSub">Your service history</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="portalReset()">Search Again</button>
+      </div>
+
+      <!-- Summary stats -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;" id="portalStats"></div>
+
+      <!-- History cards -->
+      <div id="portalHistoryList"></div>
+
+      <!-- Empty state -->
+      <div id="portalEmpty" style="display:none;text-align:center;padding:40px 20px;">
+        <div style="font-size:48px;margin-bottom:12px;">&#127949;</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:20px;color:var(--muted);">No service records found</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px;">Your service history will appear here after your first visit</div>
+      </div>
+
+      <div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Need service? Contact us</div>
+        <a href="https://wa.me/919865234433" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;padding:9px 20px;border-radius:7px;text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;">WhatsApp Sri Bikez</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- GOOGLE DRIVE SETUP MODAL                                    -->
+<!-- ============================================================ -->
+<div id="driveSetupModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:600;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--orange2);margin-bottom:16px;">Google Drive Auto-Save Setup</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7;">Bills are saved as PDF to your Google Drive automatically when you click Finish Service. Follow these steps once to set it up:</div>
+    <div style="background:#161616;border-radius:8px;padding:14px;margin-bottom:12px;font-size:12px;line-height:1.8;color:var(--text);">
+      <strong style="color:var(--orange2);">Step 1:</strong> Go to <a href="https://script.google.com" target="_blank" style="color:var(--blue);">script.google.com</a> and create a new project<br>
+      <strong style="color:var(--orange2);">Step 2:</strong> Paste the Apps Script code shown below<br>
+      <strong style="color:var(--orange2);">Step 3:</strong> Click Deploy → New Deployment → Web App → Anyone → Deploy<br>
+      <strong style="color:var(--orange2);">Step 4:</strong> Copy the Web App URL and paste it below
+    </div>
+    <div style="background:#111;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:14px;font-family:monospace;font-size:10px;color:#a8ff78;overflow-x:auto;white-space:pre-wrap;">function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var billNo = data.billNo || 'UNKNOWN';
+  var html = data.html;
+  var month = data.month; // e.g. "2024-05"
+
+  // Get or create month folder
+  var root = DriveApp.getRootFolder();
+  var folders = root.getFoldersByName('Sri Bikez Bills');
+  var main = folders.hasNext() ? folders.next() : root.createFolder('Sri Bikez Bills');
+  var mFolders = main.getFoldersByName(month);
+  var mFolder = mFolders.hasNext() ? mFolders.next() : main.createFolder(month);
+
+  // Save HTML as file (open in browser to print as PDF)
+  var blob = Utilities.newBlob(html, 'text/html', billNo + '.html');
+  mFolder.createFile(blob);
+
+  return ContentService.createTextOutput('saved')
+    .setMimeType(ContentService.MimeType.TEXT);
+}</div>
+    <div class="field" style="margin-bottom:12px;">
+      <label>Your Apps Script Web App URL</label>
+      <input type="text" id="driveWebAppURL" placeholder="https://script.google.com/macros/s/..." style="font-size:12px;">
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" onclick="saveDriveURL()">Save URL</button>
+      <button class="btn btn-secondary" onclick="closeDriveModal()">Close</button>
+      <button class="btn btn-secondary btn-sm" style="margin-left:auto;" onclick="testDriveConnection()">Test Connection</button>
+    </div>
+    <div id="driveTestResult" style="margin-top:8px;font-size:11px;color:var(--muted);"></div>
   </div>
 </div>
 
@@ -1676,6 +1831,8 @@ function finishService(){
   };
   fbSave(record,function(){
     if(state.editMode){showToast('Bill updated and completed');goAdmin();return;}
+    // Auto-save to Google Drive
+    autoSaveBillToDrive(record, s);
     document.getElementById('completeSummary').textContent=state.custName+"'s "+state.vehName+' ('+state.vehNum+') saved.';
     document.getElementById('completeDetails').innerHTML=
       '<div style="display:grid;gap:7px;">'+
@@ -1684,7 +1841,8 @@ function finishService(){
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Vehicle</span><strong>'+record.vehNum+' - '+record.vehName+'</strong></div>'+
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Total</span><strong style="color:var(--orange)">Rs '+record.total.toFixed(2)+'</strong></div>'+
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Mechanic</span><strong>'+record.mechName+'</strong></div>'+
-      '</div>';
+      '</div>'+
+      '<div id="driveStatusInline" class="drive-status saving">Saving bill to Google Drive...</div>';
     goPage(4);
     document.querySelectorAll('.prog-step').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
     showToast('Service completed and saved!');
@@ -2380,6 +2538,287 @@ function exportOwCSV(){
 // ================================================================
 function fmtDate(d){if(!d)return'--';var dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='error'?' error':'')+' show';setTimeout(function(){t.classList.remove('show');},2800);}
+
+// ================================================================
+//  GOOGLE DRIVE AUTO-SAVE
+// ================================================================
+var driveWebAppURL = localStorage.getItem('sribikez_driveURL') || '';
+
+function openDriveModal(){
+  document.getElementById('driveSetupModal').style.display='flex';
+  document.getElementById('driveWebAppURL').value = driveWebAppURL;
+}
+function closeDriveModal(){
+  document.getElementById('driveSetupModal').style.display='none';
+}
+function saveDriveURL(){
+  var url = document.getElementById('driveWebAppURL').value.trim();
+  if(!url){ showToast('Enter the Web App URL','error'); return; }
+  driveWebAppURL = url;
+  localStorage.setItem('sribikez_driveURL', url);
+  showToast('Drive URL saved! Auto-save is now active.');
+  closeDriveModal();
+}
+function testDriveConnection(){
+  var url = document.getElementById('driveWebAppURL').value.trim();
+  var res = document.getElementById('driveTestResult');
+  if(!url){ res.textContent='Enter URL first'; return; }
+  res.textContent = 'Testing connection...';
+  res.style.color='var(--blue)';
+  fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({billNo:'TEST',html:'<h1>Test</h1>',month:'test'})
+  }).then(function(r){ return r.text(); })
+  .then(function(t){
+    res.textContent = 'Connection OK! Response: '+t;
+    res.style.color='var(--green)';
+  }).catch(function(e){
+    res.textContent = 'Connection failed. Check URL and redeploy as Anyone access.';
+    res.style.color='#ef4444';
+  });
+}
+function autoSaveBillToDrive(record, s){
+  var driveEl = document.getElementById('driveStatusInline');
+  if(!driveWebAppURL){
+    if(driveEl){ driveEl.className='drive-status failed'; driveEl.textContent='Drive not configured. Go to Menu > Drive Auto-Save Setup'; }
+    return;
+  }
+  // Build bill HTML for Drive storage
+  var parts = record.parts || [];
+  var sigHTML = activeSigDataURL ?
+    '<img src="'+activeSigDataURL+'" style="max-width:140px;max-height:50px;object-fit:contain;">' :
+    '<div style="width:140px;height:48px;border-bottom:2px solid #ccc;"></div>';
+  var rows = parts.length ?
+    parts.map(function(p,i){
+      var qn=parseFloat(p.qty)||0;
+      return '<tr><td>'+(i+1)+'</td><td>'+p.desc+'</td><td style="text-align:right">'+(qn===0?'--':p.qty)+'</td><td style="text-align:right">'+parseFloat(p.rate||0).toFixed(2)+'</td><td style="text-align:right">'+parseFloat(p.amt||0).toFixed(2)+'</td></tr>';
+    }).join('') : '<tr><td colspan="5" style="text-align:center;color:#aaa;">No items</td></tr>';
+  var billHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8">'+
+    '<title>Bill '+record.billNo+'</title>'+
+    '<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&family=DM+Sans:wght@400&display=swap" rel="stylesheet">'+
+    '<style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:"DM Sans",sans-serif;padding:20px 24px;max-width:700px;margin:0 auto;}'+
+    '.biz{text-align:center;border-bottom:2px solid #E8490F;padding-bottom:10px;margin-bottom:14px;}'+
+    '.biz-name{font-family:"Rajdhani",sans-serif;font-size:26pt;font-weight:700;color:#E8490F;letter-spacing:2px;}'+
+    '.biz-sub{font-size:9pt;color:#666;letter-spacing:2px;text-transform:uppercase;}'+
+    '.biz-addr{font-size:10pt;color:#444;margin-top:4px;}'+
+    '.meta{display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}'+
+    '.to-name{font-family:"Rajdhani",sans-serif;font-size:14pt;font-weight:600;}'+
+    '.to-sub{font-size:9pt;color:#666;}'+
+    '.info{text-align:right;font-size:9pt;color:#666;line-height:1.8;}'+
+    '.bill-no{font-family:"Rajdhani",sans-serif;font-size:12pt;font-weight:700;color:#E8490F;}'+
+    'table{width:100%;border-collapse:collapse;margin-bottom:12px;}'+
+    'th{background:#E8490F;color:#fff;padding:8px 10px;text-align:left;font-family:"Rajdhani",sans-serif;font-size:10pt;}'+
+    'td{padding:7px 10px;border-bottom:1px solid #eee;font-size:9pt;}'+
+    '.num{text-align:right;}'+
+    '.tr{background:#fff8f5;font-weight:700;color:#E8490F;font-family:"Rajdhani",sans-serif;font-size:13pt;}'+
+    '.footer{display:flex;justify-content:flex-end;margin-top:16px;padding-top:10px;border-top:1px solid #eee;}'+
+    '.sign-area{text-align:center;}'+
+    '.sign-label{font-size:8pt;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}'+
+    '.thanks{font-size:9pt;color:#aaa;text-align:center;margin-top:12px;padding-top:8px;border-top:1px dashed #eee;font-style:italic;}'+
+    '.pbtn{display:block;margin:0 0 12px;padding:8px 22px;background:#E8490F;color:#fff;border:none;border-radius:6px;font-family:"Rajdhani",sans-serif;font-size:13pt;font-weight:600;cursor:pointer;}'+
+    '@media print{.pbtn{display:none;}}'+
+    '</style></head><body>'+
+    '<button class="pbtn" onclick="window.print()">Print / Save as PDF</button>'+
+    '<div class="biz"><div class="biz-name">SRI BIKEZ</div><div class="biz-sub">Two Wheeler Multi Brand Service Center</div><div class="biz-addr">Jalakandapuram main Road, Edappadi, Tamil Nadu | Phone: 9865234433</div></div>'+
+    '<div class="meta">'+
+    '<div><div style="font-size:8pt;text-transform:uppercase;letter-spacing:1px;color:#aaa;margin-bottom:2px;">Bill To</div>'+
+    '<div class="to-name">'+record.custName+'</div><div class="to-sub">'+record.vehNum+' - '+record.vehName+'</div><div class="to-sub">Ph: '+record.custPhone+'</div>'+
+    (record.vehKm?'<div class="to-sub">KM: '+record.vehKm+'</div>':'')+
+    '</div>'+
+    '<div class="info"><div class="bill-no">Bill #'+record.billNo+'</div><div>Date: '+fmtDate(record.date)+'</div><div>Mechanic: '+record.mechName+'</div></div>'+
+    '</div>'+
+    '<table><thead><tr><th style="width:32px">S.No</th><th>Particulars</th><th class="num" style="width:48px">Qty</th><th class="num" style="width:70px">Rate Rs</th><th class="num" style="width:80px">Amount Rs</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody>'+
+    '<tfoot><tr class="tr"><td colspan="4" style="text-align:right;padding:9px;">TOTAL</td><td class="num" style="padding:9px;">Rs '+record.total.toFixed(2)+'</td></tr></tfoot></table>'+
+    '<div class="footer"><div class="sign-area"><div>'+sigHTML+'</div><div class="sign-label">Authorised Signatory</div></div></div>'+
+    '<div class="thanks">Thank you for choosing Sri Bikez! We value your trust.</div>'+
+    '</body></html>';
+  // Get month folder name (e.g. "2024-05-May")
+  var d = new Date(record.date+'T00:00:00');
+  var monthStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.toLocaleDateString('en-IN',{month:'long'});
+  if(driveEl){ driveEl.className='drive-status saving'; driveEl.textContent='Saving bill to Google Drive...'; }
+  fetch(driveWebAppURL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ billNo: record.billNo, html: billHTML, month: monthStr, custName: record.custName, vehNum: record.vehNum })
+  }).then(function(r){ return r.text(); })
+  .then(function(){
+    if(driveEl){ driveEl.className='drive-status saved'; driveEl.textContent='Bill saved to Google Drive'; }
+    showToast('Bill saved to Google Drive');
+  }).catch(function(){
+    if(driveEl){ driveEl.className='drive-status failed'; driveEl.textContent='Drive save failed. Check setup in Menu > Drive Auto-Save Setup'; }
+  });
+}
+
+// ================================================================
+//  CUSTOMER PORTAL
+// ================================================================
+var portalSearchMode = 'phone'; // 'phone' or 'veh'
+
+function goPortal(){
+  document.getElementById('progressBar').style.display='none';
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.getElementById('pagePortal').classList.add('active');
+  portalReset();
+  window.scrollTo(0,0);
+}
+
+function switchPortalTab(mode){
+  portalSearchMode = mode;
+  var btnPhone = document.getElementById('portalTabPhone');
+  var btnVeh   = document.getElementById('portalTabVeh');
+  var phoneInp = document.getElementById('portalPhoneInput');
+  var vehInp   = document.getElementById('portalVehInput');
+  if(mode === 'phone'){
+    btnPhone.style.background = 'var(--orange)'; btnPhone.style.color = '#fff';
+    btnVeh.style.background   = 'transparent';   btnVeh.style.color   = 'var(--muted)';
+    phoneInp.style.display = 'block'; vehInp.style.display = 'none';
+  } else {
+    btnVeh.style.background   = 'var(--orange)'; btnVeh.style.color   = '#fff';
+    btnPhone.style.background = 'transparent';   btnPhone.style.color = 'var(--muted)';
+    vehInp.style.display = 'block'; phoneInp.style.display = 'none';
+  }
+  var errEl = document.getElementById('portalSearchError');
+  if(errEl) errEl.style.display = 'none';
+}
+
+function portalReset(){
+  document.getElementById('portalStep1').style.display = 'block';
+  document.getElementById('portalStep3').style.display = 'none';
+  var ph = document.getElementById('portalPhone'); if(ph) ph.value = '';
+  var vn = document.getElementById('portalVehNum'); if(vn) vn.value = '';
+  var err = document.getElementById('portalSearchError'); if(err) err.style.display='none';
+  switchPortalTab('phone');
+}
+
+function portalSearch(){
+  var errEl = document.getElementById('portalSearchError');
+  errEl.style.display = 'none';
+
+  if(!fbReady){
+    errEl.textContent = 'Database not connected. Please wait a moment and try again.';
+    errEl.style.display = 'block'; return;
+  }
+
+  var searchVal = '';
+  var searchType = portalSearchMode;
+
+  if(searchType === 'phone'){
+    searchVal = (document.getElementById('portalPhone').value||'').trim();
+    if(!searchVal || searchVal.length < 10){
+      errEl.textContent = 'Please enter a valid 10-digit mobile number.';
+      errEl.style.display = 'block'; return;
+    }
+  } else {
+    searchVal = (document.getElementById('portalVehNum').value||'').trim().toUpperCase();
+    if(!searchVal || searchVal.length < 4){
+      errEl.textContent = 'Please enter a valid vehicle number (e.g. TN 33 AB 1234).';
+      errEl.style.display = 'block'; return;
+    }
+  }
+
+  // Show loading state
+  var btn = document.querySelector('#portalStep1 .btn-primary');
+  if(btn){ btn.textContent = 'Searching...'; btn.disabled = true; }
+
+  window.__fbGet(window.__fbRef).then(function(snap){
+    var data = snap.val();
+    var records = [];
+    if(data){
+      Object.keys(data).forEach(function(k){
+        var r = data[k];
+        if(searchType === 'phone'){
+          if((r.custPhone||'').trim() === searchVal) records.push(r);
+        } else {
+          // Compare vehicle number ignoring spaces
+          var stored = (r.vehNum||'').replace(/\s/g,'').toUpperCase();
+          var query  = searchVal.replace(/\s/g,'').toUpperCase();
+          if(stored === query) records.push(r);
+        }
+      });
+    }
+    if(btn){ btn.textContent = 'Search My History'; btn.disabled = false; }
+    if(!records.length){
+      errEl.textContent = searchType === 'phone'
+        ? 'No records found for this mobile number. Please check the number and try again.'
+        : 'No records found for vehicle number "'+searchVal+'". Please check and try again.';
+      errEl.style.display = 'block';
+      return;
+    }
+    records.sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    document.getElementById('portalStep1').style.display = 'none';
+    document.getElementById('portalStep3').style.display = 'block';
+    renderPortalHistory(records, searchType, searchVal);
+  }).catch(function(){
+    if(btn){ btn.textContent = 'Search My History'; btn.disabled = false; }
+    errEl.textContent = 'Connection error. Please check your internet and try again.';
+    errEl.style.display = 'block';
+  });
+}
+function renderPortalHistory(records, searchType, searchVal){
+  var greet = document.getElementById('portalCustGreet');
+  var sub   = document.getElementById('portalCustSub');
+  var stats = document.getElementById('portalStats');
+  var list  = document.getElementById('portalHistoryList');
+  var empty = document.getElementById('portalEmpty');
+  if(!records.length){
+    greet.textContent='Hello!';
+    sub.textContent='No records found';
+    stats.innerHTML=''; list.innerHTML='';
+    empty.style.display='block'; return;
+  }
+  empty.style.display='none';
+  var custName = records[0].custName||'Customer';
+  greet.textContent='Hello, '+custName+'!';
+  sub.textContent = searchType==='phone'
+    ? records.length+' service record'+(records.length>1?'s':'')+' for '+searchVal
+    : records.length+' record'+(records.length>1?'s':'')+' for '+sanitize(searchVal);
+  // Stats
+  var totalSpent = records.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  var lastDate = fmtDate(records[0].date);
+  stats.innerHTML =
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;">'+
+      '<div style="font-family:\'Rajdhani\',sans-serif;font-size:22px;font-weight:700;color:var(--orange)">'+records.length+'</div>'+
+      '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Services</div>'+
+    '</div>'+
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;">'+
+      '<div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:var(--green)">Rs '+totalSpent.toFixed(0)+'</div>'+
+      '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Total Spent</div>'+
+    '</div>'+
+    '<div style="background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px;text-align:center;">'+
+      '<div style="font-family:\'Rajdhani\',sans-serif;font-size:13px;font-weight:700;color:var(--blue)">'+lastDate+'</div>'+
+      '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Last Service</div>'+
+    '</div>';
+  // History cards
+  list.innerHTML = records.map(function(r){
+    var parts = (r.parts||[]).filter(function(p){return p.desc;});
+    var payClass = r.paymentStatus==='Paid'?'badge-paid':'badge-unpaid';
+    var payText  = r.paymentStatus==='Paid'?'Paid':'Unpaid';
+    return '<div class="portal-history-card">'+
+      '<div class="portal-bill-header">'+
+        '<div>'+
+          '<div class="portal-bill-no">Bill #'+sanitize(r.billNo)+'</div>'+
+          '<div class="portal-bill-date">'+fmtDate(r.date)+'</div>'+
+        '</div>'+
+        '<span class="badge '+payClass+'">'+payText+'</span>'+
+      '</div>'+
+      '<div class="portal-veh">'+sanitize(r.vehName||'--')+' &nbsp;<span style="color:var(--orange);font-size:12px;">'+sanitize(r.vehNum||'')+'</span>'+
+        (r.vehKm?'<span class="portal-km">'+sanitize(r.vehKm)+' KM</span>':'')+
+      '</div>'+
+      (r.complaints?'<div class="portal-complaints">'+sanitize(r.complaints)+'</div>':'')+
+      '<div style="margin-bottom:6px;">'+
+        parts.map(function(p){
+          return '<div class="portal-row"><span>'+sanitize(p.desc)+'</span><span style="color:var(--text)">Rs '+parseFloat(p.amt||0).toFixed(0)+'</span></div>';
+        }).join('')+
+      '</div>'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.08);">'+
+        '<span style="font-size:11px;color:var(--muted);">Mechanic: '+sanitize(r.mechName||'--')+'</span>'+
+        '<span class="portal-total">Rs '+parseFloat(r.total||0).toFixed(0)+'</span>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
 
 // ================================================================
 //  REMINDERS PAGE
