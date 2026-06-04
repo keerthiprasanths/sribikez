@@ -1757,26 +1757,26 @@ function updateBillPreview(){
 //  WHATSAPP
 // ================================================================
 function shareServiceConfirmation(){
-  // Send service confirmation from Edit Bill page — uses editable fields
   var s = getBillingState();
   if(!s.custPhone){showToast('No phone number on this record','error');return;}
-  // Get complaints from edit field
-  var complaintsStr = document.getElementById('b_complaints') ? 
+  var complaintsStr = document.getElementById('b_complaints') ?
     document.getElementById('b_complaints').value : (state.complaints||'');
-  var complaintLines = complaintsStr ? 
-    complaintsStr.split(',').map(function(c){return '- '+c.trim();}).join('\n') :
-    '- Will be updated shortly';
-  var msg = '*Sri Bikez - Service Confirmation*\n\n'+
-    'Dear *'+s.custName+'*,\n\n'+
-    'Your vehicle *'+s.vehName+'* (Reg: *'+s.vehNum+'*) has been received for service.\n\n'+
-    '\U0001F4C5 *Service Date:* '+fmtDate(s.entryDate)+'\n'+
-    '\U0001F4C5 *Expected Delivery:* '+fmtDate(s.delivDate)+'\n\n'+
-    '\U0001F527 *Complaints Noted:*\n'+complaintLines+'\n\n'+
-    '\U0001F468\u200D\U0001F527 *Your Mechanic:* '+(s.mechName||'--')+'\n'+
-    '\U0001F4DE *Mechanic Contact:* '+(s.mechPhone||'--')+'\n\n'+
-    '\U0001F4CD Sri Bikez, Jalakandapuram main Road, Edappadi\n'+
-    '\U0001F4DE 9865234433\n\nThank you for choosing Sri Bikez! \U0001F64F';
-  window.open('https://wa.me/91'+s.custPhone+'?text='+encodeURIComponent(msg),'_blank');
+  var complaintLines = complaintsStr ?
+    complaintsStr.split(',').map(function(c){return '• '+c.trim();}).join('\n') :
+    '• Will be updated shortly';
+  var msg =
+    '*Sri Bikez - Service Confirmation*\n\n' +
+    'Dear *' + s.custName + '*,\n\n' +
+    'Your vehicle *' + s.vehName + '* (Reg: *' + s.vehNum + '*) has been received for service.\n\n' +
+    '📅 *Service Date:* '    + fmtDate(s.entryDate) + '\n' +
+    '📅 *Expected Delivery:* ' + fmtDate(s.delivDate)  + '\n\n' +
+    '🔧 *Complaints Noted:*\n' + complaintLines + '\n\n' +
+    '👨 *Your Mechanic:* '    + (s.mechName||'--') + '\n' +
+    '📞 *Mechanic Contact:* ' + (s.mechPhone||'--') + '\n\n' +
+    '📍 Sri Bikez, Jalakandapuram main Road, Edappadi\n' +
+    '📞 9865234433\n\n' +
+    'Thank you for choosing Sri Bikez! 🙏';
+  window.open('https://wa.me/91' + s.custPhone + '?text=' + encodeURIComponent(msg), '_blank');
   showToast('Service confirmation sent via WhatsApp');
 }
 
