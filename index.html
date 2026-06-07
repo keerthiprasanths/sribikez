@@ -692,48 +692,144 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 
       <!-- TAB 1: OVERVIEW (locked) -->
       <div id="tabPanel1" style="display:none;">
-        <div class="stats-row" id="statsRow"></div>
-        <div class="chart-card" style="margin-bottom:12px;">
-          <div class="chart-title">Monthly Revenue - Last 6 Months</div>
-          <div class="chart-canvas-wrap"><canvas id="chartMonthly"></canvas></div>
+
+        <!-- KPI STATS — colorful gradient cards -->
+        <div id="statsRow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;"></div>
+
+        <!-- Revenue sparkline + today highlight -->
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px;">
+          <div style="background:linear-gradient(135deg,#1a1a1a 0%,#1f1a16 100%);border:1px solid var(--border);border-radius:12px;padding:16px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
+              <span>💰 Monthly Revenue</span>
+              <span id="ovTotalRevBadge" style="font-size:11px;color:var(--green);background:rgba(34,197,94,.12);padding:2px 8px;border-radius:6px;border:1px solid rgba(34,197,94,.3);"></span>
+            </div>
+            <div style="position:relative;height:180px;"><canvas id="chartMonthly"></canvas></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div id="todayHighlight" style="background:linear-gradient(135deg,rgba(232,73,15,.15),rgba(232,73,15,.05));border:1px solid rgba(232,73,15,.3);border-radius:12px;padding:14px;flex:1;">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--orange2);margin-bottom:6px;">Today</div>
+              <div id="ovTodayJobs" style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--orange);">0</div>
+              <div style="font-size:10px;color:var(--muted);">vehicles</div>
+              <div id="ovTodayRev" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--green);margin-top:4px;">Rs 0</div>
+              <div style="font-size:9px;color:var(--muted);">collected</div>
+            </div>
+            <div id="monthHighlight" style="background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(59,130,246,.05));border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:14px;flex:1;">
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:6px;">This Month</div>
+              <div id="ovMonthJobs" style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--blue);">0</div>
+              <div style="font-size:10px;color:var(--muted);">vehicles</div>
+              <div id="ovMonthRev" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--green);margin-top:4px;">Rs 0</div>
+              <div style="font-size:9px;color:var(--muted);">this month</div>
+            </div>
+          </div>
         </div>
-        <div class="chart-grid">
-          <div class="chart-card"><div class="chart-title">Vehicles by Status</div><div class="chart-canvas-wrap"><canvas id="chartStatus"></canvas></div></div>
-          <div class="chart-card"><div class="chart-title">Jobs by Mechanic</div><div class="chart-canvas-wrap"><canvas id="chartMechanic"></canvas></div></div>
+
+        <!-- Status + Mechanic side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;">🏍️ Job Status</div>
+            <div style="position:relative;height:160px;"><canvas id="chartStatus"></canvas></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;">👨‍🔧 Jobs by Mechanic</div>
+            <div style="position:relative;height:160px;"><canvas id="chartMechanic"></canvas></div>
+          </div>
         </div>
+
+        <!-- Payment summary row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;cursor:pointer;" onclick="document.getElementById('filterPayment').value='Paid';switchTab(0);filterRecords();">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:4px;">💚 Total Collected</div>
+            <div id="ovPaidAmt" style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--green);">Rs 0</div>
+            <div id="ovPaidCount" style="font-size:10px;color:var(--muted);margin-top:2px;">0 bills paid</div>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(239,68,68,.04));border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px;cursor:pointer;" onclick="document.getElementById('filterPayment').value='Unpaid';switchTab(0);filterRecords();">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#ef4444;margin-bottom:4px;">🔴 Pending Collection</div>
+            <div id="ovUnpaidAmt" style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:#ef4444;">Rs 0</div>
+            <div id="ovUnpaidCount" style="font-size:10px;color:var(--muted);margin-top:2px;">0 bills unpaid · tap to view</div>
+          </div>
+        </div>
+
+        <!-- Weekly activity heatmap-style bar -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;">📊 Last 7 Days Activity</div>
+          <div id="weeklyActivity" style="display:flex;gap:6px;align-items:flex-end;height:60px;"></div>
+          <div id="weeklyLabels" style="display:flex;gap:6px;margin-top:5px;"></div>
+        </div>
+
       </div>
 
       <!-- TAB 2: ANALYTICS (locked) -->
       <div id="tabPanel2" style="display:none;">
-        <div class="filter-row">
-          <label>Month:</label>
-          <select id="analyticsMonth" onchange="renderAnalytics()"></select>
-          <label style="margin-left:6px;">Year:</label>
-          <select id="analyticsYear" onchange="renderAnalytics()"></select>
+
+        <!-- Filter bar -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:11px;color:var(--muted);font-weight:500;">Filter:</span>
+          <select id="analyticsMonth" onchange="renderAnalytics()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
+          <select id="analyticsYear" onchange="renderAnalytics()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
           <button class="btn btn-secondary btn-sm" onclick="analyticsAllTime()">All Time</button>
+          <span id="analyticsFilterLabel" style="font-size:10px;color:var(--orange2);margin-left:4px;"></span>
         </div>
-        <div class="insight-row" id="insightRow"></div>
-        <div class="chart-grid">
-          <div class="chart-card"><div class="chart-title">Daily Jobs</div><div class="chart-canvas-wrap"><canvas id="chartDailyJobs"></canvas></div></div>
-          <div class="chart-card"><div class="chart-title">Daily Revenue</div><div class="chart-canvas-wrap"><canvas id="chartDailyRev"></canvas></div></div>
+
+        <!-- KPI insight cards -->
+        <div id="insightRow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:16px;"></div>
+
+        <!-- Revenue + Jobs trend -->
+        <div style="background:linear-gradient(135deg,#1a1a1a,#1f1a16);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);">📈 Revenue & Jobs Trend</div>
+            <div style="display:flex;gap:12px;font-size:10px;">
+              <span style="color:var(--orange);">━ Revenue</span>
+              <span style="color:var(--blue);">━ Jobs</span>
+            </div>
+          </div>
+          <div style="position:relative;height:200px;"><canvas id="chartRevJobs"></canvas></div>
         </div>
-        <div class="chart-grid">
-          <div class="chart-card"><div class="chart-title">Top Complaints</div><div class="chart-canvas-wrap"><canvas id="chartComplaints"></canvas></div></div>
-          <div class="chart-card"><div class="chart-title">Top Vehicle Brands</div><div class="chart-canvas-wrap"><canvas id="chartBrands"></canvas></div></div>
+
+        <!-- 2 column: daily jobs + daily rev -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:9px;">📅 Daily Jobs</div>
+            <div style="position:relative;height:170px;"><canvas id="chartDailyJobs"></canvas></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:9px;">💵 Daily Revenue</div>
+            <div style="position:relative;height:170px;"><canvas id="chartDailyRev"></canvas></div>
+          </div>
         </div>
-        <div class="chart-card full" style="margin-bottom:12px;">
-          <div class="chart-title">Revenue Trend - Last 12 Months</div>
-          <div class="chart-canvas-wrap" style="height:220px;"><canvas id="chartRevTrend"></canvas></div>
+
+        <!-- Top complaints + brands -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:4px;">🔧 Top Repair Issues</div>
+            <div style="font-size:9px;color:var(--muted);margin-bottom:9px;">Excludes routine service items</div>
+            <div style="position:relative;height:180px;"><canvas id="chartComplaints"></canvas></div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:9px;">🏍️ Top Vehicle Brands</div>
+            <div style="position:relative;height:180px;"><canvas id="chartBrands"></canvas></div>
+          </div>
         </div>
-        <div class="chart-card full">
-          <div class="chart-title">Outside Work - Monthly Cost</div>
-          <div class="chart-canvas-wrap" style="height:180px;"><canvas id="chartOutsideWork"></canvas></div>
+
+        <!-- 12 month revenue trend -->
+        <div style="background:linear-gradient(135deg,#1a1a1a,#1a1f16);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:16px;margin-bottom:12px;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--green);margin-bottom:10px;">📆 12-Month Revenue Trend</div>
+          <div style="position:relative;height:200px;"><canvas id="chartRevTrend"></canvas></div>
         </div>
-        <div class="chart-card full">
-          <div class="chart-title">Mechanic Performance</div>
+
+        <!-- Outside work cost -->
+        <div style="background:linear-gradient(135deg,#1a1a1a,#1a1618);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:16px;margin-bottom:12px;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:10px;">🔩 Outside Work Monthly Cost</div>
+          <div style="position:relative;height:160px;"><canvas id="chartOutsideWork"></canvas></div>
+        </div>
+
+        <!-- Mechanic performance table — redesigned -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:12px;">👨‍🔧 Mechanic Performance Board</div>
           <div id="mechPerfTable"></div>
         </div>
+
       </div>
+
     </div>
   </div>
 </div>
@@ -2027,25 +2123,77 @@ function renderStats(records){
   var unpaidR=records.filter(function(r){return r.status==='Completed'&&r.paymentStatus!=='Paid';});
   var paidAmt=paidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
   var unpaidAmt=unpaidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+
+  // Gradient KPI stat cards for Records tab
   document.getElementById('statsRow').innerHTML=
-    '<div class="stat-card"><div class="stat-num">'+records.length+'</div><div class="stat-label">Total</div></div>'+
-    '<div class="stat-card"><div class="stat-num" style="color:var(--green)">'+todayR.length+'</div><div class="stat-label">Today</div><div class="stat-sub">Rs '+todayAmt.toFixed(0)+'</div></div>'+
-    '<div class="stat-card"><div class="stat-num" style="color:var(--blue)">'+monR.length+'</div><div class="stat-label">This Month</div><div class="stat-sub">Rs '+monAmt.toFixed(0)+'</div></div>'+
-    '<div class="stat-card"><div class="stat-num">Rs '+totalAmt.toFixed(0)+'</div><div class="stat-label">Revenue</div></div>'+
-    '<div class="stat-card"><div class="stat-num" style="color:var(--yellow)">'+inP+'</div><div class="stat-label">In Progress</div></div>'+
-    '<div class="stat-card" style="cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Paid\';switchTab(0);filterRecords();"><div class="stat-num" style="color:#16a34a">'+paidR.length+'</div><div class="stat-label">Paid</div><div class="stat-sub">Rs '+paidAmt.toFixed(0)+'</div></div>'+
-    '<div class="stat-card" style="cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Unpaid\';switchTab(0);filterRecords();"><div class="stat-num" style="color:#ef4444">'+unpaidR.length+'</div><div class="stat-label">Unpaid</div><div class="stat-sub">Rs '+unpaidAmt.toFixed(0)+'</div></div>';
+    kpiCard('📋','Total Services',records.length,'','#E8490F','')+
+    kpiCard('📅','Today',todayR.length,'Rs '+todayAmt.toFixed(0),'#22C55E','cursor:pointer;" onclick="document.getElementById(\'filterSort\').value=\'date_desc\';filterRecords()')+
+    kpiCard('🗓️','This Month',monR.length,'Rs '+monAmt.toFixed(0),'#3B82F6','')+
+    kpiCard('💰','Total Revenue','Rs '+totalAmt.toFixed(0),'all time','#F59E0B','')+
+    kpiCard('⏳','In Progress',inP,'vehicles','#F59E0B','')+
+    kpiCard('💚','Paid',paidR.length,'Rs '+paidAmt.toFixed(0),'#22C55E','cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Paid\';switchTab(0);filterRecords()')+
+    kpiCard('🔴','Unpaid',unpaidR.length,'Rs '+unpaidAmt.toFixed(0),'#ef4444','cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Unpaid\';switchTab(0);filterRecords()');
+
+  // Update overview panel highlight cards
+  var oj=document.getElementById('ovTodayJobs'); if(oj)oj.textContent=todayR.length;
+  var or2=document.getElementById('ovTodayRev'); if(or2)or2.textContent='Rs '+todayAmt.toFixed(0);
+  var mj=document.getElementById('ovMonthJobs'); if(mj)mj.textContent=monR.length;
+  var mr=document.getElementById('ovMonthRev'); if(mr)mr.textContent='Rs '+monAmt.toFixed(0);
+  var pa=document.getElementById('ovPaidAmt'); if(pa)pa.textContent='Rs '+paidAmt.toFixed(0);
+  var pc=document.getElementById('ovPaidCount'); if(pc)pc.textContent=paidR.length+' bills paid';
+  var ua=document.getElementById('ovUnpaidAmt'); if(ua)ua.textContent='Rs '+unpaidAmt.toFixed(0);
+  var uc=document.getElementById('ovUnpaidCount'); if(uc)uc.textContent=unpaidR.length+' bills unpaid · tap to view';
+  var rb=document.getElementById('ovTotalRevBadge'); if(rb)rb.textContent='Total: Rs '+totalAmt.toFixed(0);
 }
+
+function kpiCard(icon,label,value,sub,color,extraStyle){
+  return '<div style="background:linear-gradient(135deg,var(--card),#1e1e1e);border:1px solid '+color+'44;border-top:3px solid '+color+';border-radius:10px;padding:13px;text-align:center;'+extraStyle+'">' +
+    '<div style="font-size:18px;margin-bottom:3px;">'+icon+'</div>'+
+    '<div style="font-family:\'Rajdhani\',sans-serif;font-size:22px;font-weight:700;color:'+color+'">'+value+'</div>'+
+    '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:1px;">'+label+'</div>'+
+    (sub?'<div style="font-size:10px;color:var(--muted);margin-top:3px;">'+sub+'</div>':'')+
+  '</div>';
+}
+
 function renderOverviewCharts(records){
+  // Monthly revenue bar chart
   var months=[];var now=new Date();
   for(var i=5;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),label:d.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})});}
   var monRev=months.map(function(m){return records.filter(function(r){return(r.date||'').startsWith(m.key);}).reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);});
   makeChart('chartMonthly','bar',months.map(function(m){return m.label;}),monRev,'Revenue Rs','#E8490F');
+
+  // Status doughnut
   var comp=records.filter(function(r){return r.status==='Completed';}).length;
   var prog=records.filter(function(r){return r.status==='In Progress';}).length;
   makeChart('chartStatus','doughnut',['Completed','In Progress'],[comp,prog],null,['#22C55E','#F59E0B']);
+
+  // Mechanic bar
   var mechs={};records.forEach(function(r){if(r.mechName)mechs[r.mechName]=(mechs[r.mechName]||0)+1;});
   makeChart('chartMechanic','bar',Object.keys(mechs),Object.values(mechs),'Jobs','#3B82F6');
+
+  // Weekly activity bars (last 7 days)
+  var waEl=document.getElementById('weeklyActivity');
+  var wlEl=document.getElementById('weeklyLabels');
+  if(waEl&&wlEl){
+    var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var week=[];
+    for(var i=6;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);week.push({date:dd.toISOString().split('T')[0],day:days[dd.getDay()]});}
+    var maxJobs=1;
+    var weekCounts=week.map(function(w){var c=records.filter(function(r){return r.date===w.date;}).length;if(c>maxJobs)maxJobs=c;return c;});
+    waEl.innerHTML=weekCounts.map(function(c,i){
+      var pct=Math.max(8,Math.round((c/maxJobs)*100));
+      var isToday=i===6;
+      var col=isToday?'var(--orange)':(c>0?'var(--blue)':'var(--border)');
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">'+
+        '<div style="font-size:9px;color:var(--muted);">'+c+'</div>'+
+        '<div style="width:100%;height:'+pct+'%;background:'+col+';border-radius:3px 3px 0 0;min-height:4px;transition:height .3s;"></div>'+
+      '</div>';
+    }).join('');
+    wlEl.innerHTML=week.map(function(w,i){
+      var isToday=i===6;
+      return '<div style="flex:1;text-align:center;font-size:9px;color:'+(isToday?'var(--orange)':'var(--muted)')+';font-weight:'+(isToday?'700':'400')+'>'+w.day+'</div>';
+    }).join('');
+  }
 }
 function makeChart(id,type,labels,data,label,color){
   if(chartRefs[id]){chartRefs[id].destroy();chartRefs[id]=null;}
