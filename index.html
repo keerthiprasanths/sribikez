@@ -530,6 +530,61 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
         <span style="color:var(--muted);font-size:11px;">Total:</span>
         <span style="font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:var(--orange);" id="liveTotalAmt">Rs 0</span>
       </div>
+
+      <!-- PART PAYMENT SECTION -->
+      <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);">💰 Part Payment</div>
+          <button onclick="togglePartPaySection()" id="partPayToggleBtn"
+            style="background:rgba(232,73,15,.12);border:1px solid rgba(232,73,15,.35);color:var(--orange2);border-radius:7px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;">
+            + Record Payment
+          </button>
+        </div>
+
+        <!-- Payment entry (hidden by default) -->
+        <div id="partPaySection" style="display:none;background:#161616;border-radius:9px;padding:12px;margin-bottom:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="field" style="flex:1;min-width:120px;margin:0;">
+              <label>Amount Paid (Rs)</label>
+              <input type="number" id="partPayAmt" placeholder="0" min="0" oninput="updatePartPayBalance()" style="width:100%;">
+            </div>
+            <div class="field" style="flex:1;min-width:120px;margin:0;">
+              <label>Payment Mode</label>
+              <select id="partPayMode" style="background:#111;border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;width:100%;outline:none;">
+                <option value="Cash">Cash</option>
+                <option value="GPay">GPay</option>
+                <option value="PhonePe">PhonePe</option>
+                <option value="Paytm">Paytm</option>
+                <option value="UPI">Other UPI</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+            <div class="field" style="flex:1;min-width:120px;margin:0;">
+              <label>Note (Optional)</label>
+              <input type="text" id="partPayNote" placeholder="e.g. advance payment" style="width:100%;">
+            </div>
+            <button onclick="addPartPayment()"
+              style="background:var(--green);color:#000;border:none;border-radius:7px;padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">
+              ✓ Add
+            </button>
+          </div>
+        </div>
+
+        <!-- Payment history for this bill -->
+        <div id="partPayHistory" style="display:none;"></div>
+
+        <!-- Balance summary -->
+        <div id="partPaySummary" style="display:none;background:rgba(232,73,15,.07);border:1px solid rgba(232,73,15,.2);border-radius:8px;padding:10px 13px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">
+            <div style="font-size:12px;color:var(--muted);">
+              Total: <strong style="color:var(--text);" id="ppTotalBill">Rs 0</strong> &nbsp;|&nbsp;
+              Paid: <strong style="color:var(--green);" id="ppTotalPaid">Rs 0</strong> &nbsp;|&nbsp;
+              Balance: <strong style="color:#ef4444;" id="ppBalance">Rs 0</strong>
+            </div>
+            <span id="ppStatusBadge" style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:6px;"></span>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- Signature -->
     <div class="sign-section">
@@ -681,6 +736,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <select id="filterPayment" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
               <option value="">All Payments</option>
               <option value="Paid">💚 Paid</option>
+              <option value="Part Paid">🟡 Part Paid</option>
               <option value="Unpaid">🔴 Unpaid</option>
             </select>
             <select id="filterMech" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
@@ -1617,6 +1673,7 @@ function checkPendingPayments(){
     Object.keys(data).forEach(function(k){
       var r = data[k];
       if(r.status !== 'Completed') return;
+      // Include Unpaid and Part Paid records
       if(r.paymentStatus === 'Paid') return;
       var rv = (r.vehNum||'').replace(/\s/g,'').toUpperCase();
       var rp = (r.custPhone||'').trim();
@@ -1625,23 +1682,35 @@ function checkPendingPayments(){
       }
     });
     if(!pending.length){ hidePendingAlert(); return; }
-    // Show alert
     var alertEl = document.getElementById('pendingPaymentAlert');
     var listEl  = document.getElementById('pendingPaymentList');
     if(!alertEl || !listEl) return;
-    var totalPending = pending.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+    var totalPending = pending.reduce(function(s,r){
+      return s + parseFloat(r.balance>0 ? r.balance : r.total)||0;
+    },0);
     listEl.innerHTML = pending.map(function(r){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(239,68,68,.08);border-radius:7px;padding:8px 10px;margin-bottom:6px;">'+
-        '<div><div style="font-size:12px;font-weight:600;color:var(--text);">Bill '+sanitize(r.billNo)+'</div>'+
-        '<div style="font-size:10px;color:var(--muted);">'+fmtDate(r.date)+' | '+sanitize(r.vehName||'--')+'</div></div>'+
-        '<div style="font-family:\'Rajdhani\',sans-serif;font-size:16px;font-weight:700;color:#ef4444;">Rs '+parseFloat(r.total||0).toFixed(0)+'</div>'+
+      var due = r.balance>0 ? r.balance : (r.total||0);
+      var isPartPaid = r.paymentStatus==='Part Paid';
+      return '<div style="background:rgba(239,68,68,.08);border-radius:7px;padding:8px 10px;margin-bottom:6px;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">'+
+          '<div>'+
+            '<div style="font-size:12px;font-weight:600;color:var(--text);">Bill '+sanitize(r.billNo)+'</div>'+
+            '<div style="font-size:10px;color:var(--muted);">'+fmtDate(r.date)+' | '+sanitize(r.vehName||'--')+'</div>'+
+            (isPartPaid?'<div style="font-size:10px;color:var(--yellow);">Part paid: Rs '+parseFloat(r.totalPaid||0).toFixed(0)+'</div>':'')+
+          '</div>'+
+          '<div style="text-align:right;">'+
+            '<div style="font-family:\'Rajdhani\',sans-serif;font-size:16px;font-weight:700;color:#ef4444;">Balance: Rs '+parseFloat(due).toFixed(0)+'</div>'+
+            '<button onclick="addPendingToNewBill(\''+sanitize(r.billNo)+'\','+parseFloat(due)+')" '+
+              'style="margin-top:4px;background:var(--orange);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:\'Rajdhani\',sans-serif;font-weight:600;">'+
+              '+ Add to New Bill</button>'+
+          '</div>'+
+        '</div>'+
       '</div>';
     }).join('') +
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-top:1px solid rgba(239,68,68,.3);margin-top:4px;">'+
-      '<strong style="font-size:12px;color:#ef4444;">Total Pending</strong>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-top:1px solid rgba(239,68,68,.3);margin-top:4px;">'+
+      '<strong style="font-size:12px;color:#ef4444;">Total Due</strong>'+
       '<strong style="font-family:\'Rajdhani\',sans-serif;font-size:18px;color:#ef4444;">Rs '+totalPending.toFixed(0)+'</strong>'+
     '</div>';
-    // Save pending info to state for use in new bill
     state.pendingBills = pending;
     state.pendingTotal = totalPending;
     alertEl.style.display = 'block';
@@ -2153,6 +2222,149 @@ function getParts(){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 
 // ================================================================
+//  PART PAYMENT SYSTEM
+// ================================================================
+// partPayments: array of {amt, mode, note, date}
+// stored in state.partPayments and saved to Firebase record
+
+function togglePartPaySection(){
+  var sec = document.getElementById('partPaySection');
+  var btn = document.getElementById('partPayToggleBtn');
+  if(!sec) return;
+  var isOpen = sec.style.display !== 'none';
+  sec.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '+ Record Payment' : '− Hide';
+  if(!isOpen) document.getElementById('partPayAmt').focus();
+}
+
+function addPartPayment(){
+  var amtEl  = document.getElementById('partPayAmt');
+  var modeEl = document.getElementById('partPayMode');
+  var noteEl = document.getElementById('partPayNote');
+  var amt = parseFloat(amtEl.value)||0;
+  if(amt <= 0){ showToast('Enter a valid amount','error'); amtEl.focus(); return; }
+  if(amt > state.total){ showToast('Amount cannot exceed bill total','error'); return; }
+  state.partPayments.push({
+    amt: amt,
+    mode: modeEl.value,
+    note: noteEl.value.trim(),
+    date: new Date().toISOString()
+  });
+  amtEl.value = '';
+  noteEl.value = '';
+  renderPartPayHistory();
+  updatePartPayBalance();
+
+  // Auto-save to Firebase immediately
+  if(state.billNo && fbReady){
+    var recRef = window.__fbRef2(window.__fbDb, 'sribikez/records/'+state.billNo);
+    window.__fbGet(recRef).then(function(snap){
+      var ex = snap.val()||{};
+      ex.partPayments = state.partPayments;
+      var totalPaid = state.partPayments.reduce(function(s,p){return s+(parseFloat(p.amt)||0);},0);
+      ex.totalPaid = totalPaid;
+      ex.paymentStatus = totalPaid >= state.total ? 'Paid' : (totalPaid > 0 ? 'Part Paid' : 'Unpaid');
+      return window.__fbSet(recRef, ex);
+    }).then(function(){ showToast('Payment recorded'); })
+    .catch(function(){ showToast('Payment saved locally only','error'); });
+  }
+}
+
+function renderPartPayHistory(){
+  var histEl = document.getElementById('partPayHistory');
+  var sumEl  = document.getElementById('partPaySummary');
+  if(!histEl || !sumEl) return;
+  if(!state.partPayments || !state.partPayments.length){
+    histEl.style.display='none'; sumEl.style.display='none'; return;
+  }
+  histEl.style.display='block'; sumEl.style.display='block';
+  histEl.innerHTML = '<div style="margin-bottom:8px;">' +
+    state.partPayments.map(function(p, i){
+      var d = new Date(p.date);
+      var dStr = d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) +
+                 ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:7px;margin-bottom:5px;flex-wrap:wrap;">'+
+        '<div>'+
+          '<span style="font-family:\'Rajdhani\',sans-serif;font-size:14px;font-weight:700;color:var(--green);">Rs '+parseFloat(p.amt).toFixed(0)+'</span>'+
+          '<span style="font-size:10px;color:var(--muted);margin-left:8px;">'+sanitize(p.mode)+'</span>'+
+          (p.note?'<span style="font-size:10px;color:var(--muted);margin-left:6px;">· '+sanitize(p.note)+'</span>':'')+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;">'+
+          '<span style="font-size:9px;color:var(--muted);">'+dStr+'</span>'+
+          '<button onclick="removePartPayment('+i+')" style="background:none;border:none;color:#555;cursor:pointer;font-size:12px;">✕</button>'+
+        '</div>'+
+      '</div>';
+    }).join('')+
+  '</div>';
+}
+
+function removePartPayment(idx){
+  if(!state.partPayments) return;
+  state.partPayments.splice(idx, 1);
+  renderPartPayHistory();
+  updatePartPayBalance();
+  // Re-save
+  if(state.billNo && fbReady){
+    var recRef = window.__fbRef2(window.__fbDb,'sribikez/records/'+state.billNo);
+    window.__fbGet(recRef).then(function(snap){
+      var ex = snap.val()||{};
+      ex.partPayments = state.partPayments;
+      var tp = state.partPayments.reduce(function(s,p){return s+(parseFloat(p.amt)||0);},0);
+      ex.totalPaid = tp;
+      ex.paymentStatus = tp >= state.total ? 'Paid' : (tp > 0 ? 'Part Paid' : 'Unpaid');
+      return window.__fbSet(recRef, ex);
+    });
+  }
+}
+
+function updatePartPayBalance(){
+  var sumEl   = document.getElementById('partPaySummary');
+  var tBill   = document.getElementById('ppTotalBill');
+  var tPaid   = document.getElementById('ppTotalPaid');
+  var tBal    = document.getElementById('ppBalance');
+  var tBadge  = document.getElementById('ppStatusBadge');
+  if(!sumEl) return;
+  var payments = state.partPayments||[];
+  var total    = state.total||0;
+  var paid     = payments.reduce(function(s,p){return s+(parseFloat(p.amt)||0);},0);
+  var balance  = total - paid;
+  if(paid === 0 && !payments.length){ sumEl.style.display='none'; return; }
+  sumEl.style.display='block';
+  if(tBill)  tBill.textContent  = 'Rs '+total.toFixed(0);
+  if(tPaid)  tPaid.textContent  = 'Rs '+paid.toFixed(0);
+  if(tBal)   tBal.textContent   = 'Rs '+Math.max(0,balance).toFixed(0);
+  if(tBadge){
+    if(paid >= total){
+      tBadge.textContent='FULLY PAID'; tBadge.style.cssText='font-size:10px;font-weight:600;padding:2px 9px;border-radius:6px;background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);';
+    } else if(paid > 0){
+      tBadge.textContent='PART PAID'; tBadge.style.cssText='font-size:10px;font-weight:600;padding:2px 9px;border-radius:6px;background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3);';
+    } else {
+      tBadge.textContent='UNPAID'; tBadge.style.cssText='font-size:10px;font-weight:600;padding:2px 9px;border-radius:6px;background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.3);';
+    }
+  }
+}
+
+function resetPartPay(){
+  state.partPayments = [];
+  var sec = document.getElementById('partPaySection');
+  var his = document.getElementById('partPayHistory');
+  var sum = document.getElementById('partPaySummary');
+  if(sec) sec.style.display='none';
+  if(his) his.style.display='none';
+  if(sum) sum.style.display='none';
+  var btn = document.getElementById('partPayToggleBtn');
+  if(btn) btn.textContent='+ Record Payment';
+  var amtEl = document.getElementById('partPayAmt');
+  if(amtEl) amtEl.value='';
+}
+
+function loadPartPayForEdit(record){
+  state.partPayments = record.partPayments||[];
+  renderPartPayHistory();
+  updatePartPayBalance();
+}
+
+// ================================================================
 //  NAVIGATION
 // ================================================================
 function goPage(n){
@@ -2496,37 +2708,49 @@ function finishService(){
   var complaintsStr=state.editMode?
     document.getElementById('b_complaints').value:
     state.complaints.map(function(c){return c.text;}).join(', ');
+  var partPays = state.partPayments||[];
+  var totalPaid = partPays.reduce(function(sum,p){return sum+(parseFloat(p.amt)||0);},0);
+  var payStatus = totalPaid >= state.total ? 'Paid' : (totalPaid > 0 ? 'Part Paid' : 'Unpaid');
   var record={
     billNo:state.billNo,date:s.entryDate,delivDate:s.delivDate,
     vehNum:s.vehNum,vehName:s.vehName,custName:s.custName,custPhone:s.custPhone,
     mechName:s.mechName,mechPhone:s.mechPhone,complaints:complaintsStr,
     vehKm:state.vehKm||'',
-    parts:getParts(),total:state.total,status:'Completed',
-    paymentStatus:'Unpaid',
+    parts:getParts(),total:state.total,
+    partPayments:partPays,totalPaid:totalPaid,
+    balance:Math.max(0,state.total-totalPaid),
+    status:'Completed',
+    paymentStatus:payStatus,
     savedAt:new Date().toISOString()
   };
-  // Save particular names/rates to autocomplete DB before saving record
   saveParticularToDBOnFinish(record.parts);
   fbSave(record,function(){
-    if(state.editMode){showToast('Bill updated and completed');goAdmin();return;}
+    if(state.editMode){showToast('Bill updated and completed');resetPartPay();goAdmin();return;}
+    var paidLine = totalPaid>0 ?
+      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Paid Now</span><strong style="color:var(--green)">Rs '+totalPaid.toFixed(0)+'</strong></div>'+
+      (record.balance>0?'<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Balance Due</span><strong style="color:#ef4444">Rs '+record.balance.toFixed(0)+'</strong></div>':'') : '';
     document.getElementById('completeSummary').textContent=state.custName+"'s "+state.vehName+' ('+state.vehNum+') saved.';
     document.getElementById('completeDetails').innerHTML=
       '<div style="display:grid;gap:7px;">'+
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Bill No</span><strong>'+record.billNo+'</strong></div>'+
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Customer</span><strong>'+record.custName+'</strong></div>'+
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Vehicle</span><strong>'+record.vehNum+' - '+record.vehName+'</strong></div>'+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Total</span><strong style="color:var(--orange)">Rs '+record.total.toFixed(2)+'</strong></div>'+
+      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Total Bill</span><strong style="color:var(--orange)">Rs '+record.total.toFixed(0)+'</strong></div>'+
+      paidLine+
+      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Status</span><strong style="color:'+(payStatus==='Paid'?'var(--green)':payStatus==='Part Paid'?'var(--yellow)':'#ef4444')+'">'+payStatus+'</strong></div>'+
       '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Mechanic</span><strong>'+record.mechName+'</strong></div>'+
       '</div>';
+    resetPartPay();
     goPage(4);
-    document.querySelectorAll('.prog-step').forEach(function(s){s.classList.remove('active');s.classList.add('done');});
-    showToast('Service completed and saved!');
+    document.querySelectorAll('.prog-step').forEach(function(ss){ss.classList.remove('active');ss.classList.add('done');});
+    showToast('Service completed — '+payStatus+'!');
   });
 }
 function newService(){
-  state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,editMode:false,pendingBills:[],pendingTotal:0};
+  state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,editMode:false,pendingBills:[],pendingTotal:0,partPayments:[]};
   localStorage.removeItem('sribikez_p1draft');
   hidePendingAlert();
+  resetPartPay();
   ['vehNum','vehName','custName','custPhone','vehKm'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('mechSelect').value='';
   document.getElementById('mechHint').textContent='';
@@ -2701,7 +2925,11 @@ function filterRecords(){
     var mq=!q||(r.custName||'').toLowerCase().includes(q)||(r.vehNum||'').toLowerCase().includes(q)||(r.custPhone||'').includes(q)||(r.billNo||'').toLowerCase().includes(q)||(r.vehName||'').toLowerCase().includes(q);
     var ms=!fs||r.status===fs;
     var mm=!fm||r.mechName===fm;
-    var mp=!fp||(fp==='Paid'?r.paymentStatus==='Paid':r.paymentStatus!=='Paid');
+    var mp=!fp||(
+      fp==='Paid'      ? r.paymentStatus==='Paid' :
+      fp==='Part Paid' ? r.paymentStatus==='Part Paid' :
+      fp==='Unpaid'    ? (r.paymentStatus==='Unpaid'||!r.paymentStatus) : true
+    );
     return mq&&ms&&mm&&mp;
   });
 
@@ -2728,12 +2956,18 @@ function filterRecords(){
 
   wrap.innerHTML=filtered.map(function(r){
     var isPaid=r.paymentStatus==='Paid';
+    var isPartPaid=r.paymentStatus==='Part Paid';
     var isComplete=r.status==='Completed';
-    var payClass=isPaid?'badge-paid':'badge-unpaid';
-    var payText=isPaid?'PAID':'UNPAID';
+    var payClass=isPaid?'badge-paid':isPartPaid?'badge-week':'badge-unpaid';
+    var payText=isPaid?'✅ PAID':isPartPaid?'🟡 PART PAID':'🔴 UNPAID';
+    var amtColor=isPaid?'var(--green)':isPartPaid?'var(--yellow)':'#ef4444';
     var statusColor=isComplete?'var(--green)':'var(--yellow)';
     var safeBill=sanitize(r.billNo||'--');
     var borderColor=isComplete?'rgba(34,197,94,.2)':'rgba(245,158,11,.2)';
+    var balanceLine='';
+    if(isPartPaid && r.balance>0){
+      balanceLine='<div style="font-size:10px;color:var(--yellow);margin-top:1px;">Balance due: Rs '+parseFloat(r.balance||0).toFixed(0)+' | Paid: Rs '+parseFloat(r.totalPaid||0).toFixed(0)+'</div>';
+    }
 
     return '<div style="background:var(--card);border:1px solid '+borderColor+';border-left:3px solid '+statusColor+';border-radius:10px;padding:14px 16px;margin-bottom:9px;transition:background .15s;" onmouseenter="this.style.background=\'#2a2a2a\'" onmouseleave="this.style.background=\'var(--card)\'">' +
       // ROW 1: Bill No, Date, Status badges
@@ -2743,7 +2977,7 @@ function filterRecords(){
           '<span style="font-size:11px;color:var(--muted);">'+fmtDate(r.date)+'</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
-          '<span class="badge '+payClass+'" style="cursor:pointer;padding:3px 9px;" title="Click to toggle payment" data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span>' +
+          '<span class="badge '+payClass+'" style="cursor:pointer;padding:3px 9px;" title="Click to toggle Paid/Unpaid" data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span>' +
           '<span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:6px;background:'+(isComplete?'rgba(34,197,94,.12)':'rgba(245,158,11,.12)')+';color:'+statusColor+';border:1px solid '+(isComplete?'rgba(34,197,94,.3)':'rgba(245,158,11,.3)')+'">'+(r.status||'Draft')+'</span>' +
         '</div>' +
       '</div>' +
@@ -2762,7 +2996,8 @@ function filterRecords(){
           (r.vehKm?'<div style="font-size:10px;color:var(--blue);">'+sanitize(r.vehKm)+' KM</div>':'')+
         '</div>' +
         '<div style="text-align:right;">' +
-          '<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:'+(isPaid?'var(--green)':'#ef4444')+';">Rs '+parseFloat(r.total||0).toFixed(0)+'</div>' +
+          '<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:'+amtColor+';">Rs '+parseFloat(r.total||0).toFixed(0)+'</div>' +
+          balanceLine+
         '</div>' +
       '</div>' +
       // ROW 3: Actions
@@ -2803,12 +3038,14 @@ function editFromAdmin(billNo){
   state.entryDate=r.date||'';state.delivDate=r.delivDate||'';
   state.mechName=r.mechName||'';state.mechPhone=r.mechPhone||'';
   state.complaints=r.complaints||'';state.total=parseFloat(r.total)||0;
+  state.partPayments = r.partPayments||[];
   state.editMode=true;
   document.getElementById('partsBody').innerHTML='';
   var parts=r.parts||[];
   parts.forEach(function(p){addPartRow(p);});
   if(!parts.length){addPartRow(null);addPartRow(null);}
   calcTotal();setupBillingPage();updateBillPreview();
+  loadPartPayForEdit(r);
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page3').classList.add('active');
   document.querySelectorAll('.prog-step').forEach(function(s,i){
@@ -2817,6 +3054,20 @@ function editFromAdmin(billNo){
     if(i===2)s.classList.add('active');
   });
   window.scrollTo(0,0);
+}
+function addPendingToNewBill(billNo, balanceAmt){
+  // Add a row to the current bill's parts table for the pending balance
+  if(!balanceAmt || balanceAmt<=0) return;
+  // Find the pending record for reference
+  var label = 'Previous Balance (Bill '+billNo+')';
+  addPartRow({desc:label, qty:0, rate:balanceAmt.toFixed(0), amt:balanceAmt.toFixed(0)});
+  calcTotal();
+  showToast('Balance of Rs '+balanceAmt.toFixed(0)+' added to new bill');
+  // Scroll to billing section if on page 3 already, else go to complaints page
+  var p3 = document.getElementById('page3');
+  if(p3 && p3.classList.contains('active')){
+    document.querySelector('#partsBody').scrollIntoView({behavior:'smooth'});
+  }
 }
 function deleteRecord(billNo){
   if(!confirm('Delete record '+billNo+'? This cannot be undone.'))return;
