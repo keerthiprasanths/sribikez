@@ -427,7 +427,8 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" onclick="goToComplaints()">Save and Next: Complaints</button>
+      <button class="btn btn-secondary" onclick="goAdmin()">&#128203; Admin</button>
+      <button class="btn btn-primary" onclick="goToComplaints()">Save and Next: Complaints &#8594;</button>
     </div>
   </div>
 </div>
@@ -471,9 +472,9 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <div class="complaint-list" id="complaintList"></div>
     </div>
     <div class="btn-row">
-      <button class="btn btn-secondary" onclick="goPage(1)">Back</button>
-      <button class="btn btn-wa" onclick="shareEntryWhatsApp()">Share Info to Customer</button>
-      <button class="btn btn-primary" onclick="saveComplaintsAndBill()">Save and Generate Bill</button>
+      <button class="btn btn-secondary" onclick="goPage(1)">&#8592; Back</button>
+      <button class="btn btn-wa" onclick="shareEntryWhatsApp()">&#128172; Share Info</button>
+      <button class="btn btn-primary" onclick="saveComplaintsAndBill()">Generate Bill &#8594;</button>
     </div>
   </div>
 </div>
@@ -666,8 +667,8 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     <p style="color:var(--muted);font-size:13px;margin-bottom:20px;" id="completeSummary"></p>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;max-width:380px;margin:0 auto 20px;text-align:left;" id="completeDetails"></div>
     <div class="btn-row" style="justify-content:center;">
-      <button class="btn btn-primary" onclick="newService()">New Vehicle Entry</button>
-      <button class="btn btn-secondary" onclick="goAdmin()">Admin Panel</button>
+      <button class="btn btn-secondary" onclick="goAdmin()">&#8592; Admin Panel</button>
+      <button class="btn btn-primary" onclick="newService()">&#43; New Vehicle Entry</button>
     </div>
   </div>
 </div>
@@ -675,9 +676,14 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- ADMIN PAGE -->
 <div class="page" id="pageAdmin">
   <div class="step-header">
-    <div class="step-badge"><span>Admin Panel</span></div>
-    <div class="step-title">Dashboard and Records</div>
-    <div class="step-sub">Live sync across all devices</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div class="step-badge"><span>Admin Panel</span></div>
+        <div class="step-title">Dashboard and Records</div>
+        <div class="step-sub">Live sync across all devices</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="newService()" style="white-space:nowrap;">&#43; New Service</button>
+    </div>
   </div>
   <div id="adminLoginOverlay" style="display:none;">
     <div class="container">
@@ -913,9 +919,14 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- ============================================================ -->
 <div class="page" id="pageReminders">
   <div class="step-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
     <div class="step-badge"><span>Reminders</span></div>
     <div class="step-title">Service & Payment Reminders</div>
     <div class="step-sub">Auto-send WhatsApp reminders to customers</div>
+  </div>
+      <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;">&#8592; Back</button>
+    </div>
   </div>
   <div class="container">
     <div class="rem-tabs">
@@ -1015,9 +1026,17 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- ============================================================ -->
 <div class="page" id="pageOutside">
   <div class="step-header">
-    <div class="step-badge"><span>Outside Work</span></div>
-    <div class="step-title">Outside Work Manager</div>
-    <div class="step-sub">Track welding, tinkering, painting and other external work with shop-wise billing</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div class="step-badge"><span>Outside Work</span></div>
+        <div class="step-title">Outside Work Manager</div>
+        <div class="step-sub">Track external work with shop-wise billing</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;">&#8592; Back</button>
+    </div>
+  </div>
+      <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;">&#8592; Back</button>
+    </div>
   </div>
   <div class="container">
 
@@ -1177,8 +1196,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- ============================================================ -->
 <div class="page" id="pagePortal">
   <div class="portal-hero">
-    <div class="portal-title">Sri Bikez</div>
-    <div class="portal-sub">Customer Service History Portal</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:500px;margin:0 auto;width:100%;padding:0 4px;">
+      <div>
+        <div class="portal-title" style="text-align:left;">Sri Bikez</div>
+        <div class="portal-sub" style="text-align:left;">Customer Service History Portal</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3);color:#fff;">&#8592; Back</button>
+    </div>
   </div>
   <div class="container" style="max-width:500px;">
 
@@ -1258,9 +1282,14 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- ============================================================ -->
 <div class="page" id="pageAboutUs">
   <div class="step-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
     <div class="step-badge"><span>About Us</span></div>
     <div class="step-title">Sri Bikez</div>
     <div class="step-sub">Two Wheeler Multi Brand Service Center, Edappadi</div>
+  </div>
+      <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;">&#8592; Back</button>
+    </div>
   </div>
   <div class="container" style="max-width:540px;">
 
@@ -1345,9 +1374,14 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <!-- ============================================================ -->
 <div class="page" id="pageParticulars">
   <div class="step-header">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div>
     <div class="step-badge"><span>Particulars List</span></div>
     <div class="step-title">Service Particulars</div>
     <div class="step-sub">All keywords used in bills — add new ones or edit existing</div>
+  </div>
+      <button class="btn btn-secondary btn-sm" onclick="closeParticulars()" style="white-space:nowrap;">&#8592; Back</button>
+    </div>
   </div>
   <div class="container" style="max-width:600px;">
 
@@ -1517,8 +1551,6 @@ function fbGetAll(cb) {
 // ================================================================
 window.onload = function() {
   var now = new Date();
-  document.getElementById('navDate') && (document.getElementById('navDate').textContent =
-    now.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short',year:'numeric'}));
   var today = now.toISOString().split('T')[0];
   document.getElementById('entryDate').value = today;
   var deliv = new Date(now); deliv.setDate(deliv.getDate() + 3);
@@ -1527,13 +1559,13 @@ window.onload = function() {
   addPartRow(null); addPartRow(null);
   refreshSigUI();
   populateAnalyticsFilters();
-  restorePage1Draft();
-  buildParticularsDB(); // load from localStorage on startup
+  // Clear any saved draft on fresh load — always start clean
+  localStorage.removeItem('sribikez_p1draft');
+  buildParticularsDB();
   waitForFirebase(function() {
     fbReady = true;
     document.getElementById('dbStatus').textContent = 'Live';
     document.getElementById('dbStatus').className = 'db-status live';
-    // migrate old IndexedDB/localStorage
     migrateOldData();
   });
 };
@@ -1609,29 +1641,14 @@ function getNextBillNo(callback){
 // ================================================================
 var _p1SaveTimer = null;
 function page1AutoSave(){
+  // Does NOT save to localStorage — prevents old details showing on refresh
   clearTimeout(_p1SaveTimer);
   _p1SaveTimer = setTimeout(function(){
-    // Only auto-save if we have minimum required fields
     var vn = document.getElementById('vehNum').value.trim();
     var cn = document.getElementById('custName').value.trim();
-    var cp = document.getElementById('custPhone').value.trim();
-    if(!vn || !cn || !cp) return;
-    // Save to localStorage as draft so data is not lost
-    var draft = {
-      vehNum: vn,
-      vehName: document.getElementById('vehName').value.trim(),
-      custName: cn,
-      custPhone: cp,
-      entryDate: document.getElementById('entryDate').value,
-      delivDate: document.getElementById('delivDate').value,
-      vehKm: document.getElementById('vehKm').value.trim(),
-      mechSelect: document.getElementById('mechSelect').value,
-      savedAt: new Date().toISOString()
-    };
-    localStorage.setItem('sribikez_p1draft', JSON.stringify(draft));
-    // Show subtle auto-save feedback
-    showSyncStatus('✓ Draft saved');
-  }, 1500);
+    if(!vn && !cn) return;
+    showSyncStatus('\u2713 Details entered');
+  }, 1000);
 }
 
 function showSyncStatus(msg){
@@ -2801,23 +2818,36 @@ function finishService(){
   });
 }
 function newService(){
-  state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,editMode:false,pendingBills:[],pendingTotal:0,partPayments:[]};
+  state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',
+    mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,
+    editMode:false,pendingBills:[],pendingTotal:0,partPayments:[]};
+  // Clear draft from localStorage
   localStorage.removeItem('sribikez_p1draft');
-  hidePendingAlert();
-  resetPartPay();
-  ['vehNum','vehName','custName','custPhone','vehKm'].forEach(function(id){document.getElementById(id).value='';});
+  // Clear all form fields
+  ['vehNum','vehName','custName','custPhone','vehKm'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
   document.getElementById('mechSelect').value='';
   document.getElementById('mechHint').textContent='';
   document.getElementById('mechOtherName').style.display='none';
   document.getElementById('mechOtherPhoneRow').style.display='none';
   var today=new Date().toISOString().split('T')[0];
   document.getElementById('entryDate').value=today;
-  var d=new Date();d.setDate(d.getDate()+3);
+  var d=new Date(); d.setDate(d.getDate()+3);
   document.getElementById('delivDate').value=d.toISOString().split('T')[0];
+  // Clear parts
   document.getElementById('partsBody').innerHTML='';
-  addPartRow(null);addPartRow(null);
+  addPartRow(null); addPartRow(null);
   document.getElementById('liveTotalAmt').textContent='Rs 0';
-  buildChips();renderComplaintList();goPage(1);
+  // Clear complaints
+  buildChips(); renderComplaintList();
+  // Clear pending alert
+  hidePendingAlert();
+  // Clear part payments
+  resetPartPay();
+  // Go to page 1 fresh
+  goPage(1);
+  window.scrollTo(0,0);
 }
 
 // ================================================================
