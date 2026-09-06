@@ -1035,19 +1035,9 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;">&#8592; Back</button>
     </div>
   </div>
-      <button class="btn btn-secondary btn-sm" onclick="goPage(1)" style="white-space:nowrap;">&#8592; Back</button>
-    </div>
-  </div>
   <div class="container">
 
-    <!-- OW TABS -->
-    <div class="ow-tabs">
-      <div class="ow-tab active" id="owTabBtn0" onclick="switchOwTab(0)">Add Work</div>
-      <div class="ow-tab" id="owTabBtn1" onclick="switchOwTab(1)">All Entries</div>
-      <div class="ow-tab" id="owTabBtn2" onclick="switchOwTab(2)">Shop Summary</div>
-    </div>
-
-    <!-- OW TAB 0: ADD WORK -->
+    <!-- SECTION 1: ADD WORK -->
     <div id="owTabPanel0">
 
       <!-- Linked bill reference -->
@@ -1061,7 +1051,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       </div>
 
       <div class="card">
-        <div class="card-title">Link to Service Bill (Optional)</div>
+        <div class="card-title">&#128279; Link to Service Bill (Optional)</div>
         <div style="display:flex;gap:8px;align-items:flex-end;">
           <div class="field" style="flex:1;">
             <label>Bill Number</label>
@@ -1069,11 +1059,10 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
           </div>
           <button class="btn btn-blue btn-sm" style="margin-bottom:1px;" onclick="linkOwBill()">Link Bill</button>
         </div>
-        <div style="font-size:10px;color:var(--muted);margin-top:5px;">Linking a bill lets you reference which vehicle this outside work was done for</div>
       </div>
 
       <div class="card">
-        <div class="card-title">Work Details</div>
+        <div class="card-title">&#128295; Work Details</div>
         <div class="form-grid">
           <div class="field">
             <label>Date of Work *</label>
@@ -1126,13 +1115,14 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       </div>
 
       <div class="btn-row">
-        <button class="btn btn-secondary" onclick="goPage(1)">Back to Service</button>
+        <button class="btn btn-secondary" onclick="goPage(1)">&#8592; Back</button>
         <button class="btn btn-primary" onclick="saveOutsideWork()">Save Outside Work</button>
       </div>
     </div>
 
-    <!-- OW TAB 1: ALL ENTRIES -->
-    <div id="owTabPanel1" style="display:none;">
+    <!-- SECTION 2: ALL ENTRIES -->
+    <div id="owTabPanel1" style="margin-top:18px;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--orange2);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">&#128203; All Outside Work Entries</div>
       <div class="ow-filter-row">
         <input type="text" id="owSearch" placeholder="Search shop, work, bill..." oninput="renderOwEntries()">
         <select id="owFilterType" onchange="renderOwEntries()">
@@ -1170,8 +1160,9 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       </div>
     </div>
 
-    <!-- OW TAB 2: SHOP SUMMARY -->
-    <div id="owTabPanel2" style="display:none;">
+    <!-- SECTION 3: SHOP SUMMARY -->
+    <div id="owTabPanel2" style="margin-top:18px;">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--orange2);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border);">&#127974; Shop Summary</div>
       <div class="ow-filter-row">
         <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Month:</label>
         <select id="owSummaryMonth" onchange="renderShopSummary()">
@@ -3338,9 +3329,9 @@ function goOutsideWork(workType){
   document.getElementById('pageOutside').classList.add('active');
   document.getElementById('progressBar').style.display='none';
   if(workType && workType!=='Outside'){
-    document.getElementById('owWorkType').value=workType;
+    var sel = document.getElementById('owWorkType');
+    if(sel) sel.value = workType;
   }
-  switchOwTab(0);
   owInit();
   window.scrollTo(0,0);
 }
@@ -3644,12 +3635,10 @@ function populateOwMonthFilters(){
 }
 
 function switchOwTab(n){
-  for(var i=0;i<3;i++){
-    document.getElementById('owTabPanel'+i).style.display=i===n?'block':'none';
-    document.getElementById('owTabBtn'+i).classList.toggle('active',i===n);
-  }
-  if(n===1) renderOwEntries();
-  if(n===2) renderShopSummary();
+  // Tabs removed - all sections visible always
+  // Just trigger data rendering when called
+  renderOwEntries();
+  renderShopSummary();
 }
 
 function exportOwCSV(){
