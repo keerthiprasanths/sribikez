@@ -327,6 +327,43 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .drive-status.saving{background:rgba(59,130,246,.1);color:var(--blue);}
 .drive-status.saved{background:rgba(34,197,94,.1);color:var(--green);}
 .drive-status.failed{background:rgba(239,68,68,.1);color:#ef4444;}
+
+/* Calm slate admin palette; payment and service status are independent. */
+#pageAdmin{--card:#fff;--border:#dbe3ed;--text:#18283e;--muted:#586b82;--orange:#245a91;--orange2:#245a91;--green:#167044;--yellow:#916200;--blue:#2563a6;--purple:#6d48ad;background:#f1f5f9;color:var(--text)}
+#pageAdmin .container{max-width:1100px;padding:24px 18px}
+#pageAdmin .step-header{background:#e5edf6;border-color:#cedae8;padding:24px}
+#pageAdmin .step-title{letter-spacing:0}
+#pageAdmin input,#pageAdmin select,#pageAdmin option{background:#fff!important;color:#18283e!important;border-color:#cbd5e1!important}
+#pageAdmin .admin-tabs{gap:8px;background:#fff;padding:6px;border:1px solid var(--border);border-radius:10px}
+#pageAdmin .admin-tab{border-radius:6px;padding:10px 20px}
+#pageAdmin .admin-tab.active{background:#e8f0fa;color:#245a91;border-bottom-color:#245a91}
+#pageAdmin .owner-unlock{background:#fff;border-color:var(--border)}
+#pageAdmin #statsRow>div{background:#fff!important;border-color:#dbe3ed!important;box-shadow:0 2px 5px #18283e05}
+#pageAdmin .customer-card{border:1px solid var(--pay-border);background:var(--pay-bg);border-left:5px solid var(--pay-border);border-radius:12px;padding:18px;margin-bottom:12px;box-shadow:0 2px 6px #18283e06;scroll-margin-top:82px}
+#pageAdmin .payment-paid{--pay-bg:#e0f3e7;--pay-border:#399a64}
+#pageAdmin .payment-unpaid{--pay-bg:#fbe5e5;--pay-border:#ce6262}
+#pageAdmin .payment-part{--pay-bg:#fff3ca;--pay-border:#c99b28}
+#pageAdmin .customer-card:hover{box-shadow:0 4px 12px #18283e15}
+#pageAdmin .customer-card .btn{background:#ffffffb3!important;color:#334c67!important;border:1px solid #bac8d5!important}
+#pageAdmin .customer-card .btn-blue{background:#245a91!important;color:white!important;border-color:#245a91!important}
+#pageAdmin .customer-card .btn-red{color:#a53030!important}
+#pageAdmin .service-finished{background:#e8dffc;color:#6238a1;border:1px solid #b29ad9}
+#pageAdmin .service-progress{background:#deebfa;color:#285c92;border:1px solid #99b7da}
+.service-status{font-size:10px;font-weight:600;padding:4px 9px;border-radius:6px}
+.payment-legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin:16px 0}
+.payment-legend span:before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--swatch);margin-right:5px}
+.bill-back-top{margin-bottom:12px}
+.btn-finished{background:#7850ad;color:#fff}
+#page4 h2{color:#b79bdd!important}
+@media(max-width:600px){#pageAdmin .container{padding:16px 10px}#pageAdmin .customer-card{padding:14px}#pageAdmin .admin-tab{padding:9px 12px}}
+
+
+#pageAdmin .admin-payment-history{padding:10px 0 12px;border-top:1px solid #18283e14;color:var(--muted);font-size:11px}
+#pageAdmin .admin-payment-history summary{cursor:pointer;color:var(--text);font-weight:500;padding:4px 0}
+#pageAdmin .payment-last-date{margin-top:5px;line-height:1.5}
+#pageAdmin .payment-receipts{margin:7px 0}
+#pageAdmin .payment-receipt{display:flex;gap:10px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid #18283e10}
+#pageAdmin .payment-receipt time{margin-left:auto}
 </style>
 </head>
 <body>
@@ -483,13 +520,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <div class="page" id="page3">
   <div class="step-header">
     <div class="step-badge"><span>Step 3 of 3</span></div>
-    <div class="step-title">Billing</div>
+    <button class="btn btn-secondary bill-back-top" onclick="billGoBack()">← Back</button><div class="step-title">Billing</div>
     <div class="step-sub" id="billingSubtitle">Add parts and labour then print or share</div>
   </div>
   <div class="container">
     <div class="edit-banner" id="editModeBanner" style="display:none;">
       <span>Editing record from Admin Panel</span>
-      <button class="btn btn-blue btn-sm" onclick="goAdmin()">Back to Admin</button>
+      <button class="btn btn-blue btn-sm" onclick="billGoBack()">← Back to previous view</button>
     </div>
     <!-- Editable summary (edit mode) -->
     <div id="billVehicleSummary" style="display:none;" class="card">
@@ -535,14 +572,18 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <!-- PART PAYMENT SECTION -->
       <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);">💰 Part Payment</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);">Bill Payment</div>
           <button onclick="togglePartPaySection()" id="partPayToggleBtn"
             style="background:rgba(232,73,15,.12);border:1px solid rgba(232,73,15,.35);color:var(--orange2);border-radius:7px;padding:4px 12px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;">
             + Record Payment
           </button>
         </div>
 
-        <!-- Payment entry (hidden by default) -->
+        <div class="btn-row" style="margin-bottom:12px" aria-label="Bill payment status">
+<button class="btn btn-green" onclick="setBillPayment('Paid')">Paid</button>
+<button class="btn btn-red" onclick="setBillPayment('Unpaid')">Unpaid</button>
+<button class="btn" style="background:#f5c84c;color:#392a00" onclick="setBillPayment('Part Paid')">Part Paid</button>
+</div><!-- Payment entry (hidden by default) -->
         <div id="partPaySection" style="display:none;background:#161616;border-radius:9px;padding:12px;margin-bottom:8px;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
             <div class="field" style="flex:1;min-width:120px;margin:0;">
@@ -654,7 +695,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <button class="btn btn-wa" id="shareConfirmBtn" onclick="shareServiceConfirmation()" style="display:none;background:#128C7E;">Share Service Info</button>
       <button class="btn btn-wa" onclick="shareWhatsApp()">WhatsApp Bill + PDF</button>
       <button class="btn btn-primary" onclick="openPrintTab()">Print / Save PDF</button>
-      <button class="btn btn-green" onclick="finishService()">Finish Service</button>
+      <button class="btn btn-finished" onclick="finishService()">Finish Service</button>
     </div>
   </div>
 </div>
@@ -716,7 +757,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <div id="tabPanel0">
         <!-- TOP ACTION ROW -->
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-          <button class="btn btn-green" onclick="goPage(1)" style="font-size:14px;padding:10px 22px;letter-spacing:.5px;">+ New Service</button>
+          <button class="btn btn-green" onclick="newService()" style="font-size:14px;padding:10px 22px;letter-spacing:.5px;">+ New Service</button>
           <div style="display:flex;gap:7px;flex-wrap:wrap;">
             <button class="btn btn-secondary btn-sm" onclick="exportCSV()" style="border-color:var(--blue);color:var(--blue);">Export CSV</button>
             <label class="btn btn-secondary btn-sm" style="cursor:pointer;border-color:var(--purple);color:var(--purple);">Import CSV<input type="file" accept=".csv" style="display:none" onchange="importCSV(event)"></label>
@@ -734,35 +775,35 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <button onclick="document.getElementById('searchInput').value='';filterRecords();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0 4px;">✕</button>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-            <select id="filterStatus" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+            <select id="filterStatus" onchange="filterRecords()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
               <option value="">All Status</option>
               <option value="Completed">✅ Completed</option>
               <option value="In Progress">🔧 In Progress</option>
             </select>
-            <select id="filterPayment" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+            <select id="filterPayment" onchange="filterRecords()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
               <option value="">All Payments</option>
               <option value="Paid">💚 Paid</option>
               <option value="Part Paid">🟡 Part Paid</option>
               <option value="Unpaid">🔴 Unpaid</option>
             </select>
-            <select id="filterMech" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+            <select id="filterMech" onchange="filterRecords()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
               <option value="">All Mechanics</option>
               <option>Gowtham</option><option>Jeeva</option><option>Arivalazhan</option>
             </select>
-            <select id="filterSort" onchange="filterRecords()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
+            <select id="filterSort" onchange="filterRecords()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;cursor:pointer;">
               <option value="date_desc">Latest First</option>
               <option value="date_asc">Oldest First</option>
               <option value="bill_desc">Bill No ↓</option>
               <option value="bill_asc">Bill No ↑</option>
               <option value="amount_desc">Amount ↓</option>
             </select>
-            <span id="recordCountBadge" style="font-size:11px;color:var(--muted);padding:5px 9px;background:#161616;border-radius:6px;border:1px solid var(--border);white-space:nowrap;">0 records</span>
+            <span id="recordCountBadge" style="font-size:11px;color:var(--muted);padding:5px 9px;background:#fff;border-radius:6px;border:1px solid var(--border);white-space:nowrap;">0 records</span>
           </div>
         </div>
 
         <!-- RECORDS TABLE — card-style rows -->
         <div id="adminTableWrap">
-          <div id="adminCardView"></div>
+          <div class="payment-legend"><span style="--swatch:#399a64">Paid</span><span style="--swatch:#ce6262">Unpaid</span><span style="--swatch:#c99b28">Part paid</span><span style="--swatch:#7850ad">Finished vehicle</span></div><div id="adminCardView"></div>
         </div>
 
         <div style="margin-top:9px;font-size:10px;color:var(--muted);text-align:center;">
@@ -844,8 +885,8 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
         <!-- Filter bar -->
         <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
           <span style="font-size:11px;color:var(--muted);font-weight:500;">Filter:</span>
-          <select id="analyticsMonth" onchange="renderAnalytics()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
-          <select id="analyticsYear" onchange="renderAnalytics()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
+          <select id="analyticsMonth" onchange="renderAnalytics()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
+          <select id="analyticsYear" onchange="renderAnalytics()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
           <button class="btn btn-secondary btn-sm" onclick="analyticsAllTime()">All Time</button>
           <span id="analyticsFilterLabel" style="font-size:10px;color:var(--orange2);margin-left:4px;"></span>
         </div>
@@ -1792,47 +1833,10 @@ function hidePendingAlert(){
 // ================================================================
 var _editSaveTimer = null;
 function editAutoSave(){
-  clearTimeout(_editSaveTimer);
-  var statusEl = document.getElementById('editAutoSaveStatus');
-  if(statusEl) statusEl.textContent = '● Saving...';
-  _editSaveTimer = setTimeout(function(){
-    if(!state.billNo || !fbReady) return;
-    var s = getBillingState();
-    var complaintsStr = document.getElementById('b_complaints') ? document.getElementById('b_complaints').value : '';
-    var bkm = document.getElementById('b_vehKm');
-    var recRef = window.__fbRef2(window.__fbDb, 'sribikez/records/'+state.billNo);
-    window.__fbGet(recRef).then(function(snap){
-      var ex = snap.val()||{};
-      ex.custName    = s.custName;
-      ex.custPhone   = s.custPhone;
-      ex.vehNum      = s.vehNum;
-      ex.vehName     = s.vehName;
-      ex.mechName    = s.mechName;
-      ex.mechPhone   = s.mechPhone;
-      ex.date        = s.entryDate;
-      ex.delivDate   = s.delivDate;
-      ex.vehKm       = bkm ? bkm.value : (state.vehKm||'');
-      ex.complaints  = complaintsStr;
-      ex.updatedAt   = new Date().toISOString();
-      return window.__fbSet(recRef, ex);
-    }).then(function(){
-      var statusEl2 = document.getElementById('editAutoSaveStatus');
-      if(statusEl2) statusEl2.textContent = '✓ Saved at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-    }).catch(function(){
-      var statusEl3 = document.getElementById('editAutoSaveStatus');
-      if(statusEl3) statusEl3.textContent = '⚠ Save failed';
-    });
-  }, 2000);
+ clearTimeout(_editSaveTimer);
+ _editSaveTimer=setTimeout(function(){autoSaveBill();},800);
 }
 
-// ================================================================
-//  MECHANICS
-// ================================================================
-var MECHS = {
-  'Gowtham|7010258785':      { name:'Gowtham',      phone:'7010258785' },
-  'Jeeva|9789440271':        { name:'Jeeva',        phone:'9789440271' },
-  'Arivalazhan|8148840304':  { name:'Arivalazhan',  phone:'8148840304' }
-};
 function onMechSelect() {
   var v  = document.getElementById('mechSelect').value;
   var h  = document.getElementById('mechHint');
@@ -2199,7 +2203,7 @@ function addPartRow(p){
     '<td style="position:relative;">' +
       '<div class="parts-suggest" style="position:relative;">' +
         '<input type="text" placeholder="Type part or labour..." value="'+esc(dv)+'" '+
-          'oninput="updateBillPreview();showPartsDropdown(this,this.parentNode.querySelector(\'.parts-dropdown\'))" '+
+          'oninput="calcTotal();showPartsDropdown(this,this.parentNode.querySelector(\'.parts-dropdown\'))" '+
           'onblur="saveParticularOnBlur(this)" '+
           'style="width:100%;">' +
         '<div class="parts-dropdown"></div>' +
@@ -2226,7 +2230,7 @@ function calcTotal(){
   document.querySelectorAll('#partsBody tr').forEach(function(tr){t+=parseFloat(tr.cells[3].querySelector('input').value)||0;});
   state.total=t;
   document.getElementById('liveTotalAmt').textContent='Rs '+t.toFixed(2);
-  updateBillPreview();
+  updateBillPreview();updatePartPayBalance();
   // Auto-save bill after 2 seconds of no typing
   if(state.billNo) {
     clearTimeout(_autoSaveTimer);
@@ -2236,44 +2240,8 @@ function calcTotal(){
     }, 2000);
   }
 }
-function autoSaveBill(){
-  if(!state.billNo || !fbReady) return;
-  var s = getBillingState ? getBillingState() : state;
-  var complaintsStr = Array.isArray(state.complaints) ?
-    state.complaints.map(function(c){return c.text;}).join(', ') : (state.complaints||'');
-  var record = {
-    billNo:state.billNo, date:s.entryDate||state.entryDate,
-    delivDate:s.delivDate||state.delivDate,
-    vehNum:s.vehNum||state.vehNum, vehName:s.vehName||state.vehName,
-    custName:s.custName||state.custName, custPhone:s.custPhone||state.custPhone,
-    mechName:s.mechName||state.mechName, mechPhone:s.mechPhone||state.mechPhone,
-    vehKm:state.vehKm||'', complaints:complaintsStr,
-    parts:getParts(), total:state.total,
-    status:'In Progress', savedAt:new Date().toISOString(),
-    paymentStatus: 'Unpaid'
-  };
-  var bar = document.getElementById('autosaveBar');
-  var msg = document.getElementById('autosaveMsg');
-  if(bar) bar.style.display='flex';
-  if(msg) msg.textContent='Auto-saving bill...';
-  var recRef = window.__fbRef2(window.__fbDb, 'sribikez/records/'+record.billNo);
-  window.__fbGet(recRef).then(function(snap){
-    var existing = snap.val();
-    // preserve paymentStatus if already set
-    if(existing && existing.paymentStatus) record.paymentStatus = existing.paymentStatus;
-    if(existing && existing.status === 'Completed') record.status = 'Completed';
-    window.__fbSet(recRef, record).then(function(){
-      if(msg) msg.textContent='Bill auto-saved at '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
-      setTimeout(function(){ if(bar) bar.style.display='none'; }, 3000);
-    });
-  }).catch(function(){
-    // if record doesn't exist yet just save it
-    window.__fbSet(recRef, record).then(function(){
-      if(msg) msg.textContent='Bill saved';
-      setTimeout(function(){ if(bar) bar.style.display='none'; }, 3000);
-    });
-  });
-}
+function autoSaveBill(){ return saveCurrentBill(false); }
+
 function getParts(){
   var rows=[];
   document.querySelectorAll('#partsBody tr').forEach(function(tr){
@@ -2301,36 +2269,13 @@ function togglePartPaySection(){
 }
 
 function addPartPayment(){
-  var amtEl  = document.getElementById('partPayAmt');
-  var modeEl = document.getElementById('partPayMode');
-  var noteEl = document.getElementById('partPayNote');
-  var amt = parseFloat(amtEl.value)||0;
-  if(amt <= 0){ showToast('Enter a valid amount','error'); amtEl.focus(); return; }
-  if(amt > state.total){ showToast('Amount cannot exceed bill total','error'); return; }
-  state.partPayments.push({
-    amt: amt,
-    mode: modeEl.value,
-    note: noteEl.value.trim(),
-    date: new Date().toISOString()
-  });
-  amtEl.value = '';
-  noteEl.value = '';
-  renderPartPayHistory();
-  updatePartPayBalance();
-
-  // Auto-save to Firebase immediately
-  if(state.billNo && fbReady){
-    var recRef = window.__fbRef2(window.__fbDb, 'sribikez/records/'+state.billNo);
-    window.__fbGet(recRef).then(function(snap){
-      var ex = snap.val()||{};
-      ex.partPayments = state.partPayments;
-      var totalPaid = state.partPayments.reduce(function(s,p){return s+(parseFloat(p.amt)||0);},0);
-      ex.totalPaid = totalPaid;
-      ex.paymentStatus = totalPaid >= state.total ? 'Paid' : (totalPaid > 0 ? 'Part Paid' : 'Unpaid');
-      return window.__fbSet(recRef, ex);
-    }).then(function(){ showToast('Payment recorded'); })
-    .catch(function(){ showToast('Payment saved locally only','error'); });
-  }
+ var amt=Number(document.getElementById('partPayAmt').value);
+ var payments=state.partPayments||[];
+ var due=state.total-payments.reduce(function(s,p){return s+Number(p.amt||0);},0);
+ if(!Number.isFinite(amt)||amt<=0||amt>due+0.001){showToast('Enter an amount within the remaining balance','error');return;}
+ state.partPayments=payments.concat([{amt:amt,mode:document.getElementById('partPayMode').value,note:document.getElementById('partPayNote').value.trim(),date:new Date().toISOString()}]);
+ document.getElementById('partPayAmt').value='';document.getElementById('partPayNote').value='';
+ renderPartPayHistory();updatePartPayBalance();autoSaveBill();
 }
 
 function renderPartPayHistory(){
@@ -2343,9 +2288,8 @@ function renderPartPayHistory(){
   histEl.style.display='block'; sumEl.style.display='block';
   histEl.innerHTML = '<div style="margin-bottom:8px;">' +
     state.partPayments.map(function(p, i){
-      var d = new Date(p.date);
-      var dStr = d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) +
-                 ' ' + d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+      var dStr=csvDateTime(p.date);
+      dStr=dStr?dStr+' IST':'Date not recorded';
       return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 10px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:7px;margin-bottom:5px;flex-wrap:wrap;">'+
         '<div>'+
           '<span style="font-family:\'Rajdhani\',sans-serif;font-size:14px;font-weight:700;color:var(--green);">Rs '+parseFloat(p.amt).toFixed(0)+'</span>'+
@@ -2362,22 +2306,8 @@ function renderPartPayHistory(){
 }
 
 function removePartPayment(idx){
-  if(!state.partPayments) return;
-  state.partPayments.splice(idx, 1);
-  renderPartPayHistory();
-  updatePartPayBalance();
-  // Re-save
-  if(state.billNo && fbReady){
-    var recRef = window.__fbRef2(window.__fbDb,'sribikez/records/'+state.billNo);
-    window.__fbGet(recRef).then(function(snap){
-      var ex = snap.val()||{};
-      ex.partPayments = state.partPayments;
-      var tp = state.partPayments.reduce(function(s,p){return s+(parseFloat(p.amt)||0);},0);
-      ex.totalPaid = tp;
-      ex.paymentStatus = tp >= state.total ? 'Paid' : (tp > 0 ? 'Part Paid' : 'Unpaid');
-      return window.__fbSet(recRef, ex);
-    });
-  }
+ if(!confirm('Remove this payment from the bill?'))return;
+ (state.partPayments||[]).splice(idx,1);renderPartPayHistory();updatePartPayBalance();autoSaveBill();
 }
 
 function updatePartPayBalance(){
@@ -2391,13 +2321,13 @@ function updatePartPayBalance(){
   var total    = state.total||0;
   var paid     = payments.reduce(function(s,p){return s+(parseFloat(p.amt)||0);},0);
   var balance  = total - paid;
-  if(paid === 0 && !payments.length){ sumEl.style.display='none'; return; }
+  
   sumEl.style.display='block';
   if(tBill)  tBill.textContent  = 'Rs '+total.toFixed(0);
   if(tPaid)  tPaid.textContent  = 'Rs '+paid.toFixed(0);
   if(tBal)   tBal.textContent   = 'Rs '+Math.max(0,balance).toFixed(0);
   if(tBadge){
-    if(paid >= total){
+    if(total > 0 && paid >= total){
       tBadge.textContent='FULLY PAID'; tBadge.style.cssText='font-size:10px;font-weight:600;padding:2px 9px;border-radius:6px;background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);';
     } else if(paid > 0){
       tBadge.textContent='PART PAID'; tBadge.style.cssText='font-size:10px;font-weight:600;padding:2px 9px;border-radius:6px;background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3);';
@@ -2422,7 +2352,7 @@ function resetPartPay(){
 }
 
 function loadPartPayForEdit(record){
-  state.partPayments = record.partPayments||[];
+  state.partPayments = paymentsForRecord(record);
   renderPartPayHistory();
   updatePartPayBalance();
 }
@@ -2451,11 +2381,11 @@ function goAdmin(){
   startLiveListener();
   window.scrollTo(0,0);
 }
-function billGoBack(){if(state.editMode)goAdmin();else goPage(2);}
+function billGoBack(){
+ if(!state.editMode){goPage(2);return;}
+ return saveCurrentBill(false).then(function(ok){if(ok)restoreBillOrigin();});
+}
 
-// ================================================================
-//  OWNER UNLOCK (Overview + Analytics)
-// ================================================================
 function unlockOwner(){
   var v=document.getElementById('ownerPassInput').value;
   if(_checkOwner(v)){
@@ -2540,7 +2470,7 @@ function setupBillingPage(){
   if(state.editMode){
     banner.style.display='flex';summary.style.display='block';
     document.getElementById('billingSubtitle').textContent='Edit parts and labour, save when done';
-    document.getElementById('billBackBtn').textContent='Back to Admin';
+    document.getElementById('billBackBtn').textContent='← Back to previous view';
     if(confirmBtn) confirmBtn.style.display='inline-flex';
     document.getElementById('b_custName').value=state.custName;
     document.getElementById('b_custPhone').value=state.custPhone;
@@ -2765,49 +2695,17 @@ function openPrintTab(){
 //  WHATSAPP — text message + PDF download link
 // ================================================================
 function finishService(){
-  updateBillPreview();
-  var s=getBillingState();
-  var complaintsStr=state.editMode?
-    document.getElementById('b_complaints').value:
-    state.complaints.map(function(c){return c.text;}).join(', ');
-  var partPays = state.partPayments||[];
-  var totalPaid = partPays.reduce(function(sum,p){return sum+(parseFloat(p.amt)||0);},0);
-  var payStatus = totalPaid >= state.total ? 'Paid' : (totalPaid > 0 ? 'Part Paid' : 'Unpaid');
-  var record={
-    billNo:state.billNo,date:s.entryDate,delivDate:s.delivDate,
-    vehNum:s.vehNum,vehName:s.vehName,custName:s.custName,custPhone:s.custPhone,
-    mechName:s.mechName,mechPhone:s.mechPhone,complaints:complaintsStr,
-    vehKm:state.vehKm||'',
-    parts:getParts(),total:state.total,
-    partPayments:partPays,totalPaid:totalPaid,
-    balance:Math.max(0,state.total-totalPaid),
-    status:'Completed',
-    paymentStatus:payStatus,
-    savedAt:new Date().toISOString()
-  };
-  saveParticularToDBOnFinish(record.parts);
-  fbSave(record,function(){
-    if(state.editMode){showToast('Bill updated and completed');resetPartPay();goAdmin();return;}
-    var paidLine = totalPaid>0 ?
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Paid Now</span><strong style="color:var(--green)">Rs '+totalPaid.toFixed(0)+'</strong></div>'+
-      (record.balance>0?'<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Balance Due</span><strong style="color:#ef4444">Rs '+record.balance.toFixed(0)+'</strong></div>':'') : '';
-    document.getElementById('completeSummary').textContent=state.custName+"'s "+state.vehName+' ('+state.vehNum+') saved.';
-    document.getElementById('completeDetails').innerHTML=
-      '<div style="display:grid;gap:7px;">'+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Bill No</span><strong>'+record.billNo+'</strong></div>'+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Customer</span><strong>'+record.custName+'</strong></div>'+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Vehicle</span><strong>'+record.vehNum+' - '+record.vehName+'</strong></div>'+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Total Bill</span><strong style="color:var(--orange)">Rs '+record.total.toFixed(0)+'</strong></div>'+
-      paidLine+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Status</span><strong style="color:'+(payStatus==='Paid'?'var(--green)':payStatus==='Part Paid'?'var(--yellow)':'#ef4444')+'">'+payStatus+'</strong></div>'+
-      '<div style="display:flex;justify-content:space-between;"><span style="color:var(--muted)">Mechanic</span><strong>'+record.mechName+'</strong></div>'+
-      '</div>';
-    resetPartPay();
-    goPage(4);
-    document.querySelectorAll('.prog-step').forEach(function(ss){ss.classList.remove('active');ss.classList.add('done');});
-    showToast('Service completed — '+payStatus+'!');
-  });
+ saveCurrentBill(true).then(function(ok){
+  if(!ok)return;
+  saveParticularToDBOnFinish(getParts());
+  showToast('Service finished and bill saved');
+  if(state.editMode){restoreBillOrigin();return;}
+  document.getElementById('completeSummary').textContent=state.custName+' — '+state.vehNum;
+  document.getElementById('completeDetails').textContent='Bill '+state.billNo+' · Rs '+state.total.toFixed(2)+' · '+paymentSummary(state.total,state.partPayments).paymentStatus;
+  goPage(4);
+ });
 }
+
 function newService(){
   state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',
     mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,
@@ -2903,7 +2801,7 @@ function renderStats(records){
   var paidR=records.filter(function(r){return r.paymentStatus==='Paid';});
   var unpaidR=records.filter(function(r){return r.status==='Completed'&&r.paymentStatus!=='Paid';});
   var paidAmt=paidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
-  var unpaidAmt=unpaidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  var unpaidAmt=unpaidR.reduce(function(s,r){return s+paymentSummary(Number(r.total)||0,paymentsForRecord(r)).balance;},0);
 
   // Gradient KPI stat cards for Records tab
   document.getElementById('statsRow').innerHTML=
@@ -2928,7 +2826,7 @@ function renderStats(records){
 }
 
 function kpiCard(icon,label,value,sub,color,extraStyle){
-  return '<div style="background:linear-gradient(135deg,var(--card),#1e1e1e);border:1px solid '+color+'44;border-top:3px solid '+color+';border-radius:10px;padding:13px;text-align:center;'+extraStyle+'">' +
+  return '<div style="background:var(--card);border:1px solid '+color+'44;border-top:3px solid '+color+';border-radius:10px;padding:13px;text-align:center;'+extraStyle+'">' +
     '<div style="font-size:18px;margin-bottom:3px;">'+icon+'</div>'+
     '<div style="font-family:\'Rajdhani\',sans-serif;font-size:22px;font-weight:700;color:'+color+'">'+value+'</div>'+
     '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:1px;">'+label+'</div>'+
@@ -3044,7 +2942,7 @@ function filterRecords(){
       balanceLine='<div style="font-size:10px;color:var(--yellow);margin-top:1px;">Balance due: Rs '+parseFloat(r.balance||0).toFixed(0)+' | Paid: Rs '+parseFloat(r.totalPaid||0).toFixed(0)+'</div>';
     }
 
-    return '<div style="background:var(--card);border:1px solid '+borderColor+';border-left:3px solid '+statusColor+';border-radius:10px;padding:14px 16px;margin-bottom:9px;transition:background .15s;" onmouseenter="this.style.background=\'#2a2a2a\'" onmouseleave="this.style.background=\'var(--card)\'">' +
+    return '<div class="customer-card payment-'+(isPaid?'paid':isPartPaid?'part':'unpaid')+'" data-record="'+safeBill+'" aria-label="'+sanitize(r.custName||'Customer')+' — '+(r.paymentStatus||'Unpaid')+'">' +
       // ROW 1: Bill No, Date, Status badges
       '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:8px;">' +
         '<div style="display:flex;align-items:center;gap:8px;">' +
@@ -3052,8 +2950,7 @@ function filterRecords(){
           '<span style="font-size:11px;color:var(--muted);">'+fmtDate(r.date)+'</span>' +
         '</div>' +
         '<div style="display:flex;align-items:center;gap:6px;">' +
-          '<span class="badge '+payClass+'" style="cursor:pointer;padding:3px 9px;" title="Click to toggle Paid/Unpaid" data-bill="'+safeBill+'" onclick="togglePaid(this.dataset.bill)">'+payText+'</span>' +
-          '<span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:6px;background:'+(isComplete?'rgba(34,197,94,.12)':'rgba(245,158,11,.12)')+';color:'+statusColor+';border:1px solid '+(isComplete?'rgba(34,197,94,.3)':'rgba(245,158,11,.3)')+'">'+(r.status||'Draft')+'</span>' +
+          '<span class="service-status '+(isComplete?'service-finished':'service-progress')+'">'+(isComplete?'Finished vehicle':sanitize(r.status||'Draft'))+'</span>' +
         '</div>' +
       '</div>' +
       // ROW 2: Customer + Vehicle
@@ -3075,6 +2972,7 @@ function filterRecords(){
           balanceLine+
         '</div>' +
       '</div>' +
+      adminPaymentHistory(r)+
       // ROW 3: Actions
       '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);">' +
         '<button class="btn btn-blue btn-sm" style="padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">✏️ Edit Bill</button>' +
@@ -3108,18 +3006,21 @@ function editFromAdmin(billNo){
   var r=null;
   for(var i=0;i<allRecordsCached.length;i++){if(allRecordsCached[i].billNo===billNo){r=allRecordsCached[i];break;}}
   if(!r){showToast('Record not found','error');return;}
+  rememberBillOrigin();
+  clearTimeout(_autoSaveTimer);clearTimeout(_editSaveTimer);
   state.billNo=r.billNo;state.vehNum=r.vehNum||'';state.vehName=r.vehName||'';
   state.custName=r.custName||'';state.custPhone=r.custPhone||'';
   state.entryDate=r.date||'';state.delivDate=r.delivDate||'';
   state.mechName=r.mechName||'';state.mechPhone=r.mechPhone||'';
   state.complaints=r.complaints||'';state.total=parseFloat(r.total)||0;
-  state.partPayments = r.partPayments||[];
+  state.partPayments = paymentsForRecord(r);
+  state.vehKm=r.vehKm||'';
   state.editMode=true;
   document.getElementById('partsBody').innerHTML='';
   var parts=r.parts||[];
   parts.forEach(function(p){addPartRow(p);});
   if(!parts.length){addPartRow(null);addPartRow(null);}
-  calcTotal();setupBillingPage();updateBillPreview();
+  setupBillingPage();calcTotal();clearTimeout(_autoSaveTimer);updateBillPreview();
   loadPartPayForEdit(r);
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   document.getElementById('page3').classList.add('active');
@@ -3149,15 +3050,22 @@ function deleteRecord(billNo){
   fbDelete(billNo,function(){showToast('Record deleted');});
 }
 function exportCSV(){
-  if(!allRecordsCached.length){showToast('No records','error');return;}
-  var h=['Bill No','Date','Vehicle No','Vehicle','Customer','Phone','Mechanic','Mech Phone','Complaints','Total','Status'];
-  var rows=allRecordsCached.map(function(r){return[r.billNo,r.date,r.vehNum,r.vehName,r.custName,r.custPhone,r.mechName,r.mechPhone,'"'+(r.complaints||'')+'"',r.total,r.status].join(',');});
-  var csv=[h.join(',')].concat(rows).join('\n');
-  var a=document.createElement('a');
-  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='sribikez_'+new Date().toISOString().split('T')[0]+'.csv';
-  a.click();showToast('CSV downloaded!');
+ if(!allRecordsCached.length){showToast('No records','error');return;}
+ var h=['Bill No','Date','Vehicle No','Vehicle','Customer','Phone','Mechanic','Complaints','Total','Status','Payment Status','Total Paid','Balance','Created Date & Time (IST)','Payment Updated Date & Time (IST)','Paid Date & Time (IST)','Last Updated Date & Time (IST)'];
+ var paymentCount=allRecordsCached.reduce(function(max,r){return Math.max(max,paymentsForRecord(r).length);},0);
+ for(var n=1;n<=paymentCount;n++){h.push('Payment '+n+' Amount','Payment '+n+' Date & Time (IST)','Payment '+n+' Mode','Payment '+n+' Note');}
+ var rows=allRecordsCached.map(function(r){
+  var p=paymentSummary(Number(r.total)||0,paymentsForRecord(r));
+  var row=[r.billNo,r.date,r.vehNum,r.vehName,r.custName,r.custPhone,r.mechName,r.complaints,r.total,r.status,r.paymentStatus||p.paymentStatus,p.totalPaid,p.balance,csvDateTime(r.createdAt||r.savedAt),csvDateTime(r.paymentUpdatedAt||r.paidAt),csvDateTime(r.paidAt),csvDateTime(r.updatedAt||r.savedAt)];
+  var payments=paymentsForRecord(r);
+  for(var i=0;i<paymentCount;i++){var payment=payments[i];row.push(payment?Number(payment.amt||0).toFixed(2):'',payment?csvDateTime(payment.date):'',payment?payment.mode||'':'',payment?payment.note||'':'');}
+  return row.map(csvCell).join(',');
+ });
+ var a=document.createElement('a');
+ a.href='data:text/csv;charset=utf-8,'+encodeURIComponent('\uFEFF'+[h.map(csvCell).join(',')].concat(rows).join('\r\n'));
+ a.download='sribikez_'+new Date().toISOString().split('T')[0]+'.csv';a.click();showToast('CSV downloaded');
 }
+
 function clearAllData(){
   if(!confirm('Delete ALL records? Cannot be undone.'))return;
   allRecordsCached.forEach(function(r){fbDelete(r.billNo,null);});
@@ -3195,6 +3103,9 @@ function importCSV(event){
         complaints:record['complaints']||'',
         total:    parseFloat(record['total']||0)||0,
         status:   record['status']   ||'Completed',
+        paymentStatus:record['payment status']||'Unpaid',
+        totalPaid:parseFloat(record['total paid']||0)||0,
+        balance:parseFloat(record['balance']||0)||0,
         parts:[],vehKm:'',savedAt:new Date().toISOString()
       };
       if(r.billNo) { fbSave(r,null); imported++; }
@@ -4037,7 +3948,6 @@ function renderUnpaidBills(){
         // Row 2 — action buttons, clearly visible and large
         '<div style="display:flex;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);">' +
           '<button style="display:flex;align-items:center;gap:6px;background:#25D366;color:#fff;border:none;border-radius:8px;padding:9px 16px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;min-width:120px;justify-content:center;" data-bill="'+safeBill+'" onclick="sendPaymentReminder(this.dataset.bill)">💬 Remind</button>' +
-          '<button style="display:flex;align-items:center;gap:6px;background:var(--green);color:#000;border:none;border-radius:8px;padding:9px 16px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;min-width:120px;justify-content:center;" data-bill="'+safeBill+'" onclick="markPaidFromReminders(this.dataset.bill)">✅ Mark Paid</button>' +
           '<button style="display:flex;align-items:center;gap:6px;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-family:Rajdhani,sans-serif;font-size:14px;font-weight:600;cursor:pointer;flex:1;min-width:120px;justify-content:center;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">✏️ Edit Bill</button>' +
         '</div>' +
       '</div>';
@@ -4127,6 +4037,103 @@ function sendAllPaymentReminders(){
   });
   showToast('Sending '+unpaid.length+' payment reminders...');
 }
+
+// Bill edits are serialized so autosave and payment actions cannot overwrite each other.
+var billSaveQueue=Promise.resolve();
+var billOrigin=null;
+function paymentSummary(total,payments){
+ var paid=(payments||[]).reduce(function(sum,p){return sum+(Number(p.amt)||0);},0);
+ return {totalPaid:paid,balance:Math.max(0,total-paid),paymentStatus:total>0&&paid>=total?'Paid':paid>0?'Part Paid':'Unpaid'};
+}
+function paymentsForRecord(r){
+ if(r.partPayments&&r.partPayments.length)return JSON.parse(JSON.stringify(r.partPayments));
+ var paid=r.paymentStatus==='Paid'?Number(r.total):Number(r.totalPaid);
+ return paid>0?[{amt:paid,mode:'Existing payment',note:'Carried forward from saved bill',date:r.paidAt||r.paymentUpdatedAt||''}]:[];
+}
+function setBillPayment(status){
+ if(status==='Part Paid'){
+  document.getElementById('partPaySection').style.display='block';
+  document.getElementById('partPayToggleBtn').textContent='− Hide';
+  document.getElementById('partPayAmt').focus();return;
+ }
+ var p=paymentSummary(state.total,state.partPayments);
+ if(status==='Paid'){
+  if(state.total<=0){showToast('Add a bill amount first','error');return;}
+  if(p.balance>0)state.partPayments=(state.partPayments||[]).concat([{amt:p.balance,mode:document.getElementById('partPayMode').value,note:'Balance settled',date:new Date().toISOString()}]);
+ }else{
+  if(p.totalPaid>0&&!confirm('Mark unpaid and clear the recorded payments for this bill?'))return;
+  state.partPayments=[];
+ }
+ renderPartPayHistory();updatePartPayBalance();autoSaveBill();
+}
+function saveCurrentBill(completed){
+ clearTimeout(_autoSaveTimer);clearTimeout(_editSaveTimer);
+ if(!state.billNo||!fbReady){showToast('Connect to the database before saving','error');return Promise.resolve(false);}
+ var s=getBillingState(), billNo=state.billNo;
+ var payments=JSON.parse(JSON.stringify(state.partPayments||[]));
+ var summary=paymentSummary(state.total,payments);
+ var fields={billNo:billNo,date:s.entryDate,delivDate:s.delivDate,vehNum:s.vehNum,vehName:s.vehName,custName:s.custName,custPhone:s.custPhone,mechName:s.mechName,mechPhone:s.mechPhone,vehKm:s.vehKm||'',complaints:state.editMode?document.getElementById('b_complaints').value:(Array.isArray(state.complaints)?state.complaints.map(function(c){return c.text;}).join(', '):state.complaints||''),parts:getParts(),total:state.total,partPayments:payments};
+ Object.assign(fields,summary);
+ billSaveQueue=billSaveQueue.catch(function(){}).then(function(){
+  showSync('saving');
+  var ref=window.__fbRef2(window.__fbDb,'sribikez/records/'+billNo);
+  return window.__fbGet(ref).then(function(snap){
+   var old=snap.val()||{}, now=new Date().toISOString();
+   var changed=old.paymentStatus!==fields.paymentStatus||Number(old.totalPaid||0)!==fields.totalPaid||JSON.stringify(old.partPayments||[])!==JSON.stringify(payments);
+   var record=Object.assign({},old,fields,{status:completed?'Completed':old.status||'In Progress',createdAt:old.createdAt||old.savedAt||now,savedAt:old.savedAt||now,updatedAt:now});
+   if(changed)record.paymentUpdatedAt=now;
+   if(record.paymentStatus==='Paid'){if(old.paymentStatus!=='Paid')record.paidAt=now;}
+   else delete record.paidAt;
+   if(completed)record.completedAt=old.completedAt||now;
+   return window.__fbSet(ref,record).then(function(){
+    var idx=allRecordsCached.findIndex(function(r){return r.billNo===billNo;});
+    if(idx>=0)allRecordsCached[idx]=record;else allRecordsCached.push(record);
+    filterRecords();showSync('saved');return true;
+   });
+  }).catch(function(e){showSync('error');showToast('Save failed. Keep this bill open and retry.','error');return false;});
+ });
+ return billSaveQueue;
+}
+function rememberBillOrigin(){
+ var page=document.querySelector('.page.active');
+ if(page&&page.id==='page3')return;
+ billOrigin={page:page?page.id:'pageAdmin',scroll:window.scrollY,filters:{},tab:0};
+ ['searchInput','filterStatus','filterMech','filterPayment','filterSort'].forEach(function(id){var el=document.getElementById(id);if(el)billOrigin.filters[id]=el.value;});
+ for(var i=0;i<3;i++)if(document.getElementById('tabBtn'+i).classList.contains('active'))billOrigin.tab=i;
+}
+function restoreBillOrigin(){
+ var origin=billOrigin||{page:'pageAdmin',scroll:0,filters:{},tab:0};
+ document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('active',p.id===origin.page);});
+ Object.keys(origin.filters).forEach(function(id){document.getElementById(id).value=origin.filters[id];});
+ if(origin.page==='pageAdmin'){switchTab(origin.tab);filterRecords();}
+ if(origin.page==='pageReminders')renderUnpaidBills();
+ document.getElementById('progressBar').style.display=origin.page==='pageAdmin'?'flex':'none';
+ requestAnimationFrame(function(){window.scrollTo(0,origin.scroll);});
+}
+function adminPaymentHistory(record){
+ var payments=paymentsForRecord(record);
+ var summary=paymentSummary(Number(record.total)||0,payments);
+ var updated=csvDateTime(record.paymentUpdatedAt||record.paidAt);
+ var html='<div class="admin-payment-history">';
+ if(payments.length){
+  html+='<details><summary>Payment history · '+payments.length+' receipt'+(payments.length===1?'':'s')+' · Rs '+summary.totalPaid.toFixed(2)+' received</summary>';
+  html+='<div class="payment-receipts">'+payments.map(function(payment){
+   return '<div class="payment-receipt"><strong>Rs '+Number(payment.amt||0).toFixed(2)+'</strong><span>'+sanitize(payment.mode||'Payment')+'</span><time>'+sanitize(csvDateTime(payment.date)||'Date not recorded')+(payment.date?' IST':'')+'</time></div>';
+  }).join('')+'</div></details>';
+  var latest=payments[payments.length-1];
+  html+='<div class="payment-last-date">Last payment: '+sanitize(csvDateTime(latest.date)||'Date not recorded')+(latest.date?' IST':'')+'</div>';
+ }else{html+='<div class="payment-last-date">No payments recorded</div>';}
+ if(updated)html+='<div class="payment-last-date">Payment status updated: '+sanitize(updated)+' IST</div>';
+ return html+'</div>';
+}
+
+function csvCell(value){return '"'+String(value==null?'':value).replace(/"/g,'""')+'"';}
+function csvDateTime(value){
+ if(!value)return '';
+ var date=new Date(value);if(isNaN(date.getTime()))return '';
+ return date.toLocaleString('en-IN',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+}
+
 </script>
 </body>
 </html>
