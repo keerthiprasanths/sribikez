@@ -50,6 +50,9 @@ window.__fbUpdate= update;
 window.__firebaseReady = true;
 window.dispatchEvent(new Event('firebaseReady'));
 </script>
+<script>
+(function(){var theme='dark';try{theme=localStorage.getItem('sribikez_theme')||'dark';}catch(e){}document.documentElement.dataset.theme=['dark','light','contrast'].includes(theme)?theme:'dark';})();
+</script>
 <style>
 :root{
   --orange:#E8490F;--orange2:#FF6B35;--black:#0D0D0D;--dark:#1A1A1A;
@@ -87,7 +90,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 @media(max-width:500px){.form-grid{grid-template-columns:1fr;}}
 .field{display:flex;flex-direction:column;gap:4px;}
 .field label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:500;}
-.field input,.field select,.field textarea{background:#161616;border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .18s;width:100%;}
+.field input,.field select,.field textarea{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .18s;width:100%;}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--orange);}
 .field input::placeholder{color:#444;}
 .field textarea{resize:vertical;min-height:56px;}
@@ -107,17 +110,17 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .chips-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .chips-edit-btn{font-size:10px;color:var(--orange2);cursor:pointer;background:none;border:1px solid rgba(232,73,15,.36);border-radius:12px;padding:2px 9px;font-family:'DM Sans',sans-serif;}
 .chips-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
-.chip{background:#161616;border:1px solid var(--border);border-radius:16px;padding:4px 11px;font-size:11px;cursor:pointer;transition:all .13s;user-select:none;display:flex;align-items:center;gap:4px;}
+.chip{background:var(--input-bg);border:1px solid var(--border);border-radius:16px;padding:4px 11px;font-size:11px;cursor:pointer;transition:all .13s;user-select:none;display:flex;align-items:center;gap:4px;}
 .chip:hover{border-color:var(--orange2);color:var(--orange2);}
 .chip.selected{background:rgba(232,73,15,.16);border-color:var(--orange);color:var(--orange2);}
 .chip-del{font-size:9px;color:var(--muted);cursor:pointer;}
 .chip-del:hover{color:#ef4444;}
 .chip-add-form{display:flex;gap:6px;margin-bottom:10px;}
-.chip-add-form input{flex:1;background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:11px;outline:none;}
+.chip-add-form input{flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:11px;outline:none;}
 .chip-add-form input:focus{border-color:var(--orange);}
 .chip-add-form button{background:var(--orange);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;}
 .complaint-list{display:flex;flex-direction:column;gap:5px;margin-bottom:7px;}
-.complaint-item{display:flex;align-items:center;justify-content:space-between;background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 10px;}
+.complaint-item{display:flex;align-items:center;justify-content:space-between;background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;}
 .c-text{font-size:12px;}
 .c-type{font-size:9px;color:var(--orange2);text-transform:uppercase;letter-spacing:1px;}
 .del-btn{background:none;border:none;color:#555;cursor:pointer;font-size:13px;}
@@ -128,7 +131,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .vc-name{font-size:13px;font-weight:500;}
 .saved-banner{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.26);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:11px;color:var(--green);display:flex;align-items:center;gap:6px;}
 .parts-suggest{position:relative;}
-.parts-dropdown{position:absolute;top:100%;left:0;right:0;background:#1e1e1e;border:1px solid var(--orange);border-top:none;border-radius:0 0 8px 8px;z-index:100;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);}
+.parts-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--input-bg);border:1px solid var(--orange);border-top:none;border-radius:0 0 8px 8px;z-index:100;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);}
 .parts-dropdown.open{display:block;}
 .parts-option{padding:8px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;gap:8px;}
 .parts-option:hover{background:rgba(232,73,15,.15);color:var(--orange2);}
@@ -136,9 +139,9 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .parts-option-count{font-size:10px;color:var(--muted);white-space:nowrap;}
 .parts-option-freq{font-size:9px;background:rgba(232,73,15,.15);color:var(--orange2);padding:1px 5px;border-radius:4px;white-space:nowrap;}
 
-.parts-table th{background:#161616;padding:7px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);}
+.parts-table th{background:var(--input-bg);padding:7px 8px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);}
 .parts-table td{padding:5px 5px;border-bottom:1px solid #1b1b1b;}
-.parts-table input{background:#111;border:1px solid #2a2a2a;border-radius:4px;padding:4px 6px;color:var(--text);font-size:11px;width:100%;outline:none;}
+.parts-table input{background:var(--input-bg);border:1px solid #2a2a2a;border-radius:4px;padding:4px 6px;color:var(--text);font-size:11px;width:100%;outline:none;}
 .parts-table input:focus{border-color:var(--orange);}
 .add-part-btn{background:none;border:1px dashed var(--border);color:var(--muted);padding:5px;width:100%;border-radius:5px;cursor:pointer;font-size:11px;margin-top:5px;}
 .add-part-btn:hover{border-color:var(--orange);color:var(--orange);}
@@ -194,11 +197,11 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .chart-canvas-wrap{position:relative;height:190px;}
 .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border);}
 .records-table{width:100%;border-collapse:collapse;min-width:760px;}
-.records-table th{background:#161616;padding:8px 9px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
+.records-table th{background:var(--input-bg);padding:8px 9px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;}
 .records-table td{padding:7px 9px;border-bottom:1px solid #1b1b1b;font-size:11px;vertical-align:middle;}
-.records-table tr:hover td{background:#1b1b1b;}
+.records-table tr:hover td{background:var(--input-bg);}
 .search-bar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-.search-bar input,.search-bar select{background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;}
+.search-bar input,.search-bar select{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;}
 .search-bar input{flex:1;min-width:140px;}
 .search-bar input:focus,.search-bar select:focus{border-color:var(--orange);}
 .badge{display:inline-block;padding:1px 7px;border-radius:6px;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
@@ -211,11 +214,11 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .insight-sub{font-size:10px;color:var(--muted);margin-top:2px;}
 .filter-row{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:13px;}
 .filter-row label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
-.filter-row select{background:#161616;border:1px solid var(--border);border-radius:7px;padding:5px 10px;color:var(--text);font-size:11px;outline:none;}
+.filter-row select{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:5px 10px;color:var(--text);font-size:11px;outline:none;}
 .admin-login-wrap{max-width:330px;margin:55px auto;}
 /* owner unlock panel */
 .owner-unlock{background:rgba(232,73,15,.07);border:1px solid rgba(232,73,15,.24);border-radius:9px;padding:14px;margin-bottom:14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
-.owner-unlock input{background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;flex:1;min-width:140px;}
+.owner-unlock input{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:7px 11px;color:var(--text);font-size:12px;outline:none;flex:1;min-width:140px;}
 .owner-unlock input:focus{border-color:var(--orange);}
 .badge-blue{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.26);}
 .badge-paid{background:rgba(34,197,94,.18);color:#16a34a;border:1.5px solid #16a34a;font-weight:700;}
@@ -257,7 +260,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .shop-option{padding:9px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);}
 .shop-option:hover{background:rgba(232,73,15,.1);color:var(--orange2);}
 .ow-table{width:100%;border-collapse:collapse;min-width:640px;}
-.ow-table th{background:#161616;padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);}
+.ow-table th{background:var(--input-bg);padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);border-bottom:1px solid var(--border);}
 .ow-table td{padding:8px 10px;border-bottom:1px solid #1c1c1c;font-size:12px;vertical-align:middle;}
 .ow-table tr:hover td{background:#1c1c1c;}
 .shop-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:15px;}
@@ -267,7 +270,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .shop-card-amt{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--green);}
 .shop-card-count{font-size:10px;color:var(--muted);margin-top:2px;}
 .ow-filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
-.ow-filter-row select,.ow-filter-row input{background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;}
+.ow-filter-row select,.ow-filter-row input{background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;}
 .ow-filter-row select:focus,.ow-filter-row input:focus{border-color:var(--orange);}
 .ow-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:15px;}
 .ow-tab{padding:9px 16px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;}
@@ -310,7 +313,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 .portal-title{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--text);letter-spacing:1px;}
 .portal-sub{font-size:13px;color:var(--muted);margin-top:4px;}
 .portal-otp-box{display:flex;gap:8px;justify-content:center;margin:16px 0;}
-.portal-otp-box input{width:44px;height:52px;text-align:center;font-size:22px;font-weight:700;font-family:'Rajdhani',sans-serif;background:#161616;border:2px solid var(--border);border-radius:8px;color:var(--text);outline:none;}
+.portal-otp-box input{width:44px;height:52px;text-align:center;font-size:22px;font-weight:700;font-family:'Rajdhani',sans-serif;background:var(--input-bg);border:2px solid var(--border);border-radius:8px;color:var(--text);outline:none;}
 .portal-otp-box input:focus{border-color:var(--orange);}
 .portal-history-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:12px;}
 .portal-bill-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:6px;}
@@ -364,6 +367,46 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 #pageAdmin .payment-receipts{margin:7px 0}
 #pageAdmin .payment-receipt{display:flex;gap:10px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid #18283e10}
 #pageAdmin .payment-receipt time{margin-left:auto}
+
+/* Shared accessible themes across all application pages. */
+:root{--input-bg:#161d29;--black:#0e1520;--dark:#151f2e;--card:#1e293b;--border:#3b4b62;--text:#f1f5f9;--muted:#aebdd0;--orange:#ed641d;--orange2:#ffab77;--green:#4ade80;--blue:#75baff;--yellow:#facc15;--purple:#c4a1ff;color-scheme:dark}
+:root[data-theme="light"]{--input-bg:#fff;--black:#f1f5f9;--dark:#e6edf5;--card:#fff;--border:#bdccdc;--text:#17263b;--muted:#4b6078;--orange:#b8440c;--orange2:#a53c08;--green:#167044;--blue:#205ea5;--yellow:#805d00;--purple:#7041a6;color-scheme:light}
+:root[data-theme="contrast"]{--input-bg:#000;--black:#000;--dark:#000;--card:#080808;--border:#fff;--text:#fff;--muted:#eee;--orange:#ffe600;--orange2:#ffe600;--green:#62ff9a;--blue:#6cdcff;--yellow:#ffe600;--purple:#e3b9ff;color-scheme:dark}
+html[data-theme] #pageAdmin{--card:inherit;--border:inherit;--text:inherit;--muted:inherit;--orange:inherit;--orange2:inherit;--green:inherit;--yellow:inherit;--blue:inherit;--purple:inherit;background:var(--black);color:var(--text)}
+html[data-theme] #pageAdmin .step-header,.step-header{background:var(--dark);border-color:var(--border)}
+html[data-theme] #pageAdmin input,html[data-theme] #pageAdmin select,html[data-theme] #pageAdmin option{background:var(--input-bg)!important;color:var(--text)!important;border-color:var(--border)!important}
+html[data-theme] #pageAdmin .admin-tabs,html[data-theme] #pageAdmin .owner-unlock,html[data-theme] #pageAdmin #statsRow>div{background:var(--card)!important;border-color:var(--border)!important}
+html[data-theme] #pageAdmin .admin-tab.active{background:var(--input-bg);color:var(--orange2);border-color:var(--orange)}
+html[data-theme] #pageAdmin .customer-card .btn{background:var(--input-bg)!important;color:var(--text)!important;border-color:var(--border)!important}
+html[data-theme] #pageAdmin .customer-card .btn-blue{background:var(--blue)!important;color:var(--black)!important}
+html[data-theme="light"] #pageAdmin .customer-card .btn-blue{color:#fff!important}
+html[data-theme="dark"] #pageAdmin .payment-paid{--pay-bg:#153a2b;--pay-border:#4bb77d}
+html[data-theme="dark"] #pageAdmin .payment-unpaid{--pay-bg:#422427;--pay-border:#e57c82}
+html[data-theme="dark"] #pageAdmin .payment-part{--pay-bg:#3b3219;--pay-border:#dbb74e}
+html[data-theme="contrast"] #pageAdmin .payment-paid{--pay-bg:#00351a;--pay-border:#62ff9a}
+html[data-theme="contrast"] #pageAdmin .payment-unpaid{--pay-bg:#48000a;--pay-border:#ff9da6}
+html[data-theme="contrast"] #pageAdmin .payment-part{--pay-bg:#3d3200;--pay-border:#ffe600}
+html[data-theme="contrast"] .btn-primary{color:#000;background:#ffe600}
+html[data-theme="contrast"] :is(button,input,select,textarea){border:2px solid var(--border)}
+html[data-theme="contrast"] .btn-blue,html[data-theme="contrast"] .btn-green{color:#000}
+.theme-control{padding:16px;border-bottom:1px solid var(--border)}
+.theme-control label{display:block;font-size:12px;color:var(--muted);margin-bottom:8px}
+.theme-control select{width:100%;padding:10px;background:var(--input-bg);color:var(--text);border:1px solid var(--border);border-radius:7px;font:inherit}
+.ham-menu{overflow-y:auto}.ham-close{color:var(--text)}
+:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+input::placeholder,textarea::placeholder{color:var(--muted)!important;opacity:.8}
+button:disabled{opacity:.65;cursor:wait}
+.field input,.field select,.field textarea,.chip,.complaint-item,.parts-table input,.search-bar input,.search-bar select{background:var(--input-bg);color:var(--text)}
+@media(max-width:500px){.btn-row .btn{min-height:42px}.ham-menu{max-width:90vw}}
+
+/* Closed menus must not widen the mobile page. */
+.ham-menu{display:none;right:0;transition:none}.ham-menu.open{display:block;right:0}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:1200;max-width:calc(100vw - 32px);width:max-content;padding:12px 18px;border-radius:9px;background:var(--card);color:var(--text);border:1px solid var(--border);box-shadow:0 8px 30px #0005;font-size:13px;line-height:1.5;transition:opacity .15s,transform .15s}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast.error{background:#a82029;color:#fff;border-color:#ffb0b5}
+html[data-theme="light"] #remMsgPreview,html[data-theme="light"] #payMsgPreview{color:var(--text)!important}
+html[data-theme="contrast"] .ham-item{color:var(--text)!important}
+[style*="white-space:pre-wrap"]{overflow-wrap:anywhere;word-break:break-word}
 </style>
 </head>
 <body>
@@ -391,7 +434,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     <div class="ham-title">Menu</div>
     <button class="ham-close" onclick="closeHamMenu()">&#10005;</button>
   </div>
-  <div class="ham-item" onclick="closeHamMenu();goPage(1)">
+  <div class="theme-control">
+    <label for="themeSelect">Appearance</label>
+    <select id="themeSelect" onchange="setTheme(this.value)">
+      <option value="dark">Dark</option><option value="light">Light</option><option value="contrast">High Contrast</option>
+    </select>
+  </div>
+  <div class="ham-item" onclick="closeHamMenu();openVehicleEntry()">
     <span class="ham-icon">&#127949;</span> Vehicle Service
   </div>
   <div class="ham-item" onclick="closeHamMenu();goAdmin()">
@@ -465,7 +514,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     </div>
     <div class="btn-row">
       <button class="btn btn-secondary" onclick="goAdmin()">&#128203; Admin</button>
-      <button class="btn btn-primary" onclick="goToComplaints()">Save and Next: Complaints &#8594;</button>
+      <button class="btn btn-primary" id="entryNextBtn" onclick="goToComplaints()">Save and Next: Complaints &#8594;</button>
     </div>
   </div>
 </div>
@@ -584,7 +633,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
 <button class="btn btn-red" onclick="setBillPayment('Unpaid')">Unpaid</button>
 <button class="btn" style="background:#f5c84c;color:#392a00" onclick="setBillPayment('Part Paid')">Part Paid</button>
 </div><!-- Payment entry (hidden by default) -->
-        <div id="partPaySection" style="display:none;background:#161616;border-radius:9px;padding:12px;margin-bottom:8px;">
+        <div id="partPaySection" style="display:none;background:var(--input-bg);border-radius:9px;padding:12px;margin-bottom:8px;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
             <div class="field" style="flex:1;min-width:120px;margin:0;">
               <label>Amount Paid (Rs)</label>
@@ -592,7 +641,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             </div>
             <div class="field" style="flex:1;min-width:120px;margin:0;">
               <label>Payment Mode</label>
-              <select id="partPayMode" style="background:#111;border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;width:100%;outline:none;">
+              <select id="partPayMode" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:9px 11px;color:var(--text);font-size:13px;width:100%;outline:none;">
                 <option value="Cash">Cash</option>
                 <option value="GPay">GPay</option>
                 <option value="PhonePe">PhonePe</option>
@@ -986,13 +1035,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
         <button class="btn btn-wa btn-sm" onclick="sendAllServiceReminders()">Send All via WhatsApp</button>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
-        <select id="remFilterInterval" onchange="renderServiceDue()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
+        <select id="remFilterInterval" onchange="renderServiceDue()" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
           <option value="all">All Intervals</option>
           <option value="overdue">Overdue</option>
           <option value="week">Due This Week</option>
           <option value="month">Due This Month</option>
         </select>
-        <input type="text" id="remSearch" placeholder="Search customer, vehicle..." oninput="renderServiceDue()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;flex:1;min-width:140px;">
+        <input type="text" id="remSearch" placeholder="Search customer, vehicle..." oninput="renderServiceDue()" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;flex:1;min-width:140px;">
       </div>
       <div id="serviceDueList"><div class="rem-empty">Loading...</div></div>
     </div>
@@ -1007,13 +1056,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
         <button class="btn btn-wa btn-sm" onclick="sendAllPaymentReminders()">Send All via WhatsApp</button>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
-        <select id="unpaidFilterDays" onchange="renderUnpaidBills()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
+        <select id="unpaidFilterDays" onchange="renderUnpaidBills()" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;">
           <option value="0">All Unpaid</option>
           <option value="7" selected>Older than 1 week</option>
           <option value="30">Older than 1 month</option>
           <option value="60">Older than 2 months</option>
         </select>
-        <input type="text" id="unpaidSearch" placeholder="Search..." oninput="renderUnpaidBills()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;flex:1;min-width:140px;">
+        <input type="text" id="unpaidSearch" placeholder="Search..." oninput="renderUnpaidBills()" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;flex:1;min-width:140px;">
       </div>
       <div id="unpaidBillsList"><div class="rem-empty">Loading...</div></div>
     </div>
@@ -1028,7 +1077,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <div class="rem-setting-label">Default Service Interval</div>
             <div class="rem-setting-sub">Send reminder after this many months from last service</div>
           </div>
-          <select id="remDefaultInterval" onchange="saveRemSettings()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:600;">
+          <select id="remDefaultInterval" onchange="saveRemSettings()" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:600;">
             <option value="1">1 Month</option>
             <option value="2" selected>2 Months</option>
             <option value="3">3 Months</option>
@@ -1041,7 +1090,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
             <div class="rem-setting-label">Payment Reminder After</div>
             <div class="rem-setting-sub">Remind unpaid customers after this many days</div>
           </div>
-          <select id="remPayDays" onchange="saveRemSettings()" style="background:#161616;border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:600;">
+          <select id="remPayDays" onchange="saveRemSettings()" style="background:var(--input-bg);border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Rajdhani',sans-serif;font-weight:600;">
             <option value="3">3 Days</option>
             <option value="7" selected>1 Week</option>
             <option value="14">2 Weeks</option>
@@ -1052,11 +1101,11 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <div class="card">
         <div class="card-title">&#128172; WhatsApp Message Preview</div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Service reminder message that will be sent to customers:</div>
-        <div style="background:#161616;border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:#ccc;white-space:pre-wrap;" id="remMsgPreview"></div>
+        <div style="background:var(--input-bg);border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:#ccc;white-space:pre-wrap;" id="remMsgPreview"></div>
       </div>
       <div class="card">
         <div class="card-title">&#128178; Payment Reminder Preview</div>
-        <div style="background:#161616;border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:#ccc;white-space:pre-wrap;" id="payMsgPreview"></div>
+        <div style="background:var(--input-bg);border-radius:8px;padding:12px;font-size:11px;line-height:1.7;color:#ccc;white-space:pre-wrap;" id="payMsgPreview"></div>
       </div>
     </div>
   </div>
@@ -1243,7 +1292,7 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <div class="card-title" style="justify-content:center;font-size:18px;">View Your Service History</div>
       <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:18px;">Enter your mobile number or vehicle number to view all your past services and bills</p>
 
-      <div style="display:flex;gap:0;background:#161616;border-radius:8px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;">
+      <div style="display:flex;gap:0;background:var(--input-bg);border-radius:8px;border:1px solid var(--border);margin-bottom:14px;overflow:hidden;">
         <button id="portalTabPhone" onclick="switchPortalTab('phone')" style="flex:1;padding:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;background:var(--orange);color:#fff;transition:all .18s;">Mobile Number</button>
         <button id="portalTabVeh" onclick="switchPortalTab('veh')" style="flex:1;padding:10px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:all .18s;">Vehicle Number</button>
       </div>
@@ -1335,22 +1384,22 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
       <div class="card-title">&#127949; About Our Shop</div>
       <p style="font-size:13px;color:var(--text);line-height:1.85;">Sri Bikez is a trusted multi-brand two-wheeler service center in Edappadi, Tamil Nadu. We service all brands — Honda, Yamaha, TVS, Bajaj, Royal Enfield, Hero, Suzuki and more. Our experienced mechanics provide quality service at affordable prices.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px;">
-        <div style="background:#161616;border-radius:8px;padding:10px;text-align:center;"><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--orange);">All</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Brands</div></div>
-        <div style="background:#161616;border-radius:8px;padding:10px;text-align:center;"><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--green);">Fast</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Service</div></div>
-        <div style="background:#161616;border-radius:8px;padding:10px;text-align:center;"><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--blue);">Best</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Price</div></div>
+        <div style="background:var(--input-bg);border-radius:8px;padding:10px;text-align:center;"><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--orange);">All</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Brands</div></div>
+        <div style="background:var(--input-bg);border-radius:8px;padding:10px;text-align:center;"><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--green);">Fast</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Service</div></div>
+        <div style="background:var(--input-bg);border-radius:8px;padding:10px;text-align:center;"><div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--blue);">Best</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Price</div></div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">&#128222; Contact Us</div>
       <div style="display:flex;flex-direction:column;gap:9px;">
-        <a href="tel:+918489234433" style="display:flex;align-items:center;gap:12px;background:#161616;border-radius:9px;padding:13px 15px;text-decoration:none;color:var(--text);border:1px solid var(--border);">
+        <a href="tel:+918489234433" style="display:flex;align-items:center;gap:12px;background:var(--input-bg);border-radius:9px;padding:13px 15px;text-decoration:none;color:var(--text);border:1px solid var(--border);">
           <span style="font-size:22px;">&#128222;</span><div><div style="font-size:14px;font-weight:600;">+91 84892 34433</div><div style="font-size:10px;color:var(--muted);">Tap to call</div></div>
         </a>
-        <a href="tel:+919865234433" style="display:flex;align-items:center;gap:12px;background:#161616;border-radius:9px;padding:13px 15px;text-decoration:none;color:var(--text);border:1px solid var(--border);">
+        <a href="tel:+919865234433" style="display:flex;align-items:center;gap:12px;background:var(--input-bg);border-radius:9px;padding:13px 15px;text-decoration:none;color:var(--text);border:1px solid var(--border);">
           <span style="font-size:22px;">&#128222;</span><div><div style="font-size:14px;font-weight:600;">+91 98652 34433</div><div style="font-size:10px;color:var(--muted);">Tap to call</div></div>
         </a>
-        <a href="mailto:Murugan.idappadi@gmail.com" style="display:flex;align-items:center;gap:12px;background:#161616;border-radius:9px;padding:13px 15px;text-decoration:none;color:var(--text);border:1px solid var(--border);">
+        <a href="mailto:Murugan.idappadi@gmail.com" style="display:flex;align-items:center;gap:12px;background:var(--input-bg);border-radius:9px;padding:13px 15px;text-decoration:none;color:var(--text);border:1px solid var(--border);">
           <span style="font-size:22px;">&#9993;</span><div><div style="font-size:13px;font-weight:600;">Murugan.idappadi@gmail.com</div><div style="font-size:10px;color:var(--muted);">Tap to email</div></div>
         </a>
         <a href="https://wa.me/919865234433" target="_blank" style="display:flex;align-items:center;gap:12px;background:#25D366;border-radius:9px;padding:13px 15px;text-decoration:none;color:#fff;">
@@ -1390,8 +1439,8 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
     <div class="card">
       <div class="card-title">&#128336; Working Hours</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 13px;background:#161616;border-radius:7px;"><span>Monday &#8212; Saturday</span><span style="color:var(--green);font-weight:600;">8:00 AM &#8212; 7:00 PM</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 13px;background:#161616;border-radius:7px;"><span>Sunday</span><span style="color:var(--yellow);font-weight:600;">9:00 AM &#8212; 2:00 PM</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 13px;background:var(--input-bg);border-radius:7px;"><span>Monday &#8212; Saturday</span><span style="color:var(--green);font-weight:600;">8:00 AM &#8212; 7:00 PM</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 13px;background:var(--input-bg);border-radius:7px;"><span>Sunday</span><span style="color:var(--yellow);font-weight:600;">9:00 AM &#8212; 2:00 PM</span></div>
       </div>
     </div>
 
@@ -1464,12 +1513,13 @@ h1,h2,h3,h4{font-family:'Rajdhani',sans-serif;}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 // ================================================================
 //  STATE
 // ================================================================
+function readPreference(key,fallback){try{return JSON.parse(localStorage.getItem(key))||fallback;}catch(e){return fallback;}}
 var state = {
   vehNum:'',vehName:'',custName:'',custPhone:'',
   entryDate:'',delivDate:'',mechName:'',mechPhone:'',
@@ -1527,7 +1577,7 @@ function enforceInputLimits() {
     if (el && el.value.length > INPUT_LIMITS[id]) el.value = el.value.slice(0, INPUT_LIMITS[id]);
   });
 }
-var presetComplaints = JSON.parse(localStorage.getItem('sribikez_presets')||'null') || [
+var presetComplaints = readPreference('sribikez_presets',null) || [
   'Engine not starting','Battery weak / dead','Brake not working','Tyre puncture',
   'Chain loose / broken','Oil leakage','Clutch slipping','Gear not shifting',
   'Lights not working','Indicator fault','Horn not working','Suspension noise',
@@ -1581,7 +1631,15 @@ function fbGetAll(cb) {
 // ================================================================
 //  INIT
 // ================================================================
+function setTheme(theme){
+ if(!['dark','light','contrast'].includes(theme))theme='dark';
+ document.documentElement.dataset.theme=theme;
+ document.getElementById('themeSelect').value=theme;
+ try{localStorage.setItem('sribikez_theme',theme);}catch(e){}
+ Object.values(chartRefs).forEach(function(chart){if(chart)chart.update();});
+}
 window.onload = function() {
+  setTheme(document.documentElement.dataset.theme||'dark');
   var now = new Date();
   var today = now.toISOString().split('T')[0];
   document.getElementById('entryDate').value = today;
@@ -1634,7 +1692,7 @@ function getMaxSeqFromData(data){
   data.forEach(function(r){
     if(r && r.billNo && r.billNo.startsWith('SB')){
       var n = parseInt(r.billNo.slice(2));
-      if(!isNaN(n) && n >= 1 && n <= 9999 && n > max) max = n;
+      if(!isNaN(n) && n >= 1 && /^SB\d{5,}$/.test(r.billNo) && n > max) max = n;
     }
   });
   return max;
@@ -1649,23 +1707,25 @@ function nextBillNoFromCache(){
 }
 // Async: fetches ALL records from Firebase, finds true max sequential number
 function getNextBillNo(callback){
-  if(!fbReady){
-    callback(nextBillNoFromCache());
-    return;
-  }
-  window.__fbGet(window.__fbRef).then(function(snap){
-    var data = snap.val();
-    var arr = [];
-    if(data) Object.keys(data).forEach(function(k){ arr.push(data[k]); });
-    var max = getMaxSeqFromData(arr);
-    var saved = parseInt(localStorage.getItem('sribikez_seqBillNum')||'0');
-    if(saved > max) max = saved;
-    var next = max + 1;
-    localStorage.setItem('sribikez_seqBillNum', next);
-    callback(formatBillNo(next));
-  }).catch(function(){
-    callback(nextBillNoFromCache());
-  });
+ var button=document.getElementById('entryNextBtn');
+ if(button.disabled)return;
+ if(!fbReady){showToast('Database not connected. Check your connection and retry.','error');return;}
+ button.disabled=true;button.textContent='Saving vehicle…';
+ withTimeout(window.__fbGet(window.__fbRef),12000).then(function(snap){
+  var data=snap.val()||{};
+  var max=getMaxSeqFromData(Object.values(data));
+  var saved=parseInt(localStorage.getItem('sribikez_seqBillNum')||'0')||0;
+  var next=Math.max(max,saved)+1;
+  localStorage.setItem('sribikez_seqBillNum',next);
+  return callback(formatBillNo(next));
+ }).catch(function(){showToast('Could not create bill. Check your connection and retry.','error');})
+ .finally(function(){button.disabled=false;button.textContent='Save and Next: Complaints →';});
+}
+function withTimeout(promise,ms){
+ return new Promise(function(resolve,reject){
+  var timer=setTimeout(function(){reject(new Error('Connection timed out'));},ms);
+  Promise.resolve(promise).then(function(value){clearTimeout(timer);resolve(value);},function(error){clearTimeout(timer);reject(error);});
+ });
 }
 
 // ================================================================
@@ -1713,66 +1773,11 @@ function restorePage1Draft(){
 }
 
 function checkPendingPayments(){
-  var vn = (document.getElementById('vehNum').value||'').trim().replace(/\s/g,'').toUpperCase();
-  var cp = (document.getElementById('custPhone').value||'').trim();
-  // Need at least 4 chars for vehicle or exact 10 for phone to avoid false matches
-  if((!vn || vn.length < 4) && (!cp || cp.length < 10)) { hidePendingAlert(); return; }
-  if(!fbReady || !allRecordsCached.length) return;
-  // Use cached records first (already loaded from Firebase)
-  var data = {};
-  if(allRecordsCached.length){
-    allRecordsCached.forEach(function(r){ if(r.billNo) data[r.billNo]=r; });
-    _processPendingCheck(data, vn, cp);
-    return;
-  }
-  window.__fbGet(window.__fbRef).then(function(snap){
-    var data = snap.val();
-    if(!data){ hidePendingAlert(); return; }
-    Object.keys(data).forEach(function(k){
-      var r = data[k];
-      if(r.status !== 'Completed') return;
-      // Include Unpaid and Part Paid records
-      if(r.paymentStatus === 'Paid') return;
-      var rv = (r.vehNum||'').replace(/\s/g,'').toUpperCase();
-      var rp = (r.custPhone||'').trim();
-      if((vn && rv === vn) || (cp && cp.length===10 && rp === cp)){
-        pending.push(r);
-      }
-    });
-    if(!pending.length){ hidePendingAlert(); return; }
-    var alertEl = document.getElementById('pendingPaymentAlert');
-    var listEl  = document.getElementById('pendingPaymentList');
-    if(!alertEl || !listEl) return;
-    var totalPending = pending.reduce(function(s,r){
-      return s + parseFloat(r.balance>0 ? r.balance : r.total)||0;
-    },0);
-    listEl.innerHTML = pending.map(function(r){
-      var due = r.balance>0 ? r.balance : (r.total||0);
-      var isPartPaid = r.paymentStatus==='Part Paid';
-      return '<div style="background:rgba(239,68,68,.08);border-radius:7px;padding:8px 10px;margin-bottom:6px;">'+
-        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">'+
-          '<div>'+
-            '<div style="font-size:12px;font-weight:600;color:var(--text);">Bill '+sanitize(r.billNo)+'</div>'+
-            '<div style="font-size:10px;color:var(--muted);">'+fmtDate(r.date)+' | '+sanitize(r.vehName||'--')+'</div>'+
-            (isPartPaid?'<div style="font-size:10px;color:var(--yellow);">Part paid: Rs '+parseFloat(r.totalPaid||0).toFixed(0)+'</div>':'')+
-          '</div>'+
-          '<div style="text-align:right;">'+
-            '<div style="font-family:\'Rajdhani\',sans-serif;font-size:16px;font-weight:700;color:#ef4444;">Balance: Rs '+parseFloat(due).toFixed(0)+'</div>'+
-            '<button onclick="addPendingToNewBill(\''+sanitize(r.billNo)+'\','+parseFloat(due)+')" '+
-              'style="margin-top:4px;background:var(--orange);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;font-family:\'Rajdhani\',sans-serif;font-weight:600;">'+
-              '+ Add to New Bill</button>'+
-          '</div>'+
-        '</div>'+
-      '</div>';
-    }).join('') +
-    '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-top:1px solid rgba(239,68,68,.3);margin-top:4px;">'+
-      '<strong style="font-size:12px;color:#ef4444;">Total Due</strong>'+
-      '<strong style="font-family:\'Rajdhani\',sans-serif;font-size:18px;color:#ef4444;">Rs '+totalPending.toFixed(0)+'</strong>'+
-    '</div>';
-    state.pendingBills = pending;
-    state.pendingTotal = totalPending;
-    alertEl.style.display = 'block';
-  }).catch(function(){ hidePendingAlert(); });
+ var vn=(document.getElementById('vehNum').value||'').trim().replace(/\s/g,'').toUpperCase();
+ var cp=(document.getElementById('custPhone').value||'').trim();
+ if((vn.length<4&&cp.length!==10)||!fbReady){hidePendingAlert();return;}
+ if(allRecordsCached.length){var records={};allRecordsCached.forEach(function(r){records[r.billNo]=r;});_processPendingCheck(records,vn,cp);return;}
+ withTimeout(window.__fbGet(window.__fbRef),12000).then(function(snap){_processPendingCheck(snap.val()||{},vn,cp);}).catch(function(){hidePendingAlert();});
 }
 
 function _processPendingCheck(data, vn, cp){
@@ -1837,6 +1842,12 @@ function editAutoSave(){
  _editSaveTimer=setTimeout(function(){autoSaveBill();},800);
 }
 
+var MECHS = {
+  'Gowtham|7010258785':      { name:'Gowtham',      phone:'7010258785' },
+  'Jeeva|9789440271':        { name:'Jeeva',        phone:'9789440271' },
+  'Arivalazhan|8148840304':  { name:'Arivalazhan',  phone:'8148840304' }
+};
+
 function onMechSelect() {
   var v  = document.getElementById('mechSelect').value;
   var h  = document.getElementById('mechHint');
@@ -1844,13 +1855,13 @@ function onMechSelect() {
   var op = document.getElementById('mechOtherPhoneRow');
   if (!v) { h.textContent=''; on.style.display='none'; op.style.display='none'; return; }
   if (v==='others') { h.textContent=''; on.style.display='block'; op.style.display='block'; }
-  else { h.textContent='Phone: '+MECHS[v].phone; on.style.display='none'; op.style.display='none'; }
+  else { h.textContent=MECHS[v]?'Phone: '+MECHS[v].phone:'Select a valid mechanic'; on.style.display='none'; op.style.display='none'; }
 }
 function getMech() {
   var v = document.getElementById('mechSelect').value;
   if (!v) return { name:'', phone:'' };
   if (v==='others') return { name:document.getElementById('mechNameCustom').value.trim(), phone:document.getElementById('mechPhoneCustom').value.trim() };
-  return MECHS[v];
+  return MECHS[v] || {name:'',phone:''};
 }
 
 // ================================================================
@@ -2152,7 +2163,7 @@ function renderParticularsList(){
       '<div style="display:flex;align-items:center;gap:5px;">' +
         '<span style="font-size:10px;color:var(--muted);">Rate:</span>' +
         '<input type="number" min="0" placeholder="0" value="'+esc(item.lastRate||'')+'" '+
-          'style="width:72px;background:#161616;border:1px solid var(--border);border-radius:6px;padding:5px 7px;color:var(--text);font-size:12px;outline:none;" '+
+          'style="width:72px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;padding:5px 7px;color:var(--text);font-size:12px;outline:none;" '+
           'onchange="updateParticularRate(\''+esc(key)+'\',this.value)" '+
           'onfocus="this.style.borderColor=\'var(--orange)\'" '+
           'onblur="this.style.borderColor=\'var(--border)\'">' +
@@ -2211,7 +2222,7 @@ function addPartRow(p){
     '</td>'+
     '<td><input type="number" placeholder="0" min="0" style="width:48px" value="'+esc(qv)+'" oninput="calcAmt(this)"></td>'+
     '<td><input type="number" placeholder="0" min="0" style="width:60px" value="'+esc(rv)+'" oninput="calcAmt(this)"></td>'+
-    '<td><input type="number" placeholder="0" readonly style="width:66px;color:var(--orange);background:#111;" value="'+esc(av)+'"></td>'+
+    '<td><input type="number" placeholder="0" readonly style="width:66px;color:var(--orange);background:var(--input-bg);" value="'+esc(av)+'"></td>'+
     '<td><button style="background:none;border:none;color:#555;cursor:pointer;font-size:12px;" onclick="removePartRow(this)">x</button></td>';
   tbody.appendChild(tr);
   if(p) recalcRow(tr);
@@ -2360,6 +2371,7 @@ function loadPartPayForEdit(record){
 // ================================================================
 //  NAVIGATION
 // ================================================================
+function openVehicleEntry(){if(state.editMode)newService();else goPage(1);}
 function goPage(n){
   document.getElementById('progressBar').style.display='flex';
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -2418,6 +2430,7 @@ function goToComplaints(){
   // inputs are validated - no need to HTML-escape stored values
   vn = vn.toUpperCase().trim(); vm = vm.trim(); cn = cn.trim();
   var mech=getMech();
+  if(!mech.name){showToast('Select a valid mechanic','error');return;}
   if(ms==='others'&&!mech.name){showToast('Enter mechanic name','error');return;}
   if(ms==='others'&&mech.phone&&!isValidPhone(mech.phone)){showToast('Enter valid mechanic phone','error');return;}
   state.vehNum=vn;state.vehName=vm;state.custName=cn;state.custPhone=cp;
@@ -2425,39 +2438,33 @@ function goToComplaints(){
   state.delivDate=document.getElementById('delivDate').value;
   state.mechName=sanitize(mech.name);state.mechPhone=mech.phone;
   state.vehKm=document.getElementById('vehKm').value.trim();
+  if(state.editMode){showToast('Choose New Service to create another vehicle entry','error');return;}
   if(state.billNo){
     _proceedToComplaints();
   } else {
     showToast('Generating bill number...');
     getNextBillNo(function(billNo){
       state.billNo = billNo;
-      _proceedToComplaints();
+      return _proceedToComplaints();
     });
   }
 }
 function _proceedToComplaints(){
-  autoSaveRecord('In Progress',null);
+  return autoSaveRecord('In Progress',function(){
   document.getElementById('chipNum').textContent=state.vehNum;
   document.getElementById('chipName').textContent=state.vehName;
   document.getElementById('chipCust').textContent=state.custName+' | '+state.custPhone+' | Mechanic: '+state.mechName;
-  goPage(2);
+  buildChips();renderComplaintList();goPage(2);
+  });
 }
 function autoSaveRecord(status,cb){
-  var record={
-    billNo:state.billNo,date:state.entryDate,delivDate:state.delivDate,
-    vehNum:state.vehNum,vehName:state.vehName,
-    custName:state.custName,custPhone:state.custPhone,
-    mechName:state.mechName,mechPhone:state.mechPhone,
-    vehKm:state.vehKm||'',
-    complaints:state.complaints.map(function(c){return c.text;}).join(', '),
-    parts:[],total:0,status:status,savedAt:new Date().toISOString()
-  };
-  fbSave(record,cb);
+ return saveCurrentBill(status==='Completed').then(function(ok){if(ok&&cb)cb();return ok;});
 }
+
 function saveComplaintsAndBill(){
-  autoSaveRecord('In Progress',null);
-  state.editMode=false;
-  setupBillingPage();updateBillPreview();goPage(3);
+  return autoSaveRecord('In Progress',function(){
+   state.editMode=false;setupBillingPage();updateBillPreview();updatePartPayBalance();goPage(3);
+  });
 }
 
 // ================================================================
@@ -2707,6 +2714,7 @@ function finishService(){
 }
 
 function newService(){
+  clearTimeout(_autoSaveTimer);clearTimeout(_editSaveTimer);billOrigin=null;
   state={vehNum:'',vehName:'',custName:'',custPhone:'',entryDate:'',delivDate:'',
     mechName:'',mechPhone:'',vehKm:'',complaints:[],billNo:'',total:0,
     editMode:false,pendingBills:[],pendingTotal:0,partPayments:[]};
@@ -2870,11 +2878,12 @@ function renderOverviewCharts(records){
     }).join('');
     wlEl.innerHTML=week.map(function(w,i){
       var isToday=i===6;
-      return '<div style="flex:1;text-align:center;font-size:9px;color:'+(isToday?'var(--orange)':'var(--muted)')+';font-weight:'+(isToday?'700':'400')+'>'+w.day+'</div>';
+      return '<div style="flex:1;text-align:center;font-size:9px;color:'+(isToday?'var(--orange)':'var(--muted)')+';font-weight:'+(isToday?'700':'400')+'">'+w.day+'</div>';
     }).join('');
   }
 }
 function makeChart(id,type,labels,data,label,color){
+  if(typeof Chart==='undefined'){var canvas=document.getElementById(id);if(canvas)canvas.setAttribute('aria-label','Chart unavailable: reconnect to load charts');return;}
   if(chartRefs[id]){chartRefs[id].destroy();chartRefs[id]=null;}
   var ctx=document.getElementById(id);if(!ctx)return;
   chartRefs[id]=new Chart(ctx,{
@@ -3072,48 +3081,57 @@ function clearAllData(){
   showToast('All records cleared');
 }
 
-function importCSV(event){
-  var file = event.target.files[0];
-  if(!file){return;}
-  var reader = new FileReader();
-  reader.onload = function(e){
-    var lines = e.target.result.split('\n');
-    if(lines.length < 2){showToast('CSV file is empty','error');return;}
-    var headers = lines[0].split(',').map(function(h){return h.trim().replace(/"/g,'').toLowerCase();});
-    var imported = 0;
-    for(var i=1;i<lines.length;i++){
-      var line = lines[i].trim();
-      if(!line)continue;
-      // handle quoted fields with commas
-      var cols = line.match(/(".*?"|[^,]+)(?=,|$)/g)||line.split(',');
-      cols = cols.map(function(c){return c.trim().replace(/^"|"$/g,'');});
-      var record = {};
-      headers.forEach(function(h,idx){record[h]=cols[idx]||'';});
-      // Map CSV columns to record fields
-      var r = {
-        billNo:   record['bill no']   || record['billno']   || ('IMP'+Date.now()+i),
-        date:     record['date']      || '',
-        delivDate:record['expected delivery']||record['delivdate']||'',
-        vehNum:   record['vehicle no']||record['vehnum']   ||'',
-        vehName:  record['vehicle']   ||record['vehname']  ||'',
-        custName: record['customer']  ||record['custname'] ||'',
-        custPhone:record['phone']     ||record['custphone']||'',
-        mechName: record['mechanic']  ||record['mechname'] ||'',
-        mechPhone:record['mech phone']||record['mechphone']||'',
-        complaints:record['complaints']||'',
-        total:    parseFloat(record['total']||0)||0,
-        status:   record['status']   ||'Completed',
-        paymentStatus:record['payment status']||'Unpaid',
-        totalPaid:parseFloat(record['total paid']||0)||0,
-        balance:parseFloat(record['balance']||0)||0,
-        parts:[],vehKm:'',savedAt:new Date().toISOString()
-      };
-      if(r.billNo) { fbSave(r,null); imported++; }
-    }
-    showToast('Imported '+imported+' records from CSV');
-    event.target.value='';
-  };
-  reader.readAsText(file);
+function parseCSV(text){
+ var rows=[],row=[],cell='',quoted=false;
+ text=String(text).replace(/^\uFEFF/,'');
+ for(var i=0;i<text.length;i++){
+  var ch=text[i];
+  if(ch==='"'){if(quoted&&text[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}
+  else if(ch===','&&!quoted){row.push(cell);cell='';}
+  else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);if(row.some(function(v){return v!=='';}))rows.push(row);row=[];cell='';}
+  else cell+=ch;
+ }
+ if(quoted)throw new Error('Unclosed quote in CSV');
+ row.push(cell);if(row.some(function(v){return v!=='';}))rows.push(row);
+ return rows;
+}
+function importDateTime(value){
+ if(!value)return '';
+ var match=value.match(/^(\d{2})\/(\d{2})\/(\d{4}),?\s+(\d{2}):(\d{2}):(\d{2})$/);
+ var date=new Date(match?match[3]+'-'+match[2]+'-'+match[1]+'T'+match[4]+':'+match[5]+':'+match[6]+'+05:30':value);
+ return isNaN(date.getTime())?'':date.toISOString();
+}
+async function importCSV(event){
+ var file=event.target.files[0];if(!file)return;
+ if(!fbReady){showToast('Connect to the database before importing','error');return;}
+ try{
+  var rows=parseCSV(await file.text());
+  if(rows.length<2)throw new Error('CSV has no records');
+  var headers=rows.shift().map(function(h){return h.trim().toLowerCase();});
+  if(!headers.includes('bill no')&&!headers.includes('billno'))throw new Error('Missing Bill No column');
+  var imported=0;
+  for(var i=0;i<rows.length;i++){
+   var record={};headers.forEach(function(h,n){record[h]=rows[i][n]||'';});
+   var bill=record['bill no']||record.billno;
+   if(!bill||/[.#$\[\]\/]/.test(bill))throw new Error('Invalid bill number on row '+(i+2));
+   var ref=window.__fbRef2(window.__fbDb,'sribikez/records/'+bill);
+   var old=(await withTimeout(window.__fbGet(ref),12000)).val()||{};
+   var r=Object.assign({},old,{billNo:bill,date:record.date||old.date||'',vehNum:record['vehicle no']||record.vehnum||'',vehName:record.vehicle||record.vehname||'',custName:record.customer||record.custname||'',custPhone:record.phone||record.custphone||'',mechName:record.mechanic||record.mechname||'',complaints:record.complaints||'',total:Math.max(0,Number(record.total)||0),status:record.status||old.status||'Completed',parts:old.parts||[],savedAt:old.savedAt||new Date().toISOString()});
+   if(record['payment status'])r.paymentStatus=record['payment status'];
+   if(!['Paid','Part Paid','Unpaid'].includes(r.paymentStatus))r.paymentStatus='Unpaid';
+   if(headers.includes('total paid'))r.totalPaid=Math.max(0,Number(record['total paid'])||0);
+   var payments=[];
+   for(var n=1;headers.includes('payment '+n+' amount');n++){
+    var amount=Number(record['payment '+n+' amount']);
+    if(amount>0)payments.push({amt:amount,date:importDateTime(record['payment '+n+' date & time (ist)']),mode:record['payment '+n+' mode'],note:record['payment '+n+' note']});
+   }
+   if(headers.includes('payment 1 amount'))r.partPayments=payments;
+   r.balance=Math.max(0,r.total-(r.paymentStatus==='Paid'?r.total:Number(r.totalPaid)||0));
+   [['createdAt','created date & time (ist)'],['paymentUpdatedAt','payment updated date & time (ist)'],['paidAt','paid date & time (ist)'],['updatedAt','last updated date & time (ist)']].forEach(function(pair){var date=importDateTime(record[pair[1]]);if(date)r[pair[0]]=date;});
+   await withTimeout(window.__fbSet(ref,r),12000);imported++;
+  }
+  showToast('Imported '+imported+' records');event.target.value='';
+ }catch(error){showToast('Import stopped: '+error.message,'error');}
 }
 
 // ================================================================
@@ -3191,7 +3209,7 @@ function renderAnalytics(){
     '<td style="padding:8px 10px;color:var(--yellow)">'+(d.jobs-d.done)+'</td></tr>';}).join('');
   document.getElementById('mechPerfTable').innerHTML=mRows?
     '<table style="width:100%;border-collapse:collapse;">'+
-    '<thead><tr style="background:#161616;">'+
+    '<thead><tr style="background:var(--input-bg);">'+
     '<th style="padding:7px 10px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Mechanic</th>'+
     '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Jobs</th>'+
     '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Revenue</th>'+
@@ -3252,7 +3270,7 @@ function goOutsideWork(workType){
 // ================================================================
 var owRef;
 var owCached = [];
-var savedShops = JSON.parse(localStorage.getItem('sribikez_shops')||'[]');
+var savedShops = readPreference('sribikez_shops',[]);
 var owLinkedBill = null;
 
 function owFbRef(){
@@ -3269,8 +3287,10 @@ function owDeleteEntry(id){
   var r = window.__fbRef2(window.__fbDb,'sribikez/outsidework/'+id);
   window.__fbRemove(r).then(function(){ showToast('Entry deleted'); }).catch(function(){ showToast('Delete failed','error'); });
 }
+var owListenerActive=false;
 function owListenAll(){
-  if(!fbReady) return;
+  if(!fbReady||owListenerActive) return;
+  owListenerActive=true;
   window.__fbOnValue(owFbRef(), function(snap){
     var data = snap.val();
     owCached = [];
@@ -3505,7 +3525,7 @@ function renderShopSummary(){
   if(!pendingShops.length){document.getElementById('shopPendingTable').innerHTML='<div style="color:var(--green);font-size:12px;padding:8px;">All payments cleared!</div>';return;}
   document.getElementById('shopPendingTable').innerHTML=
     '<table style="width:100%;border-collapse:collapse;">'+
-    '<thead><tr style="background:#161616;">'+
+    '<thead><tr style="background:var(--input-bg);">'+
     '<th style="padding:8px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Shop</th>'+
     '<th style="padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Phone</th>'+
     '<th style="padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Jobs</th>'+
@@ -3566,7 +3586,7 @@ function exportOwCSV(){
 // ================================================================
 //  UTILS
 // ================================================================
-function fmtDate(d){if(!d)return'--';var dt=new Date(d+'T00:00:00');return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDate(d){if(!d)return'--';var dt=new Date(d+'T00:00:00');if(isNaN(dt.getTime()))return d;return dt.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type==='error'?' error':'')+' show';setTimeout(function(){t.classList.remove('show');},2800);}
 
 // ================================================================
@@ -3695,7 +3715,7 @@ function renderPortalHistory(records, searchType, searchVal){
 
   var totalSpent  = records.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
   var unpaidRecs  = records.filter(function(r){return r.status==='Completed' && r.paymentStatus!=='Paid';});
-  var pendingAmt  = unpaidRecs.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  var pendingAmt  = unpaidRecs.reduce(function(s,r){return s+paymentSummary(Number(r.total)||0,paymentsForRecord(r)).balance;},0);
   var lastDate    = fmtDate(records[0].date);
 
   // Stats
@@ -3739,8 +3759,8 @@ function renderPortalHistory(records, searchType, searchVal){
   list.innerHTML = pendingBanner + records.map(function(r){
     var parts = (r.parts||[]).filter(function(p){return p.desc;});
     var isPaid = r.paymentStatus==='Paid';
-    var payClass = isPaid ? 'badge-paid' : 'badge-unpaid';
-    var payText  = isPaid ? 'Paid' : 'Unpaid';
+    var payClass = isPaid ? 'badge-paid' : r.paymentStatus==='Part Paid'?'badge-yellow':'badge-unpaid';
+    var payText  = isPaid ? 'Paid' : r.paymentStatus==='Part Paid'?'Part Paid':'Unpaid';
     return '<div class="portal-history-card" style="border-left:3px solid '+(isPaid?'var(--green)':'#ef4444')+';">'+
       '<div class="portal-bill-header">'+
         '<div>'+
@@ -3769,7 +3789,7 @@ function renderPortalHistory(records, searchType, searchVal){
 // ================================================================
 //  REMINDERS PAGE
 // ================================================================
-var remSettings = JSON.parse(localStorage.getItem('sribikez_rem_settings')||'null') || {interval:2, payDays:7};
+var remSettings = readPreference('sribikez_rem_settings',null) || {interval:2, payDays:7};
 
 function goReminders(){
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
@@ -3827,14 +3847,14 @@ function buildServiceReminderMsg(r){
 }
 
 function buildPaymentReminderMsg(r){
-  var amt = parseFloat(r.total||0).toFixed(2);
+  var amt = paymentSummary(Number(r.total)||0,paymentsForRecord(r)).balance.toFixed(2);
   var upiLink = 'upi://pay?pa=gpay-11257023592%40okbizaxis&pn=Sri%20Bikez&am='+amt+'&cu=INR&tn=Bill%20'+(r.billNo||'');
   return '💰 *Sri Bikez - Payment Reminder*\n\n'+
     'Dear *'+r.custName+'*,\n\n'+
     'This is a gentle reminder for the pending payment for your vehicle *'+r.vehName+'* ('+r.vehNum+').\n\n'+
     '🧾 Bill No: *'+r.billNo+'*\n'+
     '📅 Service Date: '+fmtDate(r.date)+'\n'+
-    '💵 *Amount Due: Rs '+parseFloat(r.total||0).toFixed(0)+'*\n\n'+
+    '💵 *Amount Due: Rs '+Number(amt).toFixed(0)+'*\n\n'+
     '━━━━━━━━━━\n'+
     '💳 *Pay Now via UPI (Click to Pay)*\n'+
     upiLink+'\n\n'+
@@ -3922,7 +3942,7 @@ function renderUnpaidBills(){
 
   if(!unpaid.length){container.innerHTML='<div class="rem-empty">No unpaid bills matching this filter! 🎉</div>';return;}
 
-  var totalUnpaid = unpaid.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
+  var totalUnpaid = unpaid.reduce(function(s,r){return s+paymentSummary(Number(r.total)||0,paymentsForRecord(r)).balance;},0);
   container.innerHTML =
     '<div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;">' +
     '<div><div style="font-size:12px;font-weight:600;color:#ef4444;">'+unpaid.length+' Unpaid Bills</div><div style="font-size:10px;color:var(--muted);">Tap buttons to remind or mark paid</div></div>' +
@@ -4077,7 +4097,7 @@ function saveCurrentBill(completed){
  billSaveQueue=billSaveQueue.catch(function(){}).then(function(){
   showSync('saving');
   var ref=window.__fbRef2(window.__fbDb,'sribikez/records/'+billNo);
-  return window.__fbGet(ref).then(function(snap){
+  return withTimeout(window.__fbGet(ref),12000).then(function(snap){
    var old=snap.val()||{}, now=new Date().toISOString();
    var changed=old.paymentStatus!==fields.paymentStatus||Number(old.totalPaid||0)!==fields.totalPaid||JSON.stringify(old.partPayments||[])!==JSON.stringify(payments);
    var record=Object.assign({},old,fields,{status:completed?'Completed':old.status||'In Progress',createdAt:old.createdAt||old.savedAt||now,savedAt:old.savedAt||now,updatedAt:now});
@@ -4085,7 +4105,7 @@ function saveCurrentBill(completed){
    if(record.paymentStatus==='Paid'){if(old.paymentStatus!=='Paid')record.paidAt=now;}
    else delete record.paidAt;
    if(completed)record.completedAt=old.completedAt||now;
-   return window.__fbSet(ref,record).then(function(){
+   return withTimeout(window.__fbSet(ref,record),12000).then(function(){
     var idx=allRecordsCached.findIndex(function(r){return r.billNo===billNo;});
     if(idx>=0)allRecordsCached[idx]=record;else allRecordsCached.push(record);
     filterRecords();showSync('saved');return true;
