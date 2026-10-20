@@ -407,6 +407,18 @@ button:disabled{opacity:.65;cursor:wait}
 html[data-theme="light"] #remMsgPreview,html[data-theme="light"] #payMsgPreview{color:var(--text)!important}
 html[data-theme="contrast"] .ham-item{color:var(--text)!important}
 [style*="white-space:pre-wrap"]{overflow-wrap:anywhere;word-break:break-word}
+
+:root{--danger:#ff8b93}:root[data-theme="light"]{--danger:#b42332}:root[data-theme="contrast"]{--danger:#ffa6ad}
+.dash-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:6px 0 22px;flex-wrap:wrap}.dash-heading h2{font-size:28px;letter-spacing:0}.dash-heading p{color:var(--muted);font-size:12px;margin-top:4px}
+.dash-period,.dash-filters label{display:flex;flex-direction:column;gap:6px;color:var(--muted);font-size:11px}.dash-period input,.dash-filters select{padding:9px 12px;border-radius:7px;border:1px solid var(--border);background:var(--input-bg);color:var(--text)}
+.dash-filters{display:flex;align-items:end;gap:12px;flex-wrap:wrap;padding:14px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:18px}
+.dash-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:14px}.dash-metric{padding:18px;background:var(--card);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:7px}.dash-metric>span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}.dash-metric strong{font-family:'Rajdhani',sans-serif;font-size:26px}.dash-metric small{font-size:10px;color:var(--muted);line-height:1.5}
+.dash-note{font-size:11px;line-height:1.6;color:var(--muted);margin:10px 0 18px}.dash-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.dash-panel{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;min-width:0}.dash-panel h3{font-size:16px;color:var(--text);font-weight:600;margin-bottom:14px}.dash-chart{position:relative;height:235px}.chart-message{padding:60px 15px;text-align:center;color:var(--muted);font-size:12px;line-height:1.7}
+.dash-table-wrap{overflow-x:auto}.dash-table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}.dash-table th{background:var(--input-bg);color:var(--muted);font-weight:500;text-align:left;padding:11px}.dash-table td{border-bottom:1px solid var(--border);padding:12px 11px;color:var(--text)}.dash-table tr:last-child td{border:0}
+.db-status{background:var(--card);font-weight:600}.db-status.live{color:var(--green);border-color:var(--green)}.db-status.offline{color:var(--yellow);border-color:var(--yellow)}
+html[data-theme] .admin-tab.locked,html[data-theme] .lock-badge{color:var(--muted)}
+html[data-theme="light"] #page4 h2{color:#7041a6!important}
+@media(max-width:650px){.dash-grid{grid-template-columns:1fr}.dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-metric{padding:13px}.dash-metric strong{font-size:22px}.dash-heading h2{font-size:24px}}
 </style>
 </head>
 <body>
@@ -861,144 +873,21 @@ html[data-theme="contrast"] .ham-item{color:var(--text)!important}
       </div>
 
       <!-- TAB 1: OVERVIEW (locked) -->
-      <div id="tabPanel1" style="display:none;">
-
-        <!-- KPI STATS — colorful gradient cards -->
-        <div id="statsRow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px;"></div>
-
-        <!-- Revenue sparkline + today highlight -->
-        <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:14px;">
-          <div style="background:linear-gradient(135deg,#1a1a1a 0%,#1f1a16 100%);border:1px solid var(--border);border-radius:12px;padding:16px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
-              <span>💰 Monthly Revenue</span>
-              <span id="ovTotalRevBadge" style="font-size:11px;color:var(--green);background:rgba(34,197,94,.12);padding:2px 8px;border-radius:6px;border:1px solid rgba(34,197,94,.3);"></span>
-            </div>
-            <div style="position:relative;height:180px;"><canvas id="chartMonthly"></canvas></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:10px;">
-            <div id="todayHighlight" style="background:linear-gradient(135deg,rgba(232,73,15,.15),rgba(232,73,15,.05));border:1px solid rgba(232,73,15,.3);border-radius:12px;padding:14px;flex:1;">
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--orange2);margin-bottom:6px;">Today</div>
-              <div id="ovTodayJobs" style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--orange);">0</div>
-              <div style="font-size:10px;color:var(--muted);">vehicles</div>
-              <div id="ovTodayRev" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--green);margin-top:4px;">Rs 0</div>
-              <div style="font-size:9px;color:var(--muted);">collected</div>
-            </div>
-            <div id="monthHighlight" style="background:linear-gradient(135deg,rgba(59,130,246,.15),rgba(59,130,246,.05));border:1px solid rgba(59,130,246,.3);border-radius:12px;padding:14px;flex:1;">
-              <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--blue);margin-bottom:6px;">This Month</div>
-              <div id="ovMonthJobs" style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--blue);">0</div>
-              <div style="font-size:10px;color:var(--muted);">vehicles</div>
-              <div id="ovMonthRev" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;color:var(--green);margin-top:4px;">Rs 0</div>
-              <div style="font-size:9px;color:var(--muted);">this month</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Status + Mechanic side by side -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;">🏍️ Job Status</div>
-            <div style="position:relative;height:160px;"><canvas id="chartStatus"></canvas></div>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;">👨‍🔧 Jobs by Mechanic</div>
-            <div style="position:relative;height:160px;"><canvas id="chartMechanic"></canvas></div>
-          </div>
-        </div>
-
-        <!-- Payment summary row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-          <div style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:16px;cursor:pointer;" onclick="document.getElementById('filterPayment').value='Paid';switchTab(0);filterRecords();">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--green);margin-bottom:4px;">💚 Total Collected</div>
-            <div id="ovPaidAmt" style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--green);">Rs 0</div>
-            <div id="ovPaidCount" style="font-size:10px;color:var(--muted);margin-top:2px;">0 bills paid</div>
-          </div>
-          <div style="background:linear-gradient(135deg,rgba(239,68,68,.12),rgba(239,68,68,.04));border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:16px;cursor:pointer;" onclick="document.getElementById('filterPayment').value='Unpaid';switchTab(0);filterRecords();">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#ef4444;margin-bottom:4px;">🔴 Pending Collection</div>
-            <div id="ovUnpaidAmt" style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:#ef4444;">Rs 0</div>
-            <div id="ovUnpaidCount" style="font-size:10px;color:var(--muted);margin-top:2px;">0 bills unpaid · tap to view</div>
-          </div>
-        </div>
-
-        <!-- Weekly activity heatmap-style bar -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:10px;">📊 Last 7 Days Activity</div>
-          <div id="weeklyActivity" style="display:flex;gap:6px;align-items:flex-end;height:60px;"></div>
-          <div id="weeklyLabels" style="display:flex;gap:6px;margin-top:5px;"></div>
-        </div>
-
-      </div>
-
-      <!-- TAB 2: ANALYTICS (locked) -->
-      <div id="tabPanel2" style="display:none;">
-
-        <!-- Filter bar -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-          <span style="font-size:11px;color:var(--muted);font-weight:500;">Filter:</span>
-          <select id="analyticsMonth" onchange="renderAnalytics()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
-          <select id="analyticsYear" onchange="renderAnalytics()" style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:11px;outline:none;cursor:pointer;"></select>
-          <button class="btn btn-secondary btn-sm" onclick="analyticsAllTime()">All Time</button>
-          <span id="analyticsFilterLabel" style="font-size:10px;color:var(--orange2);margin-left:4px;"></span>
-        </div>
-
-        <!-- KPI insight cards -->
-        <div id="insightRow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-bottom:16px;"></div>
-
-        <!-- Revenue + Jobs trend -->
-        <div style="background:linear-gradient(135deg,#1a1a1a,#1f1a16);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);">📈 Revenue & Jobs Trend</div>
-            <div style="display:flex;gap:12px;font-size:10px;">
-              <span style="color:var(--orange);">━ Revenue</span>
-              <span style="color:var(--blue);">━ Jobs</span>
-            </div>
-          </div>
-          <div style="position:relative;height:200px;"><canvas id="chartRevJobs"></canvas></div>
-        </div>
-
-        <!-- 2 column: daily jobs + daily rev -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:9px;">📅 Daily Jobs</div>
-            <div style="position:relative;height:170px;"><canvas id="chartDailyJobs"></canvas></div>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:9px;">💵 Daily Revenue</div>
-            <div style="position:relative;height:170px;"><canvas id="chartDailyRev"></canvas></div>
-          </div>
-        </div>
-
-        <!-- Top complaints + brands -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:4px;">🔧 Top Repair Issues</div>
-            <div style="font-size:9px;color:var(--muted);margin-bottom:9px;">Excludes routine service items</div>
-            <div style="position:relative;height:180px;"><canvas id="chartComplaints"></canvas></div>
-          </div>
-          <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:var(--orange2);margin-bottom:9px;">🏍️ Top Vehicle Brands</div>
-            <div style="position:relative;height:180px;"><canvas id="chartBrands"></canvas></div>
-          </div>
-        </div>
-
-        <!-- 12 month revenue trend -->
-        <div style="background:linear-gradient(135deg,#1a1a1a,#1a1f16);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:16px;margin-bottom:12px;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--green);margin-bottom:10px;">📆 12-Month Revenue Trend</div>
-          <div style="position:relative;height:200px;"><canvas id="chartRevTrend"></canvas></div>
-        </div>
-
-        <!-- Outside work cost -->
-        <div style="background:linear-gradient(135deg,#1a1a1a,#1a1618);border:1px solid rgba(168,85,247,.2);border-radius:12px;padding:16px;margin-bottom:12px;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--purple);margin-bottom:10px;">🔩 Outside Work Monthly Cost</div>
-          <div style="position:relative;height:160px;"><canvas id="chartOutsideWork"></canvas></div>
-        </div>
-
-        <!-- Mechanic performance table — redesigned -->
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:var(--orange2);margin-bottom:12px;">👨‍🔧 Mechanic Performance Board</div>
-          <div id="mechPerfTable"></div>
-        </div>
-
-      </div>
+      <div id="tabPanel1" style="display:none">
+<div class="dash-heading"><div><h2>Monthly overview</h2><p>Service progress and payment activity at a glance.</p></div><label class="dash-period">Service month<input type="month" id="overviewMonth" onchange="renderOverviewCharts(allRecordsCached)"></label></div>
+<div id="overviewKpis" class="dash-kpis"></div>
+<div id="overviewNote" class="dash-note"></div>
+<div class="dash-grid"><section class="dash-panel"><h3>Billed and collected · last 6 months</h3><div class="dash-chart"><canvas id="chartMonthly"></canvas></div></section><section class="dash-panel"><h3>Payment status · selected service month</h3><div class="dash-chart"><canvas id="chartStatus"></canvas></div></section><section class="dash-panel"><h3>Vehicle progress · selected service month</h3><div class="dash-chart"><canvas id="chartVehicleStatus"></canvas></div></section><section class="dash-panel"><h3>Jobs by mechanic · selected service month</h3><div class="dash-chart"><canvas id="chartMechanic"></canvas></div></section></div>
+<section class="dash-panel"><h3>Monthly status</h3><p class="dash-note">Current status of bills entered each month. Collections use the actual payment date (IST).</p><div id="overviewMonthlyTable" class="dash-table-wrap"></div></section>
+</div>
+<div id="tabPanel2" style="display:none">
+<div class="dash-heading"><div><h2>Business analytics</h2><p>Compare monthly billing, receipts, and service completion.</p></div><button class="btn btn-secondary" onclick="exportMonthlySummary()">Export monthly CSV</button></div>
+<div class="dash-filters"><label>Month<select id="analyticsMonth" onchange="renderAnalytics()"></select></label><label>Year<select id="analyticsYear" onchange="renderAnalytics()"></select></label><button class="btn btn-secondary" onclick="analyticsAllTime()">All time</button><span id="analyticsFilterLabel"></span></div>
+<div id="insightRow" class="dash-kpis"></div><div id="analyticsNote" class="dash-note"></div>
+<div class="dash-grid"><section class="dash-panel"><h3>Billed and collected · selected period</h3><div class="dash-chart"><canvas id="chartRevJobs"></canvas></div></section><section class="dash-panel"><h3>Service volume · selected period</h3><div class="dash-chart"><canvas id="chartDailyJobs"></canvas></div></section><section class="dash-panel"><h3>Payment status · selected service period</h3><div class="dash-chart"><canvas id="chartPaymentStatus"></canvas></div></section><section class="dash-panel"><h3>Vehicle progress · selected service period</h3><div class="dash-chart"><canvas id="chartAnalyticsStatus"></canvas></div></section><section class="dash-panel"><h3>Most reported complaints</h3><div class="dash-chart"><canvas id="chartComplaints"></canvas></div></section><section class="dash-panel"><h3>Vehicle brands</h3><div class="dash-chart"><canvas id="chartBrands"></canvas></div></section></div>
+<section class="dash-panel"><h3>Outside work costs · selected service period</h3><div class="dash-chart"><canvas id="chartOutsideWork"></canvas></div></section><section class="dash-panel"><h3>Monthly data status</h3><p class="dash-note">Billed and balance are grouped by service entry month. Collected includes payments on older bills received during that month. Status counts reflect the latest record.</p><div id="monthlyStatusTable" class="dash-table-wrap"></div></section>
+<section class="dash-panel"><h3>Mechanic performance</h3><div id="mechPerfTable" class="dash-table-wrap"></div></section>
+</div>
 
     </div>
   </div>
@@ -1636,7 +1525,7 @@ function setTheme(theme){
  document.documentElement.dataset.theme=theme;
  document.getElementById('themeSelect').value=theme;
  try{localStorage.setItem('sribikez_theme',theme);}catch(e){}
- Object.values(chartRefs).forEach(function(chart){if(chart)chart.update();});
+ if(ownerUnlocked){if(document.getElementById('tabPanel1').style.display!=='none')renderOverviewCharts(allRecordsCached);if(document.getElementById('tabPanel2').style.display!=='none')renderAnalytics();}
 }
 window.onload = function() {
   setTheme(document.documentElement.dataset.theme||'dark');
@@ -2774,7 +2663,7 @@ function startLiveListener(){
     renderStats(arr);
     filterRecords();
     if(!ownerUnlocked)return;
-    renderOverviewCharts(arr);
+    if(document.getElementById('tabPanel1').style.display!=='none')renderOverviewCharts(arr);
     if(document.getElementById('tabPanel2').style.display!=='none')renderAnalytics();
   });
 }
@@ -2791,47 +2680,13 @@ function switchTab(n){
     }
   }
   if(n===1){renderOverviewCharts(allRecordsCached);}
-  if(n===2){populateAnalyticsFilters();renderAnalytics();}
+  if(n===2){populateAnalyticsFilters();renderAnalytics();owListenAll();}
 }
 
 // ================================================================
 //  STATS + CHARTS
 // ================================================================
-function renderStats(records){
-  var totalAmt=records.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
-  var today=new Date().toISOString().split('T')[0];
-  var todayR=records.filter(function(r){return r.date===today;});
-  var todayAmt=todayR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
-  var now=new Date();var mk=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
-  var monR=records.filter(function(r){return(r.date||'').startsWith(mk);});
-  var monAmt=monR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
-  var inP=records.filter(function(r){return r.status==='In Progress';}).length;
-  var paidR=records.filter(function(r){return r.paymentStatus==='Paid';});
-  var unpaidR=records.filter(function(r){return r.status==='Completed'&&r.paymentStatus!=='Paid';});
-  var paidAmt=paidR.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
-  var unpaidAmt=unpaidR.reduce(function(s,r){return s+paymentSummary(Number(r.total)||0,paymentsForRecord(r)).balance;},0);
-
-  // Gradient KPI stat cards for Records tab
-  document.getElementById('statsRow').innerHTML=
-    kpiCard('📋','Total Services',records.length,'','#E8490F','')+
-    kpiCard('📅','Today',todayR.length,'Rs '+todayAmt.toFixed(0),'#22C55E','cursor:pointer;" onclick="document.getElementById(\'filterSort\').value=\'date_desc\';filterRecords()')+
-    kpiCard('🗓️','This Month',monR.length,'Rs '+monAmt.toFixed(0),'#3B82F6','')+
-    kpiCard('💰','Total Revenue','Rs '+totalAmt.toFixed(0),'all time','#F59E0B','')+
-    kpiCard('⏳','In Progress',inP,'vehicles','#F59E0B','')+
-    kpiCard('💚','Paid',paidR.length,'Rs '+paidAmt.toFixed(0),'#22C55E','cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Paid\';switchTab(0);filterRecords()')+
-    kpiCard('🔴','Unpaid',unpaidR.length,'Rs '+unpaidAmt.toFixed(0),'#ef4444','cursor:pointer;" onclick="document.getElementById(\'filterPayment\').value=\'Unpaid\';switchTab(0);filterRecords()');
-
-  // Update overview panel highlight cards
-  var oj=document.getElementById('ovTodayJobs'); if(oj)oj.textContent=todayR.length;
-  var or2=document.getElementById('ovTodayRev'); if(or2)or2.textContent='Rs '+todayAmt.toFixed(0);
-  var mj=document.getElementById('ovMonthJobs'); if(mj)mj.textContent=monR.length;
-  var mr=document.getElementById('ovMonthRev'); if(mr)mr.textContent='Rs '+monAmt.toFixed(0);
-  var pa=document.getElementById('ovPaidAmt'); if(pa)pa.textContent='Rs '+paidAmt.toFixed(0);
-  var pc=document.getElementById('ovPaidCount'); if(pc)pc.textContent=paidR.length+' bills paid';
-  var ua=document.getElementById('ovUnpaidAmt'); if(ua)ua.textContent='Rs '+unpaidAmt.toFixed(0);
-  var uc=document.getElementById('ovUnpaidCount'); if(uc)uc.textContent=unpaidR.length+' bills unpaid · tap to view';
-  var rb=document.getElementById('ovTotalRevBadge'); if(rb)rb.textContent='Total: Rs '+totalAmt.toFixed(0);
-}
+function renderStats(records){if(ownerUnlocked&&document.getElementById('tabPanel1').style.display!=='none')renderOverviewCharts(records);}
 
 function kpiCard(icon,label,value,sub,color,extraStyle){
   return '<div style="background:var(--card);border:1px solid '+color+'44;border-top:3px solid '+color+';border-radius:10px;padding:13px;text-align:center;'+extraStyle+'">' +
@@ -2843,59 +2698,42 @@ function kpiCard(icon,label,value,sub,color,extraStyle){
 }
 
 function renderOverviewCharts(records){
-  // Monthly revenue bar chart
-  var months=[];var now=new Date();
-  for(var i=5;i>=0;i--){var d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({key:d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),label:d.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})});}
-  var monRev=months.map(function(m){return records.filter(function(r){return(r.date||'').startsWith(m.key);}).reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);});
-  makeChart('chartMonthly','bar',months.map(function(m){return m.label;}),monRev,'Revenue Rs','#E8490F');
-
-  // Status doughnut
-  var comp=records.filter(function(r){return r.status==='Completed';}).length;
-  var prog=records.filter(function(r){return r.status==='In Progress';}).length;
-  makeChart('chartStatus','doughnut',['Completed','In Progress'],[comp,prog],null,['#22C55E','#F59E0B']);
-
-  // Mechanic bar
-  var mechs={};records.forEach(function(r){if(r.mechName)mechs[r.mechName]=(mechs[r.mechName]||0)+1;});
-  makeChart('chartMechanic','bar',Object.keys(mechs),Object.values(mechs),'Jobs','#3B82F6');
-
-  // Weekly activity bars (last 7 days)
-  var waEl=document.getElementById('weeklyActivity');
-  var wlEl=document.getElementById('weeklyLabels');
-  if(waEl&&wlEl){
-    var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var week=[];
-    for(var i=6;i>=0;i--){var dd=new Date();dd.setDate(dd.getDate()-i);week.push({date:dd.toISOString().split('T')[0],day:days[dd.getDay()]});}
-    var maxJobs=1;
-    var weekCounts=week.map(function(w){var c=records.filter(function(r){return r.date===w.date;}).length;if(c>maxJobs)maxJobs=c;return c;});
-    waEl.innerHTML=weekCounts.map(function(c,i){
-      var pct=Math.max(8,Math.round((c/maxJobs)*100));
-      var isToday=i===6;
-      var col=isToday?'var(--orange)':(c>0?'var(--blue)':'var(--border)');
-      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">'+
-        '<div style="font-size:9px;color:var(--muted);">'+c+'</div>'+
-        '<div style="width:100%;height:'+pct+'%;background:'+col+';border-radius:3px 3px 0 0;min-height:4px;transition:height .3s;"></div>'+
-      '</div>';
-    }).join('');
-    wlEl.innerHTML=week.map(function(w,i){
-      var isToday=i===6;
-      return '<div style="flex:1;text-align:center;font-size:9px;color:'+(isToday?'var(--orange)':'var(--muted)')+';font-weight:'+(isToday?'700':'400')+'">'+w.day+'</div>';
-    }).join('');
-  }
+ var input=document.getElementById('overviewMonth');if(!input.value)input.value=istDay(new Date()).slice(0,7);
+ var key=input.value, stats=periodSummary(records,key), months=trailingMonths(key,6);
+ document.getElementById('overviewKpis').innerHTML=summaryCards(stats);
+ document.getElementById('overviewNote').textContent=summaryNote(records,key);
+ multiMoneyChart('chartMonthly',months.map(monthLabel),months.map(function(m){return periodSummary(records,m).billed;}),months.map(function(m){return periodSummary(records,m).collected;}));
+ statusCharts(stats,'chartStatus','chartVehicleStatus');
+ var mechanics={};stats.records.forEach(function(r){var name=r.mechName||'Unassigned';mechanics[name]=(mechanics[name]||0)+1;});
+ makeChart('chartMechanic','bar',Object.keys(mechanics),Object.values(mechanics),'Jobs','blue');
+ document.getElementById('overviewMonthlyTable').innerHTML=monthlyTable(records,months);
+}
+function chartPalette(){
+ var css=getComputedStyle(document.documentElement), get=function(name){return css.getPropertyValue('--'+name).trim();};
+ return {text:get('text'),muted:get('muted'),grid:get('border'),surface:get('card'),orange:get('orange2'),blue:get('blue'),green:get('green'),yellow:get('yellow'),purple:get('purple'),red:get('danger')};
 }
 function makeChart(id,type,labels,data,label,color){
-  if(typeof Chart==='undefined'){var canvas=document.getElementById(id);if(canvas)canvas.setAttribute('aria-label','Chart unavailable: reconnect to load charts');return;}
-  if(chartRefs[id]){chartRefs[id].destroy();chartRefs[id]=null;}
-  var ctx=document.getElementById(id);if(!ctx)return;
-  chartRefs[id]=new Chart(ctx,{
-    type:type,
-    data:{labels:labels,datasets:[{label:label||'',data:data,backgroundColor:Array.isArray(color)?color:color+'99',borderColor:Array.isArray(color)?color:color,borderWidth:1.5,borderRadius:type==='bar'?4:0,tension:0.4,fill:type==='line'?true:undefined}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:type==='doughnut',labels:{color:'#aaa',font:{size:9}}},tooltip:{callbacks:{label:function(ctx){if(typeof ctx.raw==='number'&&label&&label.indexOf('Rs')>=0)return 'Rs '+ctx.raw.toFixed(0);return ctx.raw;}}}},scales:type!=='doughnut'?{x:{ticks:{color:'#888',font:{size:9}},grid:{color:'#2a2a2a'}},y:{ticks:{color:'#888',font:{size:9}},grid:{color:'#2a2a2a'}}}:{}}
-  });
+ var palette=chartPalette();color=Array.isArray(color)?color.map(function(c){return palette[c]||c;}):palette[color]||color||palette.blue;
+ var datasets=[{label:label||'Count',data:data,backgroundColor:color,borderColor:color,borderWidth:2,borderRadius:4,tension:.25,fill:false}];
+ drawDashboardChart(id,type,labels,datasets,type==='doughnut');
+}
+function multiMoneyChart(id,labels,billed,collected){
+ var p=chartPalette();drawDashboardChart(id,'bar',labels,[{label:'Billed Rs',data:billed,backgroundColor:p.blue,borderRadius:4},{label:'Collected Rs',data:collected,backgroundColor:p.green,borderRadius:4}],true);
+}
+function drawDashboardChart(id,type,labels,datasets,legend){
+ var canvas=document.getElementById(id);if(!canvas)return;
+ if(chartRefs[id]){chartRefs[id].destroy();delete chartRefs[id];}
+ var note=canvas.parentElement.querySelector('.chart-message');if(note)note.remove();
+ var empty=datasets.every(function(d){return d.data.every(function(n){return !n;});});
+ canvas.style.display=empty?'none':'block';
+ if(empty||typeof Chart==='undefined'){
+  canvas.style.display='none';note=document.createElement('p');note.className='chart-message';note.textContent=empty?'No data for this period.':'Chart could not load. Monthly figures are available in the table below.';canvas.parentElement.appendChild(note);return;
+ }
+ var p=chartPalette();
+ chartRefs[id]=new Chart(canvas,{type:type,data:{labels:labels,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:legend,labels:{color:p.text,font:{size:11},boxWidth:12}},tooltip:{backgroundColor:p.surface,titleColor:p.text,bodyColor:p.text,borderColor:p.grid,borderWidth:1}},scales:type==='doughnut'?{}:{x:{ticks:{color:p.muted,font:{size:10}},grid:{display:false}},y:{beginAtZero:true,ticks:{color:p.muted,precision:0},grid:{color:p.grid}}}}});
 }
 
-// ================================================================
-//  RECORDS TABLE
-// ================================================================
+
 function filterRecords(){
   var q=(document.getElementById('searchInput')?document.getElementById('searchInput').value.toLowerCase():'');
   var fs=(document.getElementById('filterStatus')?document.getElementById('filterStatus').value:'');
@@ -3138,87 +2976,57 @@ async function importCSV(event){
 //  ANALYTICS
 // ================================================================
 function populateAnalyticsFilters(){
-  var ms=document.getElementById('analyticsMonth');
-  var ys=document.getElementById('analyticsYear');
-  if(!ms||!ys)return;
-  var mNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  var curM=new Date().getMonth();
-  ms.innerHTML='<option value="">All Months</option>'+mNames.map(function(n,i){return '<option value="'+(i+1)+'"'+(i===curM?' selected':'')+'>'+n+'</option>';}).join('');
-  var curY=new Date().getFullYear();
-  ys.innerHTML=[curY,curY-1,curY-2].map(function(y){return '<option value="'+y+'"'+(y===curY?' selected':'')+'>'+y+'</option>';}).join('');
+ var ms=document.getElementById('analyticsMonth'),ys=document.getElementById('analyticsYear');
+ var initialized=ms.dataset.ready==='yes',oldM=ms.value,oldY=ys.value,today=istDay(new Date());
+ var years=new Set([today.slice(0,4)]);
+ allRecordsCached.forEach(function(r){if(/^\d{4}-/.test(r.date||''))years.add(r.date.slice(0,4));paymentsForRecord(r).forEach(function(p){var date=istDay(p.date);if(date)years.add(date.slice(0,4));});});
+ ms.innerHTML='<option value="">All months</option>'+Array.from({length:12},function(_,i){return '<option value="'+(i+1)+'">'+new Date(2020,i,1).toLocaleString('en-IN',{month:'long'})+'</option>';}).join('');
+ ys.innerHTML='<option value="">All years</option>'+Array.from(years).sort().reverse().map(function(y){return '<option>'+y+'</option>';}).join('');
+ ms.value=initialized?oldM:String(Number(today.slice(5,7)));ys.value=initialized?oldY:today.slice(0,4);ms.dataset.ready='yes';
 }
-function analyticsAllTime(){document.getElementById('analyticsMonth').value='';renderAnalytics();}
+function analyticsAllTime(){document.getElementById('analyticsMonth').value='';document.getElementById('analyticsYear').value='';renderAnalytics();}
+function analyticsPeriod(){var m=document.getElementById('analyticsMonth').value,y=document.getElementById('analyticsYear').value;return {month:m,year:y};}
+function matchesPeriod(date,period){if(!/^\d{4}-\d{2}/.test(date||''))return !period.month&&!period.year;return (!period.year||date.slice(0,4)===period.year)&&(!period.month||Number(date.slice(5,7))===Number(period.month));}
+function analyticsMonths(){
+ var p=analyticsPeriod();if(p.year)return Array.from({length:12},function(_,i){return p.year+'-'+String(i+1).padStart(2,'0');}).filter(function(m){return !p.month||Number(m.slice(5))===Number(p.month);});
+ var keys=new Set();allRecordsCached.forEach(function(r){if(/^\d{4}-\d{2}/.test(r.date||'')&&matchesPeriod(r.date,p))keys.add(r.date.slice(0,7));paymentsForRecord(r).forEach(function(pay){var day=istDay(pay.date);if(day&&matchesPeriod(day,p))keys.add(day.slice(0,7));});});return Array.from(keys).sort();
+}
 function renderAnalytics(){
-  var records=allRecordsCached;
-  var ms=document.getElementById('analyticsMonth');
-  var ys=document.getElementById('analyticsYear');
-  if(!ms||!ys)return;
-  var selMonth=ms.value;
-  var selYear=parseInt(ys.value)||new Date().getFullYear();
-  var filtered;
-  if(selMonth){var key=selYear+'-'+String(selMonth).padStart(2,'0');filtered=records.filter(function(r){return(r.date||'').startsWith(key);});}
-  else{filtered=records.filter(function(r){return(r.date||'').startsWith(String(selYear));});}
-  var totalAmt=filtered.reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);
-  var avgAmt=filtered.length?totalAmt/filtered.length:0;
-  var phones={};filtered.forEach(function(r){if(r.custPhone)phones[r.custPhone]=1;});
-  var topMech=topEntry(filtered.map(function(r){return r.mechName;}).filter(Boolean));
-  document.getElementById('insightRow').innerHTML=
-    '<div class="insight-card"><div class="insight-label">Total Services</div><div class="insight-val" style="color:var(--orange)">'+filtered.length+'</div><div class="insight-sub">in selected period</div></div>'+
-    '<div class="insight-card"><div class="insight-label">Total Revenue</div><div class="insight-val" style="color:var(--green)">Rs '+totalAmt.toFixed(0)+'</div><div class="insight-sub">collected</div></div>'+
-    '<div class="insight-card"><div class="insight-label">Avg Bill</div><div class="insight-val" style="color:var(--blue)">Rs '+avgAmt.toFixed(0)+'</div><div class="insight-sub">per vehicle</div></div>'+
-    '<div class="insight-card"><div class="insight-label">Unique Customers</div><div class="insight-val" style="color:var(--purple)">'+Object.keys(phones).length+'</div><div class="insight-sub">by phone</div></div>'+
-    '<div class="insight-card"><div class="insight-label">Top Mechanic</div><div class="insight-val" style="color:var(--yellow);font-size:15px;">'+(topMech||'--')+'</div><div class="insight-sub">most jobs</div></div>';
-  if(selMonth){
-    var dim=new Date(selYear,parseInt(selMonth),0).getDate();
-    var days=[];for(var di=1;di<=dim;di++)days.push(di);
-    var jBD=days.map(function(d){var k=selYear+'-'+String(selMonth).padStart(2,'0')+'-'+String(d).padStart(2,'0');return filtered.filter(function(r){return r.date===k;}).length;});
-    var rBD=days.map(function(d){var k=selYear+'-'+String(selMonth).padStart(2,'0')+'-'+String(d).padStart(2,'0');return filtered.filter(function(r){return r.date===k;}).reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);});
-    makeChart('chartDailyJobs','bar',days.map(String),jBD,'Jobs','#E8490F');
-    makeChart('chartDailyRev','line',days.map(String),rBD,'Revenue Rs','#22C55E');
-  }else{
-    var mons=[];for(var mi=0;mi<12;mi++){var dd=new Date(selYear,mi,1);mons.push({key:selYear+'-'+String(mi+1).padStart(2,'0'),label:dd.toLocaleDateString('en-IN',{month:'short'})});}
-    var jBM=mons.map(function(m){return filtered.filter(function(r){return(r.date||'').startsWith(m.key);}).length;});
-    var rBM=mons.map(function(m){return filtered.filter(function(r){return(r.date||'').startsWith(m.key);}).reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);});
-    makeChart('chartDailyJobs','bar',mons.map(function(m){return m.label;}),jBM,'Jobs','#E8490F');
-    makeChart('chartDailyRev','line',mons.map(function(m){return m.label;}),rBM,'Revenue Rs','#22C55E');
-  }
-  var cC={};filtered.forEach(function(r){(r.complaints||'').split(',').forEach(function(c){var t=c.trim();if(t)cC[t]=(cC[t]||0)+1;});});
-  var topC=Object.entries(cC).sort(function(a,b){return b[1]-a[1];}).slice(0,8);
-  makeChart('chartComplaints','bar',topC.map(function(x){return x[0].length>16?x[0].slice(0,14)+'..':x[0];}),topC.map(function(x){return x[1];}), 'Count','#A855F7');
-  var bC={};filtered.forEach(function(r){var b=(r.vehName||'').split(' ')[0];if(b)bC[b]=(bC[b]||0)+1;});
-  var topB=Object.entries(bC).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
-  makeChart('chartBrands','doughnut',topB.map(function(x){return x[0];}),topB.map(function(x){return x[1];}),null,['#E8490F','#FF6B35','#F59E0B','#22C55E','#3B82F6','#A855F7','#EC4899']);
-  var tMons=[];var nowT=new Date();
-  for(var ti=11;ti>=0;ti--){var tD=new Date(nowT.getFullYear(),nowT.getMonth()-ti,1);tMons.push({key:tD.getFullYear()+'-'+String(tD.getMonth()+1).padStart(2,'0'),label:tD.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})});}
-  var tData=tMons.map(function(m){return allRecordsCached.filter(function(r){return(r.date||'').startsWith(m.key);}).reduce(function(s,r){return s+(parseFloat(r.total)||0);},0);});
-  makeChart('chartRevTrend','line',tMons.map(function(m){return m.label;}),tData,'Revenue Rs','#E8490F');
-  // Outside work monthly cost chart
-  var owTmons=[];var nowOW=new Date();
-  for(var oi=5;oi>=0;oi--){var oD=new Date(nowOW.getFullYear(),nowOW.getMonth()-oi,1);owTmons.push({key:oD.getFullYear()+'-'+String(oD.getMonth()+1).padStart(2,'0'),label:oD.toLocaleDateString('en-IN',{month:'short',year:'2-digit'})});}
-  var owData=owTmons.map(function(m){return owCached.filter(function(e){return (e.date||'').startsWith(m.key);}).reduce(function(s,e){return s+(parseFloat(e.amount)||0);},0);});
-  makeChart('chartOutsideWork','bar',owTmons.map(function(m){return m.label;}),owData,'Outside Work Rs','#A855F7');
-
-  var mMap={};filtered.forEach(function(r){if(!r.mechName)return;if(!mMap[r.mechName])mMap[r.mechName]={jobs:0,rev:0,done:0};mMap[r.mechName].jobs++;mMap[r.mechName].rev+=parseFloat(r.total)||0;if(r.status==='Completed')mMap[r.mechName].done++;});
-  var mE=Object.entries(mMap).sort(function(a,b){return b[1].rev-a[1].rev;});
-  var mRows=mE.map(function(e){var n=e[0],d=e[1];return '<tr style="border-bottom:1px solid var(--border);">'+
-    '<td style="padding:8px 10px;font-weight:600;">'+n+'</td>'+
-    '<td style="padding:8px 10px;color:var(--orange)">'+d.jobs+'</td>'+
-    '<td style="padding:8px 10px;color:var(--green)">Rs '+d.rev.toFixed(0)+'</td>'+
-    '<td style="padding:8px 10px;">Rs '+(d.jobs?Math.round(d.rev/d.jobs):0)+'</td>'+
-    '<td style="padding:8px 10px;color:var(--green)">'+d.done+'</td>'+
-    '<td style="padding:8px 10px;color:var(--yellow)">'+(d.jobs-d.done)+'</td></tr>';}).join('');
-  document.getElementById('mechPerfTable').innerHTML=mRows?
-    '<table style="width:100%;border-collapse:collapse;">'+
-    '<thead><tr style="background:var(--input-bg);">'+
-    '<th style="padding:7px 10px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Mechanic</th>'+
-    '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Jobs</th>'+
-    '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Revenue</th>'+
-    '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Avg Bill</th>'+
-    '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">Done</th>'+
-    '<th style="padding:7px 10px;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);">In Progress</th>'+
-    '</tr></thead><tbody>'+mRows+'</tbody></table>':
-    '<div style="padding:16px;color:var(--muted);font-size:11px;text-align:center;">No data for selected period</div>';
+ var p=analyticsPeriod(),stats=periodSummary(allRecordsCached,p),months=analyticsMonths();
+ document.getElementById('analyticsFilterLabel').textContent=p.month?new Date(2020,Number(p.month)-1,1).toLocaleString('en-IN',{month:'long'})+' · '+(p.year||'all years'):p.year||'All time';
+ document.getElementById('insightRow').innerHTML=summaryCards(stats);
+ document.getElementById('analyticsNote').textContent=summaryNote(allRecordsCached,p);
+ var keys=months,labels=months.map(monthLabel);
+ if(p.month&&p.year){keys=Array.from({length:new Date(Number(p.year),Number(p.month),0).getDate()},function(_,i){return p.year+'-'+String(p.month).padStart(2,'0')+'-'+String(i+1).padStart(2,'0');});labels=keys.map(function(k){return k.slice(-2);});}
+ multiMoneyChart('chartRevJobs',labels,keys.map(function(k){return periodSummary(allRecordsCached,k).billed;}),keys.map(function(k){return periodSummary(allRecordsCached,k).collected;}));
+ makeChart('chartDailyJobs','bar',labels,keys.map(function(k){return periodSummary(allRecordsCached,k).records.length;}),'Services','blue');
+ statusCharts(stats,'chartPaymentStatus','chartAnalyticsStatus');
+ var complaints={},brands={},mechanics={};stats.records.forEach(function(r){String(r.complaints||'').split(',').forEach(function(c){c=c.trim();if(c)complaints[c]=(complaints[c]||0)+1;});var b=(r.vehName||'Unknown').split(' ')[0];brands[b]=(brands[b]||0)+1;var n=r.mechName||'Unassigned';if(!mechanics[n])mechanics[n]={jobs:0,done:0,billed:0,balance:0};var v=mechanics[n];v.jobs++;v.done+=r.status==='Completed'?1:0;v.billed+=Number(r.total)||0;v.balance+=paymentSummary(Number(r.total)||0,paymentsForRecord(r)).balance;});
+ var top=Object.entries(complaints).sort(function(a,b){return b[1]-a[1];}).slice(0,8),brand=Object.entries(brands).sort(function(a,b){return b[1]-a[1];}).slice(0,7);
+ makeChart('chartComplaints','bar',top.map(function(x){return x[0];}),top.map(function(x){return x[1];}),'Reports','purple');makeChart('chartBrands','doughnut',brand.map(function(x){return x[0];}),brand.map(function(x){return x[1];}),'Vehicles',['blue','green','purple','yellow','red','orange']);
+ makeChart('chartOutsideWork','bar',months.map(monthLabel),months.map(function(m){return owCached.filter(function(e){return String(e.date||'').startsWith(m);}).reduce(function(sum,e){return sum+(Number(e.amount)||0);},0);}), 'Outside work Rs','purple');
+ document.getElementById('monthlyStatusTable').innerHTML=monthlyTable(allRecordsCached,months);
+ document.getElementById('mechPerfTable').innerHTML=dataTable(['Mechanic','Services','Finished','In progress','Billed','Balance'],Object.entries(mechanics).map(function(e){var v=e[1];return [sanitize(e[0]),v.jobs,v.done,v.jobs-v.done,money(v.billed),money(v.balance)];}));
 }
+function istDay(value){if(!value)return '';var d=new Date(value);if(isNaN(d.getTime()))return '';var parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d),v={};parts.forEach(function(p){v[p.type]=p.value;});return v.year+'-'+v.month+'-'+v.day;}
+function periodSummary(records,period){
+ var match=typeof period==='string'?function(date){return String(date||'').startsWith(period);}:function(date){return matchesPeriod(date,period);};
+ var selected=records.filter(function(r){return match(r.date);}),s={records:selected,billed:0,received:0,collected:0,balance:0,paid:0,part:0,unpaid:0,finished:0,progress:0};
+ selected.forEach(function(r){var pay=paymentSummary(Number(r.total)||0,paymentsForRecord(r));s.billed+=Number(r.total)||0;s.received+=pay.totalPaid;s.balance+=pay.balance;s[r.paymentStatus==='Paid'?'paid':r.paymentStatus==='Part Paid'?'part':'unpaid']++;s[r.status==='Completed'?'finished':'progress']++;});
+ records.forEach(function(r){paymentsForRecord(r).forEach(function(p){var day=istDay(p.date);if(day&&match(day))s.collected+=Number(p.amt)||0;});});return s;
+}
+function money(value){return 'Rs '+Number(value||0).toLocaleString('en-IN',{maximumFractionDigits:2});}
+function metric(label,value,sub,color){return '<div class="dash-metric"><span>'+label+'</span><strong style="color:var(--'+color+')">'+value+'</strong><small>'+sub+'</small></div>';}
+function summaryCards(s){return metric('Services',s.records.length,s.finished+' finished · '+s.progress+' in progress','blue')+metric('Billed',money(s.billed),'Bills entered in selected period','text')+metric('Collected',money(s.collected),'Dated receipts in selected period · IST','green')+metric('Balance due',money(s.balance),'Current balance on selected service bills','danger')+metric('Paid / Part paid / Unpaid',s.paid+' / '+s.part+' / '+s.unpaid,'Current payment status of selected bills','yellow')+metric('Completion',s.records.length?Math.round(s.finished/s.records.length*100)+'%':'—','Finished vehicles in selected service period','purple');}
+function summaryNote(records,period){var unknown=0;records.forEach(function(r){paymentsForRecord(r).forEach(function(p){if(!istDay(p.date))unknown+=Number(p.amt)||0;});});return 'Collections use payment dates, including receipts for older bills. Balances reflect current records.'+(unknown?' '+money(unknown)+' in legacy payments has no valid date and is excluded from dated collections.':'');}
+function trailingMonths(key,count){var parts=key.split('-');return Array.from({length:count},function(_,i){var d=new Date(Number(parts[0]),Number(parts[1])-count+i,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');});}
+function monthLabel(key){return new Date(key+'-01T12:00:00').toLocaleString('en-IN',{month:'short',year:'numeric'});}
+function statusCharts(s,paymentId,vehicleId){makeChart(paymentId,'doughnut',['Paid','Part paid','Unpaid'],[s.paid,s.part,s.unpaid],'Bills',['green','yellow','red']);makeChart(vehicleId,'doughnut',['Finished','In progress'],[s.finished,s.progress],'Vehicles',['purple','blue']);}
+function dataTable(headers,rows){return '<table class="dash-table"><thead><tr>'+headers.map(function(h){return '<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>'+(rows.length?rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';}).join(''):'<tr><td colspan="'+headers.length+'">No data for this period.</td></tr>')+'</tbody></table>';}
+function monthlyRows(records,months){return months.map(function(m){var s=periodSummary(records,m);return [m,s.records.length,s.finished,s.progress,s.paid,s.part,s.unpaid,s.billed,s.collected,s.balance];});}
+function monthlyTable(records,months){return dataTable(['Month','Services','Finished','In progress','Paid','Part paid','Unpaid','Billed','Collected','Balance'],monthlyRows(records,months).map(function(row){return row.map(function(v,i){return i===0?monthLabel(v):i>=7?money(v):v;});}));}
+function exportMonthlySummary(){var rows=monthlyRows(allRecordsCached,analyticsMonths());var h=['Service Month','Services','Finished','In Progress','Paid Bills','Part Paid Bills','Unpaid Bills','Billed Amount','Collected by Payment Date (IST)','Current Balance on Service Bills'];var csv='\uFEFF'+[h].concat(rows).map(function(row){return row.map(csvCell).join(',');}).join('\r\n');var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='sribikez_monthly_status.csv';a.click();}
+
 function topEntry(arr){var f={},top='',max=0;arr.forEach(function(x){f[x]=(f[x]||0)+1;if(f[x]>max){max=f[x];top=x;}});return top;}
 
 
@@ -3301,6 +3109,7 @@ function owListenAll(){
     if(panel && panel.style.display!=='none') renderOwEntries();
     var panel2 = document.getElementById('owTabPanel2');
     if(panel2 && panel2.style.display!=='none') renderShopSummary();
+    if(ownerUnlocked&&document.getElementById('tabPanel2').style.display!=='none')renderAnalytics();
   });
 }
 
