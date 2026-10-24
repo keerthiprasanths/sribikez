@@ -14,7 +14,7 @@
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, remove, onValue, push, update }
+import { getDatabase, ref, set, get, remove, onValue, push, update, runTransaction }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // ── FIREBASE CONFIG ─────────────────────────────────────────────────────────
@@ -47,6 +47,7 @@ window.__fbRemove= remove;
 window.__fbOnValue = onValue;
 window.__fbRef2  = ref;
 window.__fbUpdate= update;
+window.__fbTransaction = runTransaction;
 window.__firebaseReady = true;
 window.dispatchEvent(new Event('firebaseReady'));
 </script>
@@ -1581,18 +1582,24 @@ function getMaxSeqFromData(data){
   data.forEach(function(r){
     if(r && r.billNo && r.billNo.startsWith('SB')){
       var n = parseInt(r.billNo.slice(2));
-      if(!isNaN(n) && n >= 1 && /^SB\d{5,}$/.test(r.billNo) && n > max) max = n;
+      if(!isNaN(n) && n >= 1 && n <= 9999 && /^SB\d+$/.test(r.billNo) && n > max) max = n;
     }
   });
   return max;
 }
-function nextBillNoFromCache(){
-  var max = getMaxSeqFromData(allRecordsCached);
-  var saved = parseInt(localStorage.getItem('sribikez_seqBillNum')||'0');
-  if(saved > max) max = saved;
+// Restore the original sequential range; discard a counter polluted by legacy IDs.
+function nextSequentialBillNumber(records){
+  var max = getMaxSeqFromData(records);
+  var raw = localStorage.getItem('sribikez_seqBillNum') || '0';
+  var saved = /^\d+$/.test(raw) ? Number(raw) : 0;
+  if(Number.isSafeInteger(saved) && saved >= 1 && saved <= 9999) max = Math.max(max,saved);
+  if(max >= 9999) throw new Error('Sequential bill limit reached. Contact support before creating another bill.');
   var next = max + 1;
-  localStorage.setItem('sribikez_seqBillNum', next);
+  localStorage.setItem('sribikez_seqBillNum',String(next));
   return formatBillNo(next);
+}
+function nextBillNoFromCache(){
+  return nextSequentialBillNumber(allRecordsCached);
 }
 // Async: fetches ALL records from Firebase, finds true max sequential number
 function getNextBillNo(callback){
@@ -1602,11 +1609,7 @@ function getNextBillNo(callback){
  button.disabled=true;button.textContent='Saving vehicle…';
  withTimeout(window.__fbGet(window.__fbRef),12000).then(function(snap){
   var data=snap.val()||{};
-  var max=getMaxSeqFromData(Object.values(data));
-  var saved=parseInt(localStorage.getItem('sribikez_seqBillNum')||'0')||0;
-  var next=Math.max(max,saved)+1;
-  localStorage.setItem('sribikez_seqBillNum',next);
-  return callback(formatBillNo(next));
+  return callback(nextSequentialBillNumber(Object.values(data)));
  }).catch(function(){showToast('Could not create bill. Check your connection and retry.','error');})
  .finally(function(){button.disabled=false;button.textContent='Save and Next: Complaints →';});
 }
@@ -2823,6 +2826,7 @@ function filterRecords(){
       // ROW 3: Actions
       '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);">' +
         '<button class="btn btn-blue btn-sm" style="padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="editFromAdmin(this.dataset.bill)">✏️ Edit Bill</button>' +
+        '<button class="btn btn-secondary btn-sm" data-bill="'+safeBill+'" onclick="editBillNumber(this.dataset.bill,this)">Edit Bill Number</button>'+
         (!isPaid?'<button class="btn btn-sm" style="background:#25D366;color:#fff;padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="sendPaymentReminder(this.dataset.bill)">💬 Payment Reminder</button>':'')+
         '<button class="btn btn-sm" style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#A855F7;padding:5px 12px;font-size:12px;" data-bill="'+safeBill+'" onclick="sendServiceReminder(this.dataset.bill)">🔔 Service Reminder</button>'+
         '<button class="btn btn-red btn-sm" style="padding:5px 12px;font-size:12px;margin-left:auto;" data-bill="'+safeBill+'" onclick="deleteRecord(this.dataset.bill)">🗑️ Delete</button>'+
@@ -2896,6 +2900,100 @@ function deleteRecord(billNo){
   if(!confirm('Delete record '+billNo+'? This cannot be undone.'))return;
   fbDelete(billNo,function(){showToast('Record deleted');});
 }
+
+// Explicit, repeat-safe repair for the seven records in the 24 October export.
+var octoberBillMapping = {"SB747225": "SB00350", "SB747226": "SB00351", "SB747227": "SB00352", "SB747228": "SB00353", "SB747229": "SB00354", "SB747230": "SB00355", "SB747231": "SB00356"};
+var octoberBillIdentity = {"SB747225": {"date": "2026-10-21", "vehNum": "TN52AB0875", "custName": "SIVARAJ"}, "SB747226": {"date": "2026-10-21", "vehNum": "TN52C1887", "custName": "BOOPATHI"}, "SB747227": {"date": "2026-10-22", "vehNum": "TN52D2389", "custName": "PRAKASH"}, "SB747228": {"date": "2026-10-22", "vehNum": "TN52M6796", "custName": "SAKTHIVEL"}, "SB747229": {"date": "2026-10-14", "vehNum": "TN52L0831", "custName": "SELVAM"}, "SB747230": {"date": "2026-10-22", "vehNum": "TN77M0083", "custName": "NAGARAJ"}, "SB747231": {"date": "2026-10-22", "vehNum": "TN52K0078", "custName": "BALU"}};
+function buildOctoberBillRepair(current){
+ if(!current || !current.records)throw new Error('No records available.');
+ var result=JSON.parse(JSON.stringify(current)), records=result.records, changed=0;
+ Object.keys(octoberBillMapping).forEach(function(oldNo){
+  var newNo=octoberBillMapping[oldNo], source=records[oldNo], target=records[newNo];
+  if(!source){
+   if(target && target.previousBillNo===oldNo)return;
+   throw new Error('Missing original bill '+oldNo+'. No changes made.');
+  }
+  if(target)throw new Error('Bill '+newNo+' already exists. No changes made.');
+  var expected=octoberBillIdentity[oldNo];
+  if(source.billNo!==oldNo || source.date!==expected.date || source.vehNum!==expected.vehNum || source.custName!==expected.custName)
+   throw new Error('Details differ for '+oldNo+'. No changes made.');
+  records[newNo]=Object.assign({},source,{billNo:newNo,previousBillNo:oldNo});
+  delete records[oldNo];changed++;
+ });
+ // Update bill references in notes, balance items and outside-work links.
+ var pattern=/\bSB74722[5-9]\b|\bSB74723[01]\b/g;
+ function rewrite(value){
+  if(typeof value==='string')return value.replace(pattern,function(id){return octoberBillMapping[id]||id;});
+  if(value && typeof value==='object')Object.keys(value).forEach(function(key){
+   if(key!=='previousBillNo')value[key]=rewrite(value[key]);
+  });
+  return value;
+ }
+ rewrite(result.records);if(result.outsidework)rewrite(result.outsidework);
+ return {data:result,changed:changed};
+}
+var billNumberEditBusy=false;
+function normalizeEditableBillNumber(value){
+ var text=String(value).trim().toUpperCase();
+ if(!/^(SB)?\d{1,5}$/.test(text))throw new Error('Enter a bill number from 1 to 9999, for example 350 or SB00350.');
+ var n=Number(text.replace(/^SB/,''));
+ if(!Number.isInteger(n)||n<1||n>9999)throw new Error('Bill number must be between 1 and 9999.');
+ return formatBillNo(n);
+}
+function buildBillNumberEdit(current,oldNo,newNo,identity,when){
+ if(!current||!current.records||!current.records[oldNo])throw new Error('Original bill was not found. Refresh Admin and retry.');
+ if(oldNo===newNo)throw new Error('The bill already has that number.');
+ if(current.records[newNo]||Object.values(current.records).some(function(r){return r.billNo===newNo;}))throw new Error(newNo+' already exists. Choose an unused number.');
+ var result=JSON.parse(JSON.stringify(current)),source=result.records[oldNo];
+ if(source.billNo!==oldNo||source.vehNum!==identity.vehNum||source.custName!==identity.custName)throw new Error('Bill details changed. Refresh Admin and retry.');
+ source.billNumberHistory=(source.billNumberHistory||[]).concat([{from:oldNo,to:newNo,date:when}]);
+ source.previousBillNo=oldNo;source.billNo=newNo;
+ result.records[newNo]=source;delete result.records[oldNo];
+ function rewrite(v,key){
+  if(key==='billNumberHistory'||key==='previousBillNo')return v;
+  if(typeof v==='string')return v.replace(/\bSB\d+\b/g,function(id){return id===oldNo?newNo:id;});
+  if(v&&typeof v==='object')Object.keys(v).forEach(function(k){v[k]=rewrite(v[k],k);});
+  return v;
+ }
+ rewrite(result.records);if(result.outsidework)rewrite(result.outsidework);
+ return result;
+}
+async function editBillNumber(oldNo,button){
+ if(billNumberEditBusy)return;
+ if(!fbReady){alert('Database is not connected. Please retry when it shows Live.');return;}
+ var entered=prompt('New bill number for '+oldNo+' (example: 350 or SB00350):',octoberBillMapping[oldNo]||oldNo);
+ if(entered===null)return;
+ var newNo;
+ try{newNo=normalizeEditableBillNumber(entered);}catch(e){alert(e.message);return;}
+ if(newNo===oldNo)return;
+ if(!confirm('Change '+oldNo+' to '+newNo+'? This updates the saved bill and its linked references. Close other editing tabs before continuing.'))return;
+ billNumberEditBusy=true;button.disabled=true;
+ try{
+  if(state.billNo && !(await saveCurrentBill(false)))throw new Error('Save the current bill before changing its number.');
+  await billSaveQueue;
+  var root=window.__fbRef2(window.__fbDb,'sribikez');
+  var before=(await window.__fbGet(root)).val();
+  var identity=before&&before.records&&before.records[oldNo];
+  if(!identity)throw new Error('Bill not found. Refresh Admin and retry.');
+  var when=new Date().toISOString();
+  buildBillNumberEdit(before,oldNo,newNo,identity,when);
+  var error='';
+  var outcome=await window.__fbTransaction(root,function(current){
+   if(current===null)return null;
+   try{return buildBillNumberEdit(current,oldNo,newNo,identity,when);}catch(e){error=e.message;return;}
+  },{applyLocally:false});
+  if(!outcome.committed)throw new Error(error||'Number change was not saved.');
+  var data=outcome.snapshot.val();
+  if(!data||!data.records||data.records[oldNo]||!data.records[newNo])throw new Error('Number change could not be verified. Refresh Admin.');
+  if(state.billNo===oldNo){state.billNo=newNo;updateBillPreview();}
+  var saved=Number(localStorage.getItem('sribikez_seqBillNum'))||0;
+  localStorage.setItem('sribikez_seqBillNum',String(Math.max(getMaxSeqFromData(Object.values(data.records)),saved>0&&saved<=9999?saved:0)));
+  allRecordsCached=Object.values(data.records);filterRecords();
+  alert('Saved: '+oldNo+' is now '+newNo+'. Admin, printed bills and CSV exports will use the new number.');
+ }catch(e){alert('Bill number was not confirmed as changed: '+(e.message||'Please check your connection and retry.'));}
+ finally{billNumberEditBusy=false;button.disabled=false;}
+}
+
 function exportCSV(){
  if(!allRecordsCached.length){showToast('No records','error');return;}
  var h=['Bill No','Date','Vehicle No','Vehicle','Customer','Phone','Mechanic','Complaints','Total','Status','Payment Status','Total Paid','Balance','Created Date & Time (IST)','Payment Updated Date & Time (IST)','Paid Date & Time (IST)','Last Updated Date & Time (IST)'];
